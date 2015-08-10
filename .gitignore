@@ -1,0 +1,19 @@
+libmseed - Copy/
+libmseed/ms_test/Debug/
+libmseed/ms_test/ms_test.exe
+libmseed/ms_test/ms_test.exe.manifest
+libmseed/ms_test/vc90.idb
+libmseed/ms_test/vc90.pdb
+libmseed/ms_test/ms_test.suo
+*.obj
+*.ncb
+libmseed/exampleVS/examples/Debug/
+libmseed/exampleVS/examples/msrepack/Debug/
+*.suo
+libmseed/example/msrepack
+libmseed/example/msrepack.exe
+libmseed/example/haha
+libmseed/libmseed.a
+libmseed/libmseed.def
+libmseed/libmseed.lib
+libmseed/ms_test/ms_test.ilk

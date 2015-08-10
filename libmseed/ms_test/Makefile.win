@@ -1,0 +1,33 @@
+#
+# Nmake file - Windows version
+# Use 'nmake -f Makefile.win'
+#
+# THIS HAS NEVER BEEN TESTED
+# Some modification might be required.
+
+NODEBUG=1
+
+!include <ntwin32.mak>
+
+INCS = /I..
+LIBS = ../libmseed.lib
+BINS = ms_test.exe
+
+cflags = $(cflags) -DWIN32
+
+all: $(BINS)
+
+ms_test.exe:	ms_test.obj
+	link.exe /OUT:"ms_test.exe" /NOLOGO /MANIFEST /MANIFESTFILE:"ms_test.exe.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"vc90.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE /NXCOMPAT /ERRORREPORT:PROMPT $(LIBS) ms_test.obj
+#	link.exe /nologo /out:ms_test.exe /PDB:"vc90.pdb" $(LIBS) ms_test.obj
+
+.c.obj:
+   $(cc) /nologo $(cflags) $(cdebug) $(cvarsmt) $(tflags) /Zi /Fd"vc90.pdb" $(INCS) $<
+#   $(cc) /Od $(INCS) /D "WIN32" /FD /EHsc /MDd /Fd"vc90.pdb" /nologo /c /Zi /errorReport:prompt $<
+
+# Clean-up directives
+clean:
+	-del a.out core *.o *.obj *% *~ $(BINS)
+
+# Rebuild directives
+rebuild: clean all
