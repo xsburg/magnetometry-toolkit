@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 # variables declaration
 
-SET(PROJECT Common)
+SET(PROJECT common)
 
 FILE(GLOB_RECURSE HEADERS "${PROJECT}/*.h")
 

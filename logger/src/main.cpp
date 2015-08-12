@@ -5,7 +5,10 @@
 #include "Common/SmartPtr.h"
 #include "Common/Path.h"
 #include "Common/Connection.h"
-#include "Greis/DataChunk.h"
+
+using namespace Common;
+
+/*#include "Greis/DataChunk.h"
 #include "Greis/SerialPortBinaryStream.h"
 #include "Platform/SerialStreamReader.h"
 #include "Platform/ServiceManager.h"
@@ -13,9 +16,8 @@
 #include "Greis/LoggingBinaryStream.h"
 #include "Greis/FileBinaryStream.h"
 
-using namespace Common;
 using namespace Greis;
-using namespace Platform;
+using namespace Platform;*/
 
 
 #ifdef Q_OS_WIN
@@ -50,7 +52,7 @@ namespace jpslogd
         QString receiverBoard;
     };
 
-    ReceiverInfo logDeviceInfo(SerialPortBinaryStream::SharedPtr_t& deviceBinaryStream)
+    /*ReceiverInfo logDeviceInfo(SerialPortBinaryStream::SharedPtr_t& deviceBinaryStream)
     {
         auto serialStream = SerialStreamReader(deviceBinaryStream);
         // Get recevier data
@@ -279,7 +281,7 @@ namespace jpslogd
             sLogger.Error("Something bad has happened. Queueing restart.");
             return false;
         }
-    }
+    }*/
 }
 
 int main(int argc, char** argv)
@@ -375,7 +377,7 @@ int main(int argc, char** argv)
         }
 
 
-        while (!jpslogd::startLoop())
+        //while (!jpslogd::startLoop())
         {
             sLogger.Warn("An error occured, acquisition restart pending.");
             qSleep(1000);

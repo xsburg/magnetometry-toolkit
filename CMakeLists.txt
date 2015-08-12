@@ -26,7 +26,7 @@ ENDMACRO()
 
 # Project settings
 
-PROJECT(jpsutils CXX)
+PROJECT(gem CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -77,20 +77,16 @@ INCLUDE(CMakeGTest.txt)
 
 # Sub projects
 
-add_subdirectory(Common)
-add_subdirectory(Common.Tests)
-add_subdirectory(Greis)
-add_subdirectory(Greis.Tests)
-add_subdirectory(Platform)
-add_subdirectory(Platform.Tests)
-add_subdirectory(DatabaseToJps)
-add_subdirectory(JpsToDatabase)
-add_subdirectory(jpslogd)
+add_subdirectory(common)
+add_subdirectory(common.tests)
+add_subdirectory(core)
+add_subdirectory(core.tests)
+add_subdirectory(libmseed)
+add_subdirectory(logger)
 
 # Tests
 
 ENABLE_TESTING()
 
-ADD_TEST_EX(Common.Tests)
-ADD_TEST_EX(Greis.Tests)
-ADD_TEST_EX(Platform.Tests)
+ADD_TEST_EX(common.tests)
+ADD_TEST_EX(core.tests)

@@ -2,9 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 # variables declaration
 
-SET(PROJECT jpslogd)
+SET(PROJECT logger)
 
-SET(DEPENDS_ON_PROJECTS Common Greis Platform)
+SET(DEPENDS_ON_PROJECTS common core)
 
 FILE(GLOB_RECURSE HEADERS "include/*.h")
 

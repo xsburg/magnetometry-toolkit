@@ -1,0 +1,23 @@
+﻿<#@ template debug="false" hostSpecific="true" #>
+<#@ output extension=".h" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>///
+/// Generated code. DO NOT MODIFY MANUALLY.
+///
+
+#pragma once
+
+<#
+    Console.WriteLine("Building test includes list...");
+    var testsDir = Host.ResolvePath("Tests");
+    var fileNames = Directory.GetFiles(testsDir, "*Tests.h", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToArray();
+    foreach (var fileName in fileNames)
+    {
+        #>#include "Tests/<#=fileName#>"
+<#
+    }
+#>
