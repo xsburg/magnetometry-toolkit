@@ -10,9 +10,9 @@
 
 using namespace Common;
 
-namespace Greis
+namespace core
 {
-    namespace Tests
+    namespace tests
     {
         class EnvironmentTests : public BaseTest
         {

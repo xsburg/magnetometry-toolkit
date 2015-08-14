@@ -4,5 +4,5 @@
 
 #pragma once
 
-#include "Tests/DataChunkTests.h"
 #include "Tests/EnvironmentTests.h"
+#include "Tests/MSeedWriterTests.h"

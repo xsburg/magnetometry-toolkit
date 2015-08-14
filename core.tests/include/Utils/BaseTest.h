@@ -8,9 +8,9 @@
 #include "Common/Exception.h"
 #include "Common/Connection.h"
 
-namespace Greis
+namespace core
 {
-    namespace Tests
+    namespace tests
     {
         class BaseTest : public ::testing::Test
         {

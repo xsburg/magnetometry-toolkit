@@ -31,6 +31,11 @@ namespace core
 
         int pos() const { return _file->pos(); }
 
+        void close()
+        {
+            _file->close();
+        }
+
         void write(QByteArray data)
         {
             _file->write(data);

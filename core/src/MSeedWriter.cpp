@@ -24,7 +24,12 @@ namespace core
         binaryStream->write(record, reclen);
     }
 
-    inline bool MSeedWriter::write(IntegerSampleRange::SharedPtr_t sampleRange)
+    void MSeedWriter::close()
+    {
+        _binaryStream->close();
+    }
+
+    bool MSeedWriter::write(IntegerSampleRange::SharedPtr_t sampleRange)
     {
         // наполнения хедера mseed
         MSRecord* msr = msr_init(NULL);

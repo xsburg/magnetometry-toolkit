@@ -8,9 +8,9 @@
 
 using namespace Common;
 
-namespace Greis
+namespace core
 {
-    namespace Tests
+    namespace tests
     {
         class Helpers
         {
@@ -25,4 +25,4 @@ namespace Greis
     }
 }
 
-#define sHelpers SINGLETON_INSTANCE(::Greis::Tests::Helpers)
+#define sHelpers SINGLETON_INSTANCE(::core::tests::Helpers)

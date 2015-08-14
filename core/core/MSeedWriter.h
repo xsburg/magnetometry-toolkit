@@ -39,6 +39,7 @@ namespace core
         {
             _recordLength = 512;
             _encoding = MSeedDataEncoding::Steim2;
+            _verbose = All;
         }
 
         inline MSeedDataEncoding encoding() const { return _encoding; }
@@ -54,7 +55,7 @@ namespace core
         inline int packedSamples() const { return _packedSamples; }
 
         bool write(IntegerSampleRange::SharedPtr_t sampleRange);
-
+        void close();
     private:
         IBinaryStream::SharedPtr_t _binaryStream;
         int _recordLength;

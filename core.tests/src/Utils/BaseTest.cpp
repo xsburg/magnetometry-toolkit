@@ -1,9 +1,9 @@
 #include "Utils/BaseTest.h"
 #include "Common/File.h"
 
-namespace Greis
+namespace core
 {
-    namespace Tests
+    namespace tests
     {
         BaseTest::BaseTest()
         {

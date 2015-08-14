@@ -29,6 +29,8 @@ namespace core
         }
 
     public:
+        SMART_PTR_T(AbstractSampleRange);
+
         virtual MSeedSampleType getSampleType() const = 0;
 
         inline QString channelName() const { return _channelName; }
