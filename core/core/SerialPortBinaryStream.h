@@ -28,7 +28,7 @@ static int rate_to_constant(int baudrate) {
 #include "IBinaryStream.h"
 #include "Common/Exception.h"
 
-namespace Greis
+namespace core
 {
     class SerialPortBinaryStream : public IBinaryStream
     {
@@ -76,6 +76,10 @@ namespace Greis
             boost::asio::write(_serial, boost::asio::buffer(data.data(), data.size()));
         }
 
+        void write(const char* data, qint64 len)
+        {
+            boost::asio::write(_serial, boost::asio::buffer(data, len));
+        }
 
         QByteArray read(qint64 maxlen)
         {

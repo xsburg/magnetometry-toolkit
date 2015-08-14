@@ -1,96 +1,66 @@
-#ifndef MSEEDWRITER_H
-#define MSEEDWRITER_H
+#pragma once
 
-#include <ctime>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <cassert>
-#include <libmseed.h>
-#include <boost/format.hpp>
+#include <QtCore/QString>
 
-#include "Sedis.h"
+#include "IBinaryStream.h"
+#include "SampleRange.h"
 
-using std::ofstream;
-using std::string;
-using std::vector;
-using std::ios;
-using boost::format;
-
-static BTime tm_to_BTime(tm ctime)
+namespace core
 {
-    BTime btime;
-    btime.year = 1900 + ctime.tm_year;
-    btime.day = ctime.tm_yday + 1;
-    btime.hour = ctime.tm_hour;
-    btime.min = ctime.tm_min;
-    btime.sec = ctime.tm_sec;
-    btime.fract = 0;
-    return btime;
-}
-
-typedef int int32;
-
-// Функция для записи mseed Record в файл
-static void recorder(char* record, int reclen, void* pvOutStream)
-{
-    ofstream* outstream = reinterpret_cast<ofstream*>(pvOutStream);
-    outstream->write(record, reclen);
-}
-
-// при конвертации подставлять текущее время вместо времени из файла SEDIS
-//#define WRITE_CURRENTTIME
-
-class SedisMSeedWriter
-{
-public:
-    SedisMSeedWriter();
-    ~SedisMSeedWriter();
-
-    enum EWriteType
+    enum MSeedDataEncoding
     {
-        FILE_SINGLE = 0,
-        FILE_MULTI = 1
+        Ascii = 0,
+        Int16 = 1,
+        Int32 = 3,
+        Float32 = 4,
+        Float64 = 5,
+        Steim1 = 10,
+        Steim2 = 11,
+        Geoscope24 = 12,
+        Geoscope163 = 13,
+        Geoscope164 = 14,
+        Cdsn = 16,
+        Sro = 30,
+        Dwwssn = 32
     };
-    // шаблон имени для записываемого mseed файла (без расширения mseed и индекса '-%d')
-    inline void setFileName(const string& filename, EWriteType type) { _filename = filename; _writeType = type; }
-    string curFileName() const;
-    // TODO: сейчас не используется. число файлов = число вызовов addRecord(...)
-    /// в байтах, настоящий размер может отличатся, так как записи MSeed нельзя разделять в разные файлы.
-    void setSplitSize(int size);
-    /// Название сети. 2 символа.
-    inline void setNetwork(const string& network) { _network = network; }
-    /// Название станции. 5 символов.
-    inline void setStation(const string& station) { _station = station; }
-    /// Название локации. 2 символа.
-    inline void setLocation(const string& location) { _location = location; }
-    /// Название каналов - вектор из 6 строк
-    inline void setChannelNames(const vector<string>& names) { assert(names.size() == 6); _chNames = names; }
-    /// длина генерируемых записей mseed
-    inline void setReclen(int len) { _recLen = len; }
-    // алгоритм сжатия
-    inline void setEncoding(int encoding) { _encoding = encoding; }
-    // добавление записи SEDIS в файл
-    void addRecord(const vector<char>& data);
-    void reset();
-private:
-    string _network;
-    string _station;
-    string _location;
-    string _filename;
-    EWriteType _writeType;
-    vector<string> _chNames; // названия каналов
 
-    int _recLen;
-    int _encoding;
+    enum MSeedPackVerbose
+    {
+        None = 0,
+        All = 3
+    };
 
-    ofstream* _curFile;
-    int _curFileIndex;
-    
-    void openFile();
-    void closeFile();
+    class MSeedWriter
+    {
+    public:
+        SMART_PTR_T(MSeedWriter);
 
-    //MSRecord *msr;
-};
+        MSeedWriter(IBinaryStream::SharedPtr_t binaryStream) : _binaryStream(binaryStream)
+        {
+            _recordLength = 512;
+            _encoding = MSeedDataEncoding::Steim2;
+        }
 
-#endif // MSEEDWRITER_H
+        inline MSeedDataEncoding encoding() const { return _encoding; }
+        inline void encoding(const MSeedDataEncoding& encoding) { _encoding = encoding; }
+
+        inline int recordLength() const { return _recordLength; }
+        inline void recordLength(const int& recordLength) { _recordLength = recordLength; }
+
+        inline MSeedPackVerbose verbose() const { return _verbose; }
+        inline void verbose(const MSeedPackVerbose& verbose) { _verbose = verbose; }
+
+        inline int packedRecords() const { return _packedRecords; }
+        inline int packedSamples() const { return _packedSamples; }
+
+        bool write(IntegerSampleRange::SharedPtr_t sampleRange);
+
+    private:
+        IBinaryStream::SharedPtr_t _binaryStream;
+        int _recordLength;
+        int _packedRecords;
+        int _packedSamples;
+        MSeedDataEncoding _encoding;
+        MSeedPackVerbose _verbose;
+    };
+}
