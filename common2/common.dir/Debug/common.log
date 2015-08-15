@@ -1,0 +1,30 @@
+﻿Build started 8/15/2015 11:54:40 AM.
+     1>Project "D:\work\git\ifz\gem\common\common.vcxproj" on node 2 (Rebuild target(s)).
+     1>CustomBuild:
+         Building Custom Rule D:/work/git/ifz/gem/common/CMakeLists.txt
+         CMake does not need to re-run because D:\work\git\ifz\gem\common\CMakeFiles\generate.stamp is up-to-date.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ID:\work\lib\cpp\boost_1_55_0 /ID:\work\git\ifz\gem\ThirdParty\src\googletest\include /ID:\work\git\ifz\gem\common\include /ID:\work\git\ifz\gem\common\common /ID:\work\lib\cpp\qt\5.3\msvc2013\include /ID:\work\lib\cpp\qt\5.3\msvc2013\include\QtCore /I"D:\work\lib\cpp\qt\5.3\msvc2013\mkspecs\win32-msvc2013" /Zi /nologo /W3 /WX- /MP /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D BOOST_ALL_NO_LIB /D QT_CORE_LIB /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"common.dir\Debug\\" /Fd"common.dir\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt D:\work\git\ifz\gem\common\src\BitConverter.cpp D:\work\git\ifz\gem\common\src\Connection.cpp D:\work\git\ifz\gem\common\src\DatabaseHelper.cpp D:\work\git\ifz\gem\common\src\DataBatchInserter.cpp D:\work\git\ifz\gem\common\src\File.cpp D:\work\git\ifz\gem\common\src\IniSettings.cpp D:\work\git\ifz\gem\common\src\Logger.cpp D:\work\git\ifz\gem\common\src\Path.cpp
+         BitConverter.cpp
+         Connection.cpp
+         DatabaseHelper.cpp
+         DataBatchInserter.cpp
+         File.cpp
+         IniSettings.cpp
+         Logger.cpp
+         Path.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"D:\work\git\ifz\gem\build\lib\Debug\common.lib" /NOLOGO common.dir\Debug\BitConverter.obj
+         common.dir\Debug\Connection.obj
+         common.dir\Debug\DatabaseHelper.obj
+         common.dir\Debug\DataBatchInserter.obj
+         common.dir\Debug\File.obj
+         common.dir\Debug\IniSettings.obj
+         common.dir\Debug\Logger.obj
+         common.dir\Debug\Path.obj
+         common.vcxproj -> D:\work\git\ifz\gem\build\lib\Debug\common.lib
+     1>Done Building Project "D:\work\git\ifz\gem\common\common.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.50
