@@ -6,8 +6,6 @@
 
 int main(int argc, char **argv)
 {
-    QString test = "sad";
-    Common::Connection c;
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -52,13 +52,13 @@ namespace core
         {
             QString baseDir = QCoreApplication::applicationDirPath();
             QString fullPath1(baseDir + "/../../../TestData/" + fileName);
-            if (QFile::exists(fullPath1))
+            if (QDir(baseDir + "/../../../TestData/").exists())
             {
                 return fullPath1;
             }
 
             QString fullPath2 = baseDir + "/../../TestData/" + fileName;
-            if (QFile::exists(fullPath2))
+            if (QDir(baseDir + "/../../TestData/").exists())
             {
                 return fullPath2;
             }
