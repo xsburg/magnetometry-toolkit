@@ -1,11 +1,7 @@
 #pragma once
 
-#include <vector>
-#include <cmath>
 #include <gtest/gtest.h>
-#include <boost/thread.hpp>
 #include "Utils/BaseTest.h"
-#include "Common/SmartPtr.h"
 #include <core/MSeedWriter.h>
 #include <core/FileBinaryStream.h>
 #include <core/MSeedReader.h>
@@ -20,18 +16,18 @@ namespace core
         {
         };
 
-        TEST_F(MSeedWriterTests, ShouldWriteIntegerSampleRange)
+        TEST_F(MSeedWriterTests, ShouldWriteAndReadIntegerMSeedRecord)
         {
             // Arrange
             QString fileName = this->ResolvePath("data.mseed");
-            QVector<IntegerSampleRange::SharedPtr_t> data(4);
+            QVector<IntegerMSeedRecord::SharedPtr_t> data(4);
             for (int i = 0; i < 4; i++)
             {
-                auto range = data[i] = std::make_shared<IntegerSampleRange>();
-                range->channelName(QString("CH") + i);
-                range->location("MSK");
-                range->network("IFZN");
-                range->station("IFZMSKM");
+                auto range = data[i] = std::make_shared<IntegerMSeedRecord>();
+                range->channelName(QString("CH") + QString::number(i));
+                range->location("MS");
+                range->network("IF");
+                range->station("IFZMK");
                 range->samplingRateHz(3);
                 range->startTime(QDateTime(QDate(2015, 6, 4), QTime(13, 44), Qt::UTC));
                 for (int j = 0; j < 500; j++)
@@ -53,20 +49,25 @@ namespace core
 
             // Assert
             auto reader = std::make_shared<MSeedReader>(fileName);
-            reader->read();
-            /*for (auto e = file->Body().begin(); e != file->Body().end(); ++e)
-            {
-                for (auto it = (*e)->Messages.begin(); it != (*e)->Messages.end(); ++it)
-                {
-                    bool res = (*it)->Validate();
-                    EXPECT_TRUE(res);
-                }
-            }
+            auto records = reader->readAll();
 
-            auto ba = file->ToByteArray();
-            auto outFile = File::CreateBinary("generatedJpsFile.jps");
-            outFile->write(ba);
-            outFile->close();*/
+            ASSERT_EQ(records.size(), 4);
+            for (int i = 0; i < 4; i++)
+            {
+                auto record = records[i];
+                ASSERT_TRUE(record->channelName() == data[i]->channelName());
+                ASSERT_TRUE(record->location() == data[i]->location());
+                ASSERT_TRUE(record->network() == data[i]->network());
+                ASSERT_TRUE(record->station() == data[i]->station());
+                ASSERT_TRUE(record->samplingRateHz() == data[i]->samplingRateHz());
+                auto actualStartDate = record->startTime().toString(Qt::ISODate);
+                auto expectedStartDate = data[i]->startTime().toString(Qt::ISODate);
+                ASSERT_TRUE(actualStartDate == expectedStartDate);
+                ASSERT_TRUE(record->getSampleType() == Integer);
+                auto iRecord = std::dynamic_pointer_cast<IntegerMSeedRecord>(record);
+                ASSERT_EQ(iRecord->data().size(), 500);
+                ASSERT_TRUE(memcmp(iRecord->data().data(), data[i]->data().data(), data[i]->data().size() * 4) == 0);
+            }
         }
     }
 }

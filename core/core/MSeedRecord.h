@@ -21,15 +21,15 @@ namespace core
         Integer
     };
 
-    class AbstractSampleRange
+    class AbstractMSeedRecord
     {
     protected:
-        virtual ~AbstractSampleRange()
+        virtual ~AbstractMSeedRecord()
         {
         }
 
     public:
-        SMART_PTR_T(AbstractSampleRange);
+        SMART_PTR_T(AbstractMSeedRecord);
 
         virtual MSeedSampleType getSampleType() const = 0;
 
@@ -87,12 +87,12 @@ namespace core
         double _samplingRateHz;
     };
 
-    class IntegerSampleRange : public AbstractSampleRange
+    class IntegerMSeedRecord : public AbstractMSeedRecord
     {
     public:
-        SMART_PTR_T(IntegerSampleRange);
+        SMART_PTR_T(IntegerMSeedRecord);
 
-        virtual ~IntegerSampleRange()
+        virtual ~IntegerMSeedRecord()
         {
         }
 

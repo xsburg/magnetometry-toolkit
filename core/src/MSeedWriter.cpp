@@ -29,7 +29,7 @@ namespace core
         _binaryStream->close();
     }
 
-    bool MSeedWriter::write(IntegerSampleRange::SharedPtr_t sampleRange)
+    bool MSeedWriter::write(IntegerMSeedRecord::SharedPtr_t sampleRange)
     {
         // наполнения хедера mseed
         MSRecord* msr = msr_init(NULL);

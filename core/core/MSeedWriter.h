@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 
 #include "IBinaryStream.h"
-#include "SampleRange.h"
+#include "MSeedRecord.h"
 
 namespace core
 {
@@ -54,7 +54,7 @@ namespace core
         inline int packedRecords() const { return _packedRecords; }
         inline int packedSamples() const { return _packedSamples; }
 
-        bool write(IntegerSampleRange::SharedPtr_t sampleRange);
+        bool write(IntegerMSeedRecord::SharedPtr_t sampleRange);
         void close();
     private:
         IBinaryStream::SharedPtr_t _binaryStream;

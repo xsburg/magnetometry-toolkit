@@ -9,7 +9,7 @@
 // ***********************************************************************
 #pragma once
 
-#include "SampleRange.h"
+#include "MSeedRecord.h"
 #include "MSeedWriter.h"
 
 namespace core
@@ -19,14 +19,12 @@ namespace core
     public:
         SMART_PTR_T(MSeedReader);
 
-        MSeedReader(QString fileName) : _fileName(fileName)
-        {
-        }
+        MSeedReader(QString fileName);
 
         inline MSeedPackVerbose verbose() const { return _verbose; }
         inline void verbose(const MSeedPackVerbose& verbose) { _verbose = verbose; }
 
-        AbstractSampleRange::SharedPtr_t read();
+        QList<AbstractMSeedRecord::SharedPtr_t> readAll(bool *success = nullptr);
     private:
         QString _fileName;
         MSeedPackVerbose _verbose;
