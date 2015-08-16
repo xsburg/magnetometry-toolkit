@@ -2,9 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 # variables declaration
 
-SET(PROJECT logger)
+SET(PROJECT gemlogd)
 
-SET(DEPENDS_ON_PROJECTS common core)
+SET(DEPENDS_ON_PROJECTS common core mongoose)
 
 FILE(GLOB_RECURSE HEADERS "include/*.h")
 

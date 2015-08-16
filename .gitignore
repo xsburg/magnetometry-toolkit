@@ -67,3 +67,10 @@ common/common.vcxproj
 core/core.sln
 core/core.vcxproj
 libmseed/_pack.c.zxc
+gemlogd/gemlogd.sln
+gemlogd/gemlogd.vcxproj
+gemlogd/gemlogd.vcxproj.filters
+mongoose/mongoose.vcxproj.filters
+mongoose/mongoose.dir/
+mongoose/mongoose.sln
+mongoose/mongoose.vcxproj

@@ -82,7 +82,8 @@ add_subdirectory(common.tests)
 add_subdirectory(core)
 add_subdirectory(core.tests)
 add_subdirectory(libmseed)
-add_subdirectory(logger)
+add_subdirectory(mongoose)
+add_subdirectory(gemlogd)
 
 # Tests
 
