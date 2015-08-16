@@ -2,7 +2,7 @@
 #define BitConverterTests_h__
 
 #include "gtest/gtest.h"
-#include "Common/BitConverter.h"
+#include "common/BitConverter.h"
 
 using namespace Common;
 

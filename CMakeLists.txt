@@ -26,7 +26,7 @@ ENDMACRO()
 
 # Project settings
 
-PROJECT(gem CXX)
+PROJECT(gem)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

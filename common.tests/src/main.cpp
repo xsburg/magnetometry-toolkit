@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "BitConverterTests.h"
-#include "Common/Connection.h"
+#include "common/Connection.h"
 
 #include <QtCore>
 
