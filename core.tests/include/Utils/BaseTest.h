@@ -4,9 +4,9 @@
 #include <cmath>
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
-#include "Common/SmartPtr.h"
-#include "Common/Exception.h"
-#include "Common/Connection.h"
+#include "common/SmartPtr.h"
+#include "common/Exception.h"
+#include "common/Connection.h"
 
 namespace core
 {

@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include "Utils/BaseTest.h"
-#include "Common/SmartPtr.h"
-#include "Common/Connection.h"
+#include "common/SmartPtr.h"
+#include "common/Connection.h"
 
 using namespace Common;
 

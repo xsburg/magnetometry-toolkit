@@ -2,8 +2,8 @@
 #include <locale>
 #include <QtCore/QtCore>
 #include <gtest/gtest.h>
-#include "Common/Logger.h"
-#include "Common/Path.h"
+#include "common/Logger.h"
+#include "common/Path.h"
 
 #include "tests.h"
 

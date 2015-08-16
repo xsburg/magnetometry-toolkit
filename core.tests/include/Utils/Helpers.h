@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QtCore/QtCore>
-#include "Common/Singleton.h"
-#include "Common/SmartPtr.h"
-#include "Common/Exception.h"
-#include "Common/Connection.h"
+#include "common/Singleton.h"
+#include "common/SmartPtr.h"
+#include "common/Exception.h"
+#include "common/Connection.h"
 
 using namespace Common;
 

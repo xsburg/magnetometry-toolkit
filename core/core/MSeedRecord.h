@@ -11,8 +11,8 @@
 
 #include <cstdint>
 
-#include "Common/SmartPtr.h"
-#include <Common/InvalidOperationException.h>
+#include "common/SmartPtr.h"
+#include <common/InvalidOperationException.h>
 
 namespace core
 {

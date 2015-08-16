@@ -2,7 +2,7 @@
 
 #include <QtCore/QtCore>
 
-#include "Common/SmartPtr.h"
+#include "common/SmartPtr.h"
 
 namespace core
 {

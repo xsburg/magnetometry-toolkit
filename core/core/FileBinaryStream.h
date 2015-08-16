@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IBinaryStream.h"
-#include "Common/File.h"
+#include "common/File.h"
 
 namespace core
 {

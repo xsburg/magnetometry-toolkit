@@ -26,7 +26,7 @@ static int rate_to_constant(int baudrate) {
 #endif
 
 #include "IBinaryStream.h"
-#include "Common/Exception.h"
+#include "common/Exception.h"
 
 namespace core
 {

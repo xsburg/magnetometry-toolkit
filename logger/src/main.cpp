@@ -1,10 +1,10 @@
 #include <QtCore/QtCore>
 #include <clocale>
 #include <locale>
-#include "Common/Logger.h"
-#include "Common/SmartPtr.h"
-#include "Common/Path.h"
-#include "Common/Connection.h"
+#include "common/Logger.h"
+#include "common/SmartPtr.h"
+#include "common/Path.h"
+#include "common/Connection.h"
 
 using namespace Common;
 
