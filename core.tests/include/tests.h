@@ -6,3 +6,4 @@
 
 #include "Tests/EnvironmentTests.h"
 #include "Tests/MSeedWriterTests.h"
+#include "Tests/WebServerTests.h"
