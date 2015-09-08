@@ -40,7 +40,7 @@ namespace core
             QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
 
             // the HTTP request
-            QNetworkRequest req(QUrl(QString("http://ip.jsontest.com/")));
+            QNetworkRequest req(QUrl(QString("http://localhost:8000/api/sum")));
             QNetworkReply *reply = mgr.get(req);
             eventLoop.exec(); // blocks stack until "finished()" has been called
 
