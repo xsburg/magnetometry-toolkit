@@ -62,6 +62,7 @@ endif()
 #set(CMAKE_AUTOMOC ON)
 FIND_PACKAGE(Qt5Core)
 FIND_PACKAGE(Qt5Sql)
+FIND_PACKAGE(Qt5Network)
 
 ## Boost
 

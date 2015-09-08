@@ -60,6 +60,7 @@ target_link_libraries(
     ${Boost_LIBRARIES}
     Qt5::Core
     Qt5::Sql
+    Qt5::Network
     debug ${GTEST_DEBUG_LIBS}
     optimized ${GTEST_RELEASE_LIBS}
     ${Pthread})
