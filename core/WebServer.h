@@ -10,6 +10,8 @@
 #pragma once
 
 #include <common/SmartPtr.h>
+#include "WebServerActionHandler.h"
+#include <QtCore>
 
 namespace core
 {
@@ -19,12 +21,19 @@ namespace core
         SMART_PTR_T(WebServer);
 
         WebServer();
+        ~WebServer();
 
         inline int port() const { return _port; }
         inline void port(const int& port) { _port = port; }
 
+        inline const QList<WebServerActionHandler::SharedPtr_t>& handlers() const { return _handlers; }
+
+        void addActionHandler(WebServerActionHandler::SharedPtr_t handler);
+
         void runAsync();
     private:
         int _port;
+        WebServer** _thisRef;
+        QList<WebServerActionHandler::SharedPtr_t> _handlers;
     };
 }

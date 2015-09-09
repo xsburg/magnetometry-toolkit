@@ -5,6 +5,7 @@
 #include "common/SmartPtr.h"
 #include "common/Exception.h"
 #include "common/Connection.h"
+#include <QtNetwork/QNetworkReply>
 
 using namespace Common;
 
@@ -21,6 +22,7 @@ namespace core
 
             void assertBinaryArray(const QByteArray& expected, const QByteArray& actual);
             
+            QString getResponse(const QString& url);
         };
     }
 }
