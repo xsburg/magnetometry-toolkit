@@ -75,3 +75,4 @@ mongoose/mongoose.dir/
 mongoose/mongoose.sln
 mongoose/mongoose.vcxproj
 gemlogd/gemlogd.dir/
+*.vcxproj.user
