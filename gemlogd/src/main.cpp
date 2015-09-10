@@ -3,9 +3,11 @@
 #include "common/SmartPtr.h"
 #include "common/Path.h"
 #include "common/Connection.h"
+#include <boost/system/system_error.hpp>
+#include <EbDeviceManager.h>
 
 using namespace Common;
-
+/*
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +39,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
         return MG_MORE;
     default: return MG_FALSE;
     }
-}
+}*/
 
 int main(int argc, char** argv)
 {
@@ -60,23 +62,27 @@ int main(int argc, char** argv)
         }
 
 
+        auto device = std::make_shared<core::EbDeviceManager>();
 
-        struct mg_server *server;
-        // Create and configure the server
-        server = mg_create_server(NULL, ev_handler);
-        mg_set_option(server, "listening_port", "8000");
-        // Serve request. Hit Ctrl-C to terminate the program
-        printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
-        for (;;) {
-            mg_poll_server(server, 1000);
+        device->connect();
+
+
+
+
+
+
+        return 0;
+    }
+    catch (boost::system::system_error& bex)
+    {
+        if (bex.code().value() == 2) {
+            sLogger.Error("Connection to receiver could not be made.");
+            sLogger.Error("The application could not find the port specified.");
+            sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
+        } else {
+            sLogger.Error("No connection to receiver, code: " + QString::number(bex.code().value()));
         }
-        // Cleanup, and free server instance
-        mg_destroy_server(&server);
-        return 0;
-
-
-
-        return 0;
+        return 1;
     }
     catch (Exception& e)
     {

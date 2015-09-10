@@ -18,9 +18,6 @@ namespace core
     public:
         SMART_PTR_T(EbDeviceManager);
 
-        void connect()
-        {
-            
-        }
+        void connect();
     };
 }
