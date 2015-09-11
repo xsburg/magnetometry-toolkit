@@ -11,6 +11,7 @@
 
 #include "common/SmartPtr.h"
 #include <QtCore>
+#include "SerialPortBinaryStream.h"
 
 namespace core
 {
@@ -93,5 +94,9 @@ namespace core
         // если Prm < 0 то его абсолютное значение определяет частоту последующих измерений в Гц. 
         // Допустимые значения Prm в данной модели датчика: –5  –1 и 1  86400.
         void sendAuto();
+    private:
+        SerialPortBinaryStream::UniquePtr_t _serialPort;
+
+        void sendCommand(QByteArray command);
     };
 }
