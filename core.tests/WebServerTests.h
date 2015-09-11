@@ -1,9 +1,9 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "Utils/BaseTest.h"
+#include "BaseTest.h"
 #include <WebServer.h>
-#include <Utils/Helpers.h>
+#include <Helpers.h>
 #include <mongoose/mongoose.h>
 
 using namespace Common;

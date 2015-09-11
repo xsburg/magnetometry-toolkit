@@ -6,15 +6,15 @@ SET(PROJECT core.tests)
 
 SET(DEPENDS_ON_PROJECTS common core)
 
-FILE(GLOB_RECURSE HEADERS "include/*.h")
+FILE(GLOB_RECURSE HEADERS "*.h")
 
-FILE(GLOB_RECURSE SOURCES "src/*.cpp")
+FILE(GLOB_RECURSE SOURCES "*.cpp")
 
 FILE(GLOB_RECURSE MOC_SOURCES "*_automoc.cpp")
 
 SET(CONFIG_FILES "config.test.ini")
 
-SET(TEXT_TEMPLATES "include/tests.h")
+SET(TEXT_TEMPLATES "tests.h")
 
 # check 64 bit
 #if(CMAKE_SIZEOF_VOID_P EQUALS 4)
@@ -45,8 +45,7 @@ foreach(DEPENDENCY ${DEPENDS_ON_PROJECTS})
 endforeach()
 
 include_directories("..")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT}")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 # linking
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "Utils/BaseTest.h"
+#include "BaseTest.h"
 #include <core/MSeedWriter.h>
 #include <core/FileBinaryStream.h>
 #include <core/MSeedReader.h>

@@ -13,11 +13,11 @@
 
 <#
     Console.WriteLine("Building test includes list...");
-    var testsDir = Host.ResolvePath("Tests");
-    var fileNames = Directory.GetFiles(testsDir, "*Tests.h", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToArray();
+    var testsDir = Host.ResolvePath(".");
+    var fileNames = Directory.GetFiles(testsDir, "*Tests.h", SearchOption.TopDirectoryOnly).Select(x => Path.GetFileName(x)).Where(x => x != "tests.h").ToArray();
     foreach (var fileName in fileNames)
     {
-        #>#include "Tests/<#=fileName#>"
+        #>#include "<#=fileName#>"
 <#
     }
 #>
