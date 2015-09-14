@@ -15,6 +15,8 @@ void core::EbDeviceManager::connect()
 {
     sLogger.Info("Before connect...");
     _serialPort = Common::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
+    _serialPort->close();
+    _serialPort->open();
     sLogger.Info("Connected, writing command...");
     _serialPort->write("\x05\x00");
     sLogger.Info("Done, reading...");

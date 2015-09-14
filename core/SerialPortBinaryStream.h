@@ -35,6 +35,7 @@ namespace core
     private:
         boost::asio::io_service _io;
         boost::asio::serial_port _serial;
+        std::string _portName;
 
         QByteArray _peekedData;
     public:
@@ -47,7 +48,7 @@ namespace core
          * \throws boost::system::system_error if cannot open the
          * serial device
          */
-        SerialPortBinaryStream(std::string portName, unsigned int baudRate) : _io(), _serial(_io, portName)
+        SerialPortBinaryStream(std::string portName, unsigned int baudRate) : _io(), _serial(_io, portName), _portName(portName)
         {
 #ifdef Q_OS_WIN
             _serial.set_option(boost::asio::serial_port_base::baud_rate(baudRate));
@@ -159,6 +160,11 @@ namespace core
         void close() 
         {
             _serial.close();
+        }
+
+        void open()
+        {
+            _serial.open(_portName);
         }
     };
 }
