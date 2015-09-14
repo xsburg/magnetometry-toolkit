@@ -18,9 +18,10 @@ void core::EbDeviceManager::connect()
     sLogger.Info("Connected, writing command...");
     _serialPort->write("\x05\x00");
     sLogger.Info("Done, reading...");
+    QThread::sleep(1);
     while (true)
     {
-        auto data = _serialPort->read(1000);
+        auto data = _serialPort->read(1);
         sLogger.Info("------- DATA BLOCK ------");
         sLogger.Info(data);
         sLogger.Info("-------------------------");
