@@ -2,6 +2,7 @@
 #include "common/Logger.h"
 #include "SerialPortBinaryStream.h"
 #include <common/InvalidOperationException.h>
+#include <boost/exception/diagnostic_information.hpp> 
 
 core::EbDeviceManager::EbDeviceManager() : EbDeviceManager(Mode::Text)
 {
@@ -13,20 +14,40 @@ core::EbDeviceManager::EbDeviceManager(Mode mode) : _bitConverter(Common::BitCon
 
 void core::EbDeviceManager::connect()
 {
-    sLogger.Info("Before connect...");
-    _serialPort = Common::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
-    _serialPort->close();
-    _serialPort->open();
-    sLogger.Info("Connected, writing command...");
-    _serialPort->write("\x05\x00");
-    sLogger.Info("Done, reading...");
-    QThread::sleep(1);
-    while (true)
+    try
     {
-        auto data = _serialPort->read(1);
-        sLogger.Info("------- DATA BLOCK ------");
-        sLogger.Info(data);
-        sLogger.Info("-------------------------");
+        sLogger.Info("Before connect...");
+        _serialPort = Common::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
+        _serialPort->close();
+        _serialPort->open();
+        sLogger.Info("Connected, writing command...");
+        _serialPort->write("\x05\x00");
+        sLogger.Info("Done, reading...");
+        QThread::sleep(1);
+        while (true)
+        {
+            auto data = _serialPort->read(1);
+            sLogger.Info("------- DATA BLOCK ------");
+            sLogger.Info(data);
+            sLogger.Info("-------------------------");
+        }
+    }
+    catch (boost::system::system_error& e)
+    {
+        sLogger.Error("------- DEFAULT ERROR BLOCK ------");
+        if (e.code().value() == 2) {
+            sLogger.Error("Connection to receiver could not be made.");
+            sLogger.Error("The application could not find the port specified.");
+            sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
+        }
+        else {
+            sLogger.Error("No connection to receiver, code: " + QString::number(e.code().value()));
+        }
+        sLogger.Error("------- NEW ERROR BLOCK ------");
+        sLogger.Error(QString("Error: %1").arg(e.what()));
+        auto info = boost::diagnostic_information(e);
+        sLogger.Error(QString("Info: %1").arg(info.c_str()));
+        sLogger.Error("------------------------------");
     }
 }
 
