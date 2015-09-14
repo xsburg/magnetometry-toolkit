@@ -14,7 +14,7 @@ core::EbDeviceManager::EbDeviceManager(Mode mode) : _bitConverter(Common::BitCon
 void core::EbDeviceManager::connect()
 {
     sLogger.Info("Before connect...");
-    _serialPort = std::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
+    _serialPort = Common::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
     sLogger.Info("Connected, writing command...");
     _serialPort->write("\x05\x00");
     sLogger.Info("Done, reading...");
