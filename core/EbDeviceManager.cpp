@@ -26,15 +26,15 @@ void core::EbDeviceManager::connect(QString portName)
     sLogger.Debug("Connected, sending setMode : binary...");
     sendSetMode(Mode::Binary);
     _mode = readSetMode();
-    sLogger.Debug("Done.");
+    sLogger.Debug("Done connecting.");
 
     /*auto written = serialPort.write("\x05\x00", 2);
     //serialPort.flush();
     while (!serialPort.waitForBytesWritten(1000))
     {
-        sLogger.Info("Failed waiting!");
-        auto err = serialPort.error();
-        sLogger.Info(QString::number(err));
+    sLogger.Info("Failed waiting!");
+    auto err = serialPort.error();
+    sLogger.Info(QString::number(err));
     }
     sLogger.Info(QString("written: %1").arg(written));
     QThread::sleep(1);
@@ -44,20 +44,20 @@ void core::EbDeviceManager::connect(QString portName)
     }
     while (true)
     {
-        auto data = serialPort.read(1000);
-        //sLogger.Info(QString("is readable: %1").arg(serialPort.isReadable()));
-        //sLogger.Info(QString("bytes available: %1").arg(serialPort.bytesAvailable()));
-        if (data.size() != 0)
-        {
-            sLogger.Info("------- DATA BLOCK ------");
-            sLogger.Info(data);
-            sLogger.Info("-------------------------");
-        }
-        else {
-            //sLogger.Info("EMPTY");
-            auto err = _serialPort.error();
-            //sLogger.Info(QString::number(err));
-        }
+    auto data = serialPort.read(1000);
+    //sLogger.Info(QString("is readable: %1").arg(serialPort.isReadable()));
+    //sLogger.Info(QString("bytes available: %1").arg(serialPort.bytesAvailable()));
+    if (data.size() != 0)
+    {
+    sLogger.Info("------- DATA BLOCK ------");
+    sLogger.Info(data);
+    sLogger.Info("-------------------------");
+    }
+    else {
+    //sLogger.Info("EMPTY");
+    auto err = _serialPort.error();
+    //sLogger.Info(QString::number(err));
+    }
     }
     return;
 
@@ -75,58 +75,58 @@ void core::EbDeviceManager::connect(QString portName)
     auto written = serialPort.write("\x05\x00", 2);
     if (!serialPort.waitForBytesWritten(1000))
     {
-        sLogger.Info("Failed waiting!");
+    sLogger.Info("Failed waiting!");
     }
     sLogger.Info(QString("written: %1").arg(written));
     serialPort.flush();
     sLogger.Info("Done, reading...");
     while (true)
     {
-        sLogger.Info(QString("is readable: %1").arg(serialPort.isReadable()));
-        sLogger.Info(QString("bytes available: %1").arg(serialPort.bytesAvailable()));
-        auto data = serialPort.read(1);
-        sLogger.Info("------- DATA BLOCK ------");
-        sLogger.Info("-------------------------");
-        auto err = serialPort.error();
-        sLogger.Info(QString::number(err));
+    sLogger.Info(QString("is readable: %1").arg(serialPort.isReadable()));
+    sLogger.Info(QString("bytes available: %1").arg(serialPort.bytesAvailable()));
+    auto data = serialPort.read(1);
+    sLogger.Info("------- DATA BLOCK ------");
+    sLogger.Info("-------------------------");
+    auto err = serialPort.error();
+    sLogger.Info(QString::number(err));
     }
 
 
     return;
     try
     {
-        sLogger.Info("Before connect...");
-        _serialPort = Common::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
-        _serialPort->close();
-        _serialPort->open();
-        sLogger.Info("Connected, writing command...");
-        _serialPort->write("\x05\x00");
-        sLogger.Info("Done, reading...");
-        QThread::sleep(1);
-        while (true)
-        {
-            auto data = _serialPort->read(1);
-            sLogger.Info("------- DATA BLOCK ------");
-            sLogger.Info(data);
-            sLogger.Info("-------------------------");
-        }
+    sLogger.Info("Before connect...");
+    _serialPort = Common::make_unique<SerialPortBinaryStream>("/dev/ttyS3", 9600);
+    _serialPort->close();
+    _serialPort->open();
+    sLogger.Info("Connected, writing command...");
+    _serialPort->write("\x05\x00");
+    sLogger.Info("Done, reading...");
+    QThread::sleep(1);
+    while (true)
+    {
+    auto data = _serialPort->read(1);
+    sLogger.Info("------- DATA BLOCK ------");
+    sLogger.Info(data);
+    sLogger.Info("-------------------------");
+    }
     }
     catch (boost::system::system_error& e)
     {
-        sLogger.Error("------- DEFAULT ERROR BLOCK ------");
-        if (e.code().value() == 2) {
-            sLogger.Error("Connection to receiver could not be made.");
-            sLogger.Error("The application could not find the port specified.");
-            sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
-        }
-        else {
-            sLogger.Error("No connection to receiver, code: " + QString::number(e.code().value()));
-        }
-        sLogger.Error("------- NEW ERROR BLOCK ------");
-        sLogger.Error(QString("Error: %1").arg(e.what()));
-        auto info = boost::diagnostic_information(e);
-        sLogger.Error(QString("Info: %1").arg(info.c_str()));
-        sLogger.Error("------------------------------");
+    sLogger.Error("------- DEFAULT ERROR BLOCK ------");
+    if (e.code().value() == 2) {
+    sLogger.Error("Connection to receiver could not be made.");
+    sLogger.Error("The application could not find the port specified.");
+    sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
+    }
+    else {
+    sLogger.Error("No connection to receiver, code: " + QString::number(e.code().value()));
+    }
+    sLogger.Error("------- NEW ERROR BLOCK ------");
+    sLogger.Error(QString("Error: %1").arg(e.what()));
+    auto info = boost::diagnostic_information(e);
+    sLogger.Error(QString("Info: %1").arg(info.c_str()));
+    sLogger.Error("------------------------------");
     }*/
 }
 
@@ -168,7 +168,7 @@ void core::EbDeviceManager::sendSetMode(Mode mode)
 {
     switch (mode)
     {
-    case Text: 
+    case Text:
         sendCommand("mode text");
         break;
     case Binary:
@@ -189,19 +189,19 @@ void core::EbDeviceManager::sendSetTime(QDateTime dateTime)
     switch (_mode)
     {
     case Text:
-        {
-            auto timePart = dateTime.toString("hh:mm:ss");
-            sendCommand("time " + timePart.toLatin1());
-            break;
-        }
+    {
+                 auto timePart = dateTime.toString("hh:mm:ss");
+                 sendCommand("time " + timePart.toLatin1());
+                 break;
+    }
     case Binary:
-        {
-            QByteArray command("time xxxx");
-            uint32_t unixtime = dateTime.toTime_t();
-            _bitConverter.ToByteArray(unixtime, command.data() + 5);
-            sendCommand(command);
-            break;
-        }
+    {
+                   QByteArray command("time xxxx");
+                   uint32_t unixtime = dateTime.toTime_t();
+                   _bitConverter.ToByteArray(unixtime, command.data() + 5);
+                   sendCommand(command);
+                   break;
+    }
     default:
         throw Common::InvalidOperationException();
     }
@@ -218,13 +218,13 @@ void core::EbDeviceManager::sendSetDate(QDateTime dateTime)
     {
     case Text:
     {
-        auto timePart = dateTime.toString("MM:dd:yy");
-        sendCommand("date " + timePart.toLatin1());
-        break;
+                 auto timePart = dateTime.toString("MM:dd:yy");
+                 sendCommand("date " + timePart.toLatin1());
+                 break;
     }
     case Binary:
     {
-        throw Common::InvalidOperationException();
+                   throw Common::InvalidOperationException();
     }
     default:
         throw Common::InvalidOperationException();
@@ -242,16 +242,16 @@ void core::EbDeviceManager::sendSetRange(uint32_t center)
     {
     case Text:
     {
-        auto centerStr = QString::number(center);
-        sendCommand("range " + centerStr.toLatin1());
-        break;
+                 auto centerStr = QString::number(center);
+                 sendCommand("range " + centerStr.toLatin1());
+                 break;
     }
     case Binary:
     {
-        auto command = QByteArray("range xxxx");
-        _bitConverter.ToByteArray(center, command.data() + 6);
-        sendCommand(command);
-        break;
+                   auto command = QByteArray("range xxxx");
+                   _bitConverter.ToByteArray(center, command.data() + 6);
+                   sendCommand(command);
+                   break;
     }
     default:
         throw Common::InvalidOperationException();
@@ -269,16 +269,16 @@ void core::EbDeviceManager::sendAuto(uint32_t freq)
     {
     case Text:
     {
-        auto centerStr = QString::number(freq);
-        sendCommand("auto " + centerStr.toLatin1(), 5000);
-        break;
+                 auto centerStr = QString::number(freq);
+                 sendCommand("auto " + centerStr.toLatin1(), 5000);
+                 break;
     }
     case Binary:
     {
-        auto command = QByteArray("auto xxxx");
-        _bitConverter.ToByteArray(freq, command.data() + 5);
-        sendCommand(command, 5000);
-        break;
+                   auto command = QByteArray("auto xxxx");
+                   _bitConverter.ToByteArray(freq, command.data() + 5);
+                   sendCommand(command, 5000);
+                   break;
     }
     default:
         throw Common::InvalidOperationException();
@@ -402,19 +402,97 @@ bool core::EbDeviceManager::validateSample(const Sample& sample)
 
 void core::EbDeviceManager::runDiagnosticSequence()
 {
+    sLogger.Info("Testing ENQ...");
     sendEnq();
     auto responseString = readEnq();
     assertTrue(responseString.size() > 0, "ENQ data is empty.");
-    
-    sendNak();
-    responseString = readEnq();
-    assertTrue(responseString.size() > 0, "NAK must send ENQ results.");
+    sLogger.Info("Done.");
 
+    sLogger.Info("Testing about...");
     sendAbout();
     responseString = readAbout();
     assertTrue(responseString.size() > 0, "About text is empty.");
+    sLogger.Info("Done.");
 
-    
+    sLogger.Info("Testing StandBy true...");
+    sendStandBy(true);
+    bool standBy = readStandBy();
+    assertTrue(standBy, "StandBy must be true.");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing StandBy false...");
+    sendStandBy(false);
+    standBy = readStandBy();
+    assertTrue(!standBy, "StandBy must be false.");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing getMode...");
+    sendGetMode();
+    auto mode = readGetMode();
+    assertTrue(mode == Mode::Binary, "Mode must be binary");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing setMode text...");
+    sendSetMode(Mode::Text);
+    mode = readSetMode();
+    assertTrue(mode == Mode::Text, "Mode must be text");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing setMode binary...");
+    sendSetMode(Mode::Binary);
+    mode = readSetMode();
+    assertTrue(mode == Mode::Binary, "Mode must be binary again");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing setTime...");
+    auto expectedTime = QDateTime(QDate(2015, 9, 17), QTime(15, 15, 15), Qt::UTC);
+    sendSetTime(expectedTime);
+    readSetTime();
+    sLogger.Info(QString("Set time: %1").arg(expectedTime.toString(Qt::ISODate)));
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing getTime...");
+    sendGetTime();
+    auto actualTime = readGetTime();
+    sLogger.Info(QString("Got time: %1").arg(actualTime.toString(Qt::ISODate)));
+    assertTrue(actualTime.date() == expectedTime.date(), "Date must be the same.");
+    assertTrue(actualTime.time().hour() == expectedTime.time().hour(), "Hours must be the same.");
+    assertTrue(actualTime.time().minute() == expectedTime.time().minute(), "Minutes must be the same.");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing getRange...");
+    sendGetRange();
+    auto rangeData = readGetRange();
+    sLogger.Info(QString("Got range: minField: %1, maxField: %2").arg(rangeData.minField).arg(rangeData.maxField));
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing setRange 25500...");
+    sendSetRange(25550);
+    rangeData = readSetRange();
+    sLogger.Info(QString("Got range: minField: %1, maxField: %2").arg(rangeData.minField).arg(rangeData.maxField));
+    assertTrue(rangeData.minField == 25000, "Range min != 25000.");
+    assertTrue(rangeData.maxField == 26300, "Range max != 26300.");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing setRange 55500...");
+    sendSetRange(55500);
+    rangeData = readSetRange();
+    sLogger.Info(QString("Got range: minField: %1, maxField: %2").arg(rangeData.minField).arg(rangeData.maxField));
+    assertTrue(rangeData.minField == 54400, "Range min != 54400.");
+    assertTrue(rangeData.maxField == 56700, "Range max != 56700.");
+    sLogger.Info("Done.");
+
+    sLogger.Info("Testing run...");
+    sendRun();
+    auto sample = readSample();
+    auto isValid = validateSample(sample);
+    sLogger.Info(QString("Got sample: field: %1, time: %2, state: 0x%3, qmc: %4, pph: %5, isValid: %6")
+        .arg(sample.field).arg(sample.time).arg(sample.state, 2, 16).arg(sample.qmc).arg(sample.pph).arg(isValid));
+    assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
+    sLogger.Info("Done.");
+
+    //sendNak();
+    //sample = readSample();
 }
 
 void core::EbDeviceManager::sendCommand(QByteArray command, int delayMilliseconds, bool escape)
@@ -447,6 +525,7 @@ QByteArray core::EbDeviceManager::readResponse(qint64 maxlen)
     {
         throw Common::Exception("EbDevice read data error: data block MUST end with \\0.");
     }
+    sLogger.Debug(QString("EbDevice got response, length = %1...").arg(data.size()));
     return unescapeData(data);
 }
 

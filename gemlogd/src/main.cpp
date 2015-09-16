@@ -29,10 +29,11 @@ int main(int argc, char** argv)
             sLogger.Debug(sqlDriverName);
         }
 
-        auto portName = sIniSettings.value("device.portName").toString();
+        auto portName = sIniSettings.value("device/portName").toString();
 
-        sLogger.Info("Config:");
+        sLogger.Info("=== Config ===");
         sLogger.Info(QString("device.portName: %1").arg(portName));
+        sLogger.Info("==============");
 
         auto device = std::make_shared<core::EbDeviceManager>();
         device->connect(portName);
@@ -54,7 +55,8 @@ int main(int argc, char** argv)
             sLogger.Error("Connection to receiver could not be made.");
             sLogger.Error("The application could not find the port specified.");
             sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
-        } else {
+        }
+        else {
             sLogger.Error("No connection to receiver, code: " + QString::number(ex.code().value()));
         }
         return 1;
