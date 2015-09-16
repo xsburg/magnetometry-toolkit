@@ -1,5 +1,6 @@
-#ifndef BitConverter_h__
-#define BitConverter_h__
+#pragma once
+
+#include <stdint.h>
 
 namespace Common
 {
@@ -17,103 +18,103 @@ namespace Common
         EByteOrder _machineByteOrder;
     public:
 
-        BitConverter(EByteOrder byteOrder = LeastSignificantByte);
+        explicit BitConverter(EByteOrder byteOrder = LeastSignificantByte);
 
         EByteOrder ByteOrder() const { return _byteOrder; }
         EByteOrder MachineByteOrder() const { return _machineByteOrder; }
 
-        inline void ToByteArray(unsigned long long val, char* dst) const
+        void ToByteArray(uint64_t val, char* dst) const
         {
-            *((unsigned long long*)dst) = val;
+            *reinterpret_cast<uint64_t*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned long long*)dst));
+                endianSwap(*reinterpret_cast<uint64_t*>(dst));
             }
         }
 
-        inline void ToByteArray(unsigned int val, char* dst) const
+        void ToByteArray(uint32_t val, char* dst) const
         {
-            *((unsigned int*)dst) = val;
+            *reinterpret_cast<uint32_t*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned int*)dst));
+                endianSwap(*reinterpret_cast<uint32_t*>(dst));
             }
         }
 
-        inline void ToByteArray(unsigned short val, char* dst) const
+        void ToByteArray(uint16_t val, char* dst) const
         {
-            *((unsigned short*)dst) = val;
+            *reinterpret_cast<uint16_t*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned short*)dst));
+                endianSwap(*reinterpret_cast<uint16_t*>(dst));
             }
         }
 
-        inline void ToByteArray(unsigned char val, char* dst) const
+        void ToByteArray(uint8_t val, char* dst) const
         {
-            *((unsigned char*)dst) = val;
+            *reinterpret_cast<uint8_t*>(dst) = val;
         }
 
-        inline void ToByteArray(long long val, char* dst) const
+        void ToByteArray(int64_t val, char* dst) const
         {
-            *((long long*)dst) = val;
+            *reinterpret_cast<int64_t*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned long long*)dst));
+                endianSwap(*reinterpret_cast<uint64_t*>(dst));
             }
         }
 
-        inline void ToByteArray(int val, char* dst) const
+        void ToByteArray(int32_t val, char* dst) const
         {
-            *((int*)dst) = val;
+            *reinterpret_cast<int32_t*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned int*)dst));
+                endianSwap(*reinterpret_cast<uint32_t*>(dst));
             }
         }
 
-        inline void ToByteArray(short val, char* dst) const
+        void ToByteArray(int16_t val, char* dst) const
         {
-            *((short*)dst) = val;
+            *reinterpret_cast<int16_t*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned short*)dst));
+                endianSwap(*reinterpret_cast<uint16_t*>(dst));
             }
         }
 
-        inline void ToByteArray(char val, char* dst) const
+        void ToByteArray(int8_t val, char* dst) const
         {
             *dst = val;
         }
 
-        inline void ToByteArray(float val, char* dst) const
+        void ToByteArray(float val, char* dst) const
         {
-            *((float*)dst) = val;
+            *reinterpret_cast<float*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned int*)dst));
+                endianSwap(*reinterpret_cast<uint32_t*>(dst));
             }
         }
 
-        inline void ToByteArray(double val, char* dst) const
+        void ToByteArray(double val, char* dst) const
         {
-            *((double*)dst) = val;
+            *reinterpret_cast<double*>(dst) = val;
             if (_machineByteOrder != _byteOrder)
             {
-                endianSwap(*((unsigned long long*)dst));
+                endianSwap(*reinterpret_cast<uint64_t*>(dst));
             }
         }
 
-        inline unsigned char GetUChar(const char* data) const
+        uint8_t GetUInt8(const char* data) const
         {
-            unsigned const char* ucdata = reinterpret_cast<unsigned const char*>(data);
+            const uint8_t* ucdata = reinterpret_cast<const uint8_t*>(data);
             return *ucdata;
         }
 
-        inline unsigned short GetUShort(const char* data) const
+        uint16_t GetUInt16(const char* data) const
         {
-            unsigned const char* ucdata = reinterpret_cast<unsigned const char*>(data);
-            unsigned short val = (unsigned short)((((unsigned short)*ucdata) << 8) + (*(ucdata+1)));
+            const uint8_t* ucdata = reinterpret_cast<const uint8_t*>(data);
+            uint16_t val = static_cast<uint16_t>((static_cast<uint16_t>(*ucdata) << 8) + *(ucdata+1));
             if (_byteOrder == LeastSignificantByte)
             {
                 endianSwap(val);
@@ -121,14 +122,14 @@ namespace Common
             return val;
         }
 
-        inline unsigned int GetUInt(const char* data) const
+        uint32_t GetUInt32(const char* data) const
         {
-            unsigned const char* ucdata = reinterpret_cast<unsigned const char*>(data);
-            unsigned int val = (unsigned int)(
-                                (((unsigned int)*ucdata) << 24) + 
-                                (((unsigned int)*(ucdata+1)) << 16) + 
-                                (((unsigned int)*(ucdata+2)) << 8) + 
-                                (*(ucdata+3)));
+            const uint8_t* ucdata = reinterpret_cast<const uint8_t*>(data);
+            uint32_t val = static_cast<uint32_t>(
+                (static_cast<uint32_t>(*ucdata) << 24) + 
+                (static_cast<uint32_t>(*(ucdata+1)) << 16) + 
+                (static_cast<uint32_t>(*(ucdata+2)) << 8) + 
+                *(ucdata+3));
             if (_byteOrder == LeastSignificantByte)
             {
                 endianSwap(val);
@@ -136,18 +137,18 @@ namespace Common
             return val;
         }
 
-        inline unsigned long long GetULongLong(const char* data) const
+        uint64_t GetUInt64(const char* data) const
         {
-            unsigned const char* ucdata = reinterpret_cast<unsigned const char*>(data);
-            unsigned long long val = (unsigned long long)(
-                (((unsigned long long)*ucdata) << 56) + 
-                (((unsigned long long)*(ucdata+1)) << 48) + 
-                (((unsigned long long)*(ucdata+2)) << 40) + 
-                (((unsigned long long)*(ucdata+3)) << 32) + 
-                (((unsigned long long)*(ucdata+4)) << 24) + 
-                (((unsigned long long)*(ucdata+5)) << 16) + 
-                (((unsigned long long)*(ucdata+6)) << 8) + 
-                (*(ucdata+7)));
+            const uint8_t* ucdata = reinterpret_cast<const uint8_t*>(data);
+            uint64_t val = static_cast<uint64_t>(
+                (static_cast<uint64_t>(*ucdata) << 56) + 
+                (static_cast<uint64_t>(*(ucdata+1)) << 48) + 
+                (static_cast<uint64_t>(*(ucdata+2)) << 40) + 
+                (static_cast<uint64_t>(*(ucdata+3)) << 32) + 
+                (static_cast<uint64_t>(*(ucdata+4)) << 24) + 
+                (static_cast<uint64_t>(*(ucdata+5)) << 16) + 
+                (static_cast<uint64_t>(*(ucdata+6)) << 8) + 
+                *(ucdata+7));
             if (_byteOrder == LeastSignificantByte)
             {
                 endianSwap(val);
@@ -155,75 +156,70 @@ namespace Common
             return val;
         }
 
-        inline char GetChar(const char* data) const
+        int8_t GetInt8(const char* data) const
         {
             return *data;
         }
 
-        inline short GetShort(const char* data) const
+        int16_t GetInt16(const char* data) const
         {
-            unsigned short uval = GetUShort(data);
-            int val = *(reinterpret_cast<short*>(&uval));
+            uint16_t uval = GetUInt16(data);
+            int16_t val = *reinterpret_cast<int16_t*>(&uval);
             return val;
         }
 
-        inline int GetInt(const char* data) const
+        int32_t GetInt32(const char* data) const
         {
-            unsigned int uval = GetUInt(data);
-            int val = *(reinterpret_cast<int*>(&uval));
+            uint32_t uval = GetUInt32(data);
+            int32_t val = *reinterpret_cast<int32_t*>(&uval);
             return val;
         }
 
-        inline long long GetLongLong(const char* data) const
+        int64_t GetInt64(const char* data) const
         {
-            unsigned long long uval = GetULongLong(data);
-            long long val = *(reinterpret_cast<long long*>(&uval));
+            uint64_t uval = GetUInt64(data);
+            int64_t val = *reinterpret_cast<int64_t*>(&uval);
             return val;
         }
 
-        inline float GetFloat(const char* data) const
+        float GetFloat(const char* data) const
         {
-            unsigned int uiVal = GetUInt(data);
-            float fVal = *(reinterpret_cast<float*>(&uiVal));
+            uint32_t uiVal = GetUInt32(data);
+            float fVal = *reinterpret_cast<float*>(&uiVal);
             return fVal;
         }
 
-        inline double GetDouble(const char* data) const
+        double GetDouble(const char* data) const
         {
-            unsigned long long uval = GetULongLong(data);
-            double dVal = *(reinterpret_cast<double*>(&uval));
+            uint64_t uval = GetUInt64(data);
+            double dVal = *reinterpret_cast<double*>(&uval);
             return dVal;
         }
 
     private:
-        inline static void endianSwap(unsigned short& x)
+        static void endianSwap(uint16_t& x)
         {
-            x = (unsigned short)
-                ((x>>8) | 
-                (x<<8));
+            x = static_cast<uint16_t>(x>>8 | x<<8);
         }
 
-        inline static void endianSwap(unsigned int& x)
+        static void endianSwap(uint32_t& x)
         {
-            x = (x>>24) | 
-                ((x<<8) & 0x00FF0000) |
-                ((x>>8) & 0x0000FF00) |
-                (x<<24);
+            x = x>>24 | 
+                x<<8 & 0x00FF0000 |
+                x>>8 & 0x0000FF00 |
+                x<<24;
         }
 
-        // __int64 for MSVC, "long long" for gcc
-        inline static void endianSwap(unsigned long long& x)
+        static void endianSwap(uint64_t& x)
         {
-            x = (x>>56) | 
-                ((x<<40) & 0x00FF000000000000) |
-                ((x<<24) & 0x0000FF0000000000) |
-                ((x<<8)  & 0x000000FF00000000) |
-                ((x>>8)  & 0x00000000FF000000) |
-                ((x>>24) & 0x0000000000FF0000) |
-                ((x>>40) & 0x000000000000FF00) |
-                (x<<56);
+            x = x>>56 | 
+                x<<40 & 0x00FF000000000000 |
+                x<<24 & 0x0000FF0000000000 |
+                x<<8  & 0x000000FF00000000 |
+                x>>8  & 0x00000000FF000000 |
+                x>>24 & 0x0000000000FF0000 |
+                x>>40 & 0x000000000000FF00 |
+                x<<56;
         }
     };
 }
-
-#endif // BitConverter_h__

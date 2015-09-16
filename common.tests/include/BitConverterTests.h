@@ -61,43 +61,43 @@ namespace
         // unsigned
         {
             unsigned char expected = 234;
-            auto actual = bc.GetUChar((const char*) &expected);
+            auto actual = bc.GetUInt8((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         {
             unsigned short expected = 12345;
-            auto actual = bc.GetUShort((const char*) &expected);
+            auto actual = bc.GetUInt16((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         {
             unsigned int expected = 1234567891;
-            auto actual = bc.GetUInt((const char*) &expected);
+            auto actual = bc.GetUInt32((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         {
             unsigned long long expected = 12345678912345;
-            auto actual = bc.GetULongLong((const char*) &expected);
+            auto actual = bc.GetUInt64((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         // signed
         {
             char expected = -112;
-            auto actual = bc.GetChar((const char*) &expected);
+            auto actual = bc.GetInt8((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         {
             short expected = -12345;
-            auto actual = bc.GetShort((const char*) &expected);
+            auto actual = bc.GetInt16((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         {
             int expected = -1234567891;
-            auto actual = bc.GetInt((const char*) &expected);
+            auto actual = bc.GetInt32((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         {
             long long expected = -12345678912345;
-            auto actual = bc.GetLongLong((const char*) &expected);
+            auto actual = bc.GetInt64((const char*) &expected);
             EXPECT_EQ(expected, actual);
         }
         // floating point

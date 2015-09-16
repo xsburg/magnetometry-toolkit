@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
         auto device = std::make_shared<core::EbDeviceManager>();
 
-        device->connect();
+        device->connect("/dev/ttyUSB0");
 
 
 

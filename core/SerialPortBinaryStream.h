@@ -162,10 +162,5 @@ namespace core
         {
             _serial.close();
         }
-
-        void open()
-        {
-            _serial.open(_portName);
-        }
     };
 }
