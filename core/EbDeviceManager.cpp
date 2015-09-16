@@ -390,8 +390,11 @@ core::EbDeviceManager::Sample core::EbDeviceManager::readSample()
     data.field = _bitConverter.GetInt32(responsePtr);
     data.qmc = _bitConverter.GetUInt16(responsePtr + 4);
     data.state = static_cast<SampleState>(_bitConverter.GetUInt8(responsePtr + 6));
-    data.time = _bitConverter.GetInt32(responsePtr + 7);
-    data.pph = _bitConverter.GetUInt8(responsePtr + 11);
+    auto time = _bitConverter.GetInt32(responsePtr + 7);
+    auto pph = _bitConverter.GetUInt8(responsePtr + 11);
+    auto dateTime = QDateTime::fromTime_t(time, Qt::UTC);
+    dateTime = dateTime.addMSecs(pph * 10);
+    data.time = dateTime;
     return data;
 }
 
@@ -486,8 +489,8 @@ void core::EbDeviceManager::runDiagnosticSequence()
     sendRun();
     auto sample = readSample();
     auto isValid = validateSample(sample);
-    sLogger.Info(QString("Got sample: field: %1, time: %2, state: 0x%3, qmc: %4, pph: %5, isValid: %6")
-        .arg(sample.field).arg(sample.time).arg(sample.state, 2, 16).arg(sample.qmc).arg(sample.pph).arg(isValid));
+    sLogger.Info(QString("Got sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000).arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
     assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
     sLogger.Info("Done.");
 

@@ -52,8 +52,7 @@ namespace core
             int32_t field; /* Field (pT) */
             uint16_t qmc;  /* Quality(pT) */
             SampleState state; /* State */
-            uint32_t time;  /* Time */
-            uint8_t pph;  /* pph of time */
+            QDateTime time;
         };
 
         EbDeviceManager();
