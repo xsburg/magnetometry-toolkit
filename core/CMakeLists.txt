@@ -53,4 +53,5 @@ target_link_libraries(
     ${DEPENDS_ON_PROJECTS}
     ${Boost_LIBRARIES}
     Qt5::Core
-	Qt5::Sql)
+	Qt5::Sql
+	Qt5::SerialPort)

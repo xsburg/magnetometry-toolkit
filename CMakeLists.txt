@@ -63,6 +63,7 @@ endif()
 FIND_PACKAGE(Qt5Core)
 FIND_PACKAGE(Qt5Sql)
 FIND_PACKAGE(Qt5Network)
+FIND_PACKAGE(Qt5SerialPort)
 
 ## Boost
 

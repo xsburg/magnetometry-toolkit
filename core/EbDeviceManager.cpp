@@ -2,7 +2,8 @@
 #include "common/Logger.h"
 #include "SerialPortBinaryStream.h"
 #include <common/InvalidOperationException.h>
-#include <boost/exception/diagnostic_information.hpp> 
+#include <boost/exception/diagnostic_information.hpp>
+#include <QtSerialPort/QSerialPort>
 
 core::EbDeviceManager::EbDeviceManager() : EbDeviceManager(Mode::Text)
 {
@@ -14,6 +15,82 @@ core::EbDeviceManager::EbDeviceManager(Mode mode) : _bitConverter(Common::BitCon
 
 void core::EbDeviceManager::connect()
 {
+    sLogger.Info("Before connect...");
+    QSerialPort serialPort;
+    serialPort.setPortName("/dev/ttyUSB0");
+    serialPort.setBaudRate(QSerialPort::Baud9600);
+    serialPort.setFlowControl(QSerialPort::NoFlowControl);
+    serialPort.setParity(QSerialPort::NoParity);
+    serialPort.setDataBits(QSerialPort::Data8);
+    serialPort.setStopBits(QSerialPort::OneStop);
+    serialPort.open(QIODevice::ReadWrite);
+    serialPort.setBreakEnabled(false);
+    sLogger.Info("Connected, writing command...");
+    auto written = serialPort.write("\x05\x00", 2);
+    //serialPort.flush();
+    while (!serialPort.waitForBytesWritten(1000))
+    {
+        sLogger.Info("Failed waiting!");
+        auto err = serialPort.error();
+        sLogger.Info(QString::number(err));
+    }
+    sLogger.Info(QString("written: %1").arg(written));
+    QThread::sleep(1);
+    sLogger.Info("Done, reading...");
+    while (!serialPort.waitForReadyRead(100))
+    {
+    }
+    while (true)
+    {
+        auto data = serialPort.read(1000);
+        //sLogger.Info(QString("is readable: %1").arg(serialPort.isReadable()));
+        //sLogger.Info(QString("bytes available: %1").arg(serialPort.bytesAvailable()));
+        if (data.size() != 0)
+        {
+            sLogger.Info("------- DATA BLOCK ------");
+            sLogger.Info(data);
+            sLogger.Info("-------------------------");
+        }
+        else {
+            //sLogger.Info("EMPTY");
+            auto err = serialPort.error();
+            //sLogger.Info(QString::number(err));
+        }
+    }
+    return;
+
+    sLogger.Info("Before connect...");
+    QSerialPort serialPort;
+    serialPort.setPortName("/dev/ttyUSB0");
+    serialPort.setBaudRate(QSerialPort::Baud9600);
+    serialPort.setFlowControl(QSerialPort::NoFlowControl);
+    serialPort.setParity(QSerialPort::NoParity);
+    serialPort.setDataBits(QSerialPort::Data8);
+    serialPort.setStopBits(QSerialPort::OneStop);
+    serialPort.setBreakEnabled(false);
+    serialPort.open(QIODevice::OpenModeFlag::ReadWrite);
+    sLogger.Info("Connected, writing command...");
+    auto written = serialPort.write("\x05\x00", 2);
+    if (!serialPort.waitForBytesWritten(1000))
+    {
+        sLogger.Info("Failed waiting!");
+    }
+    sLogger.Info(QString("written: %1").arg(written));
+    serialPort.flush();
+    sLogger.Info("Done, reading...");
+    while (true)
+    {
+        sLogger.Info(QString("is readable: %1").arg(serialPort.isReadable()));
+        sLogger.Info(QString("bytes available: %1").arg(serialPort.bytesAvailable()));
+        auto data = serialPort.read(1);
+        sLogger.Info("------- DATA BLOCK ------");
+        sLogger.Info("-------------------------");
+        auto err = serialPort.error();
+        sLogger.Info(QString::number(err));
+    }
+
+
+    return;
     try
     {
         sLogger.Info("Before connect...");

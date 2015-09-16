@@ -65,6 +65,7 @@ namespace core
                 return;
             }
 #endif
+            _serial.set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
             _serial.set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
             _serial.set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
             _serial.set_option(boost::asio::serial_port_base::character_size(8));
