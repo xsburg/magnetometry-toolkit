@@ -189,19 +189,19 @@ void core::EbDeviceManager::sendSetTime(QDateTime dateTime)
     switch (_mode)
     {
     case Text:
-    {
-                 auto timePart = dateTime.toString("hh:mm:ss");
-                 sendCommand("time " + timePart.toLatin1());
-                 break;
-    }
+        {
+            auto timePart = dateTime.toString("hh:mm:ss");
+            sendCommand("time " + timePart.toLatin1());
+            break;
+        }
     case Binary:
-    {
-                   QByteArray command("time xxxx");
-                   uint32_t unixtime = dateTime.toTime_t();
-                   _bitConverter.ToByteArray(unixtime, command.data() + 5);
-                   sendCommand(command);
-                   break;
-    }
+        {
+            QByteArray command("time xxxx");
+            uint32_t unixtime = dateTime.toTime_t();
+            _bitConverter.ToByteArray(unixtime, command.data() + 5);
+            sendCommand(command);
+            break;
+        }
     default:
         throw Common::InvalidOperationException();
     }
@@ -217,15 +217,15 @@ void core::EbDeviceManager::sendSetDate(QDateTime dateTime)
     switch (_mode)
     {
     case Text:
-    {
-                 auto timePart = dateTime.toString("MM:dd:yy");
-                 sendCommand("date " + timePart.toLatin1());
-                 break;
-    }
+        {
+            auto timePart = dateTime.toString("MM:dd:yy");
+            sendCommand("date " + timePart.toLatin1());
+            break;
+        }
     case Binary:
-    {
-                   throw Common::InvalidOperationException();
-    }
+        {
+            throw Common::InvalidOperationException();
+        }
     default:
         throw Common::InvalidOperationException();
     }
@@ -241,18 +241,18 @@ void core::EbDeviceManager::sendSetRange(uint32_t center)
     switch (_mode)
     {
     case Text:
-    {
-                 auto centerStr = QString::number(center);
-                 sendCommand("range " + centerStr.toLatin1());
-                 break;
-    }
+        {
+            auto centerStr = QString::number(center);
+            sendCommand("range " + centerStr.toLatin1());
+            break;
+        }
     case Binary:
-    {
-                   auto command = QByteArray("range xxxx");
-                   _bitConverter.ToByteArray(center, command.data() + 6);
-                   sendCommand(command);
-                   break;
-    }
+        {
+            auto command = QByteArray("range xxxx");
+            _bitConverter.ToByteArray(center, command.data() + 6);
+            sendCommand(command);
+            break;
+        }
     default:
         throw Common::InvalidOperationException();
     }
@@ -268,18 +268,18 @@ void core::EbDeviceManager::sendAuto(uint32_t freq)
     switch (_mode)
     {
     case Text:
-    {
-                 auto centerStr = QString::number(freq);
-                 sendCommand("auto " + centerStr.toLatin1(), 5000);
-                 break;
-    }
+        {
+            auto centerStr = QString::number(freq);
+            sendCommand("auto " + centerStr.toLatin1(), 5000);
+            break;
+        }
     case Binary:
-    {
-                   auto command = QByteArray("auto xxxx");
-                   _bitConverter.ToByteArray(freq, command.data() + 5);
-                   sendCommand(command, 5000);
-                   break;
-    }
+        {
+            auto command = QByteArray("auto xxxx");
+            _bitConverter.ToByteArray(freq, command.data() + 5);
+            sendCommand(command, 5000);
+            break;
+        }
     default:
         throw Common::InvalidOperationException();
     }
@@ -490,12 +490,34 @@ void core::EbDeviceManager::runDiagnosticSequence()
     auto sample = readSample();
     auto isValid = validateSample(sample);
     sLogger.Info(QString("Got sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
-        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000).arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+        .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
     assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
     sLogger.Info("Done.");
 
     //sendNak();
     //sample = readSample();
+}
+
+void core::EbDeviceManager::runTestAutoSequence()
+{
+    int intervalBetweenSamples = 1;
+    sLogger.Info(QString("Testing auto mode, every %1 seconds...").arg(intervalBetweenSamples));
+    sendAuto(intervalBetweenSamples);
+    for (int i = 0; i < 10; i++)
+    {
+        auto sample = readSample();
+        auto isValid = validateSample(sample);
+        sLogger.Info(QString("Got sample #%7: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+            .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+            .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
+        assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
+        QThread::sleep(intervalBetweenSamples);
+    }
+    sendEnq();
+    auto responseString = readEnq();
+    assertTrue(responseString.size() > 0, "ENQ data is empty.");
+    sLogger.Info("Done.");
 }
 
 void core::EbDeviceManager::sendCommand(QByteArray command, int delayMilliseconds, bool escape)

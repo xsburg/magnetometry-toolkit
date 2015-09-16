@@ -75,7 +75,7 @@ namespace core
         void sendGetRange();
         void sendSetRange(uint32_t center);
         void sendRun();
-        void sendAuto(uint32_t freq);
+        void sendAuto(uint32_t freq /* -X Hz || 1/X mes/sec, X = [-5,-1]|[1,86400] */);
 
         QString readEnq();
         QString readAbout();
@@ -93,6 +93,7 @@ namespace core
         bool validateSample(const Sample& sample);
         
         void runDiagnosticSequence();
+        void runTestAutoSequence();
 
     private:
         Common::BitConverter _bitConverter;

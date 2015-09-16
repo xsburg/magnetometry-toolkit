@@ -38,11 +38,7 @@ int main(int argc, char** argv)
         auto device = std::make_shared<core::EbDeviceManager>();
         device->connect(portName);
         device->runDiagnosticSequence();
-
-
-
-
-
+        device->runTestAutoSequence();
 
         return 0;
     }
@@ -56,7 +52,8 @@ int main(int argc, char** argv)
             sLogger.Error("The application could not find the port specified.");
             sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
         }
-        else {
+        else
+        {
             sLogger.Error("No connection to receiver, code: " + QString::number(ex.code().value()));
         }
         return 1;
