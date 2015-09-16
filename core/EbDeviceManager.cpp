@@ -403,8 +403,18 @@ bool core::EbDeviceManager::validateSample(const Sample& sample)
 void core::EbDeviceManager::runDiagnosticSequence()
 {
     sendEnq();
-    auto enqData = readEnq();
-    assertTrue(enqData.size() > 0, "ENQ data not empty");
+    auto responseString = readEnq();
+    assertTrue(responseString.size() > 0, "ENQ data is empty.");
+    
+    sendNak();
+    responseString = readEnq();
+    assertTrue(responseString.size() > 0, "NAK must send ENQ results.");
+
+    sendAbout();
+    responseString = readAbout();
+    assertTrue(responseString.size() > 0, "About text is empty.");
+
+    
 }
 
 void core::EbDeviceManager::sendCommand(QByteArray command, int delayMilliseconds, bool escape)
@@ -444,6 +454,7 @@ QString core::EbDeviceManager::readResponseString(qint64 maxlen)
 {
     auto response = readResponse(maxlen);
     auto responseString = QString(response);
+    sLogger.Debug(QString("EbDevice got text response: '%1'").arg(responseString));
     return responseString;
 }
 
