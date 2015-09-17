@@ -189,19 +189,19 @@ void core::EbDeviceManager::sendSetTime(QDateTime dateTime)
     switch (_mode)
     {
     case Text:
-        {
-            auto timePart = dateTime.toString("hh:mm:ss");
-            sendCommand("time " + timePart.toLatin1());
-            break;
-        }
+    {
+                 auto timePart = dateTime.toString("hh:mm:ss");
+                 sendCommand("time " + timePart.toLatin1());
+                 break;
+    }
     case Binary:
-        {
-            QByteArray command("time xxxx");
-            uint32_t unixtime = dateTime.toTime_t();
-            _bitConverter.ToByteArray(unixtime, command.data() + 5);
-            sendCommand(command);
-            break;
-        }
+    {
+                   QByteArray command("time xxxx");
+                   uint32_t unixtime = dateTime.toTime_t();
+                   _bitConverter.ToByteArray(unixtime, command.data() + 5);
+                   sendCommand(command);
+                   break;
+    }
     default:
         throw Common::InvalidOperationException();
     }
@@ -217,15 +217,15 @@ void core::EbDeviceManager::sendSetDate(QDateTime dateTime)
     switch (_mode)
     {
     case Text:
-        {
-            auto timePart = dateTime.toString("MM:dd:yy");
-            sendCommand("date " + timePart.toLatin1());
-            break;
-        }
+    {
+                 auto timePart = dateTime.toString("MM:dd:yy");
+                 sendCommand("date " + timePart.toLatin1());
+                 break;
+    }
     case Binary:
-        {
-            throw Common::InvalidOperationException();
-        }
+    {
+                   throw Common::InvalidOperationException();
+    }
     default:
         throw Common::InvalidOperationException();
     }
@@ -241,18 +241,18 @@ void core::EbDeviceManager::sendSetRange(uint32_t center)
     switch (_mode)
     {
     case Text:
-        {
-            auto centerStr = QString::number(center);
-            sendCommand("range " + centerStr.toLatin1());
-            break;
-        }
+    {
+                 auto centerStr = QString::number(center);
+                 sendCommand("range " + centerStr.toLatin1());
+                 break;
+    }
     case Binary:
-        {
-            auto command = QByteArray("range xxxx");
-            _bitConverter.ToByteArray(center, command.data() + 6);
-            sendCommand(command);
-            break;
-        }
+    {
+                   auto command = QByteArray("range xxxx");
+                   _bitConverter.ToByteArray(center, command.data() + 6);
+                   sendCommand(command);
+                   break;
+    }
     default:
         throw Common::InvalidOperationException();
     }
@@ -268,18 +268,18 @@ void core::EbDeviceManager::sendAuto(uint32_t freq)
     switch (_mode)
     {
     case Text:
-        {
-            auto centerStr = QString::number(freq);
-            sendCommand("auto " + centerStr.toLatin1(), 5000);
-            break;
-        }
+    {
+                 auto centerStr = QString::number(freq);
+                 sendCommand("auto " + centerStr.toLatin1(), 5000);
+                 break;
+    }
     case Binary:
-        {
-            auto command = QByteArray("auto xxxx");
-            _bitConverter.ToByteArray(freq, command.data() + 5);
-            sendCommand(command, 5000);
-            break;
-        }
+    {
+                   auto command = QByteArray("auto xxxx");
+                   _bitConverter.ToByteArray(freq, command.data() + 5);
+                   sendCommand(command, 5000);
+                   break;
+    }
     default:
         throw Common::InvalidOperationException();
     }
@@ -382,10 +382,10 @@ core::EbDeviceManager::RangeData core::EbDeviceManager::readSetRange()
     return readGetRange();
 }
 
-core::EbDeviceManager::Sample core::EbDeviceManager::readSample()
+core::EbDeviceManager::Sample core::EbDeviceManager::readSample(int readTimeout)
 {
     Sample data;
-    auto response = readResponse();
+    auto response = readResponse(256, readTimeout);
     auto responsePtr = response.data();
     data.field = _bitConverter.GetInt32(responsePtr);
     data.qmc = _bitConverter.GetUInt16(responsePtr + 4);
@@ -506,13 +506,12 @@ void core::EbDeviceManager::runTestAutoSequence()
     sendAuto(intervalBetweenSamples);
     for (int i = 0; i < 10; i++)
     {
-        auto sample = readSample();
+        auto sample = readSample((intervalBetweenSamples + 1) * 1000);
         auto isValid = validateSample(sample);
         sLogger.Info(QString("Got sample #%7: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
             .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
             .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
         assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
-        QThread::sleep(intervalBetweenSamples);
     }
     sendEnq();
     auto responseString = readEnq();
@@ -539,24 +538,38 @@ void core::EbDeviceManager::sendCommand(QByteArray command, int delayMillisecond
     QThread::msleep(delayMilliseconds);
 }
 
-QByteArray core::EbDeviceManager::readResponse(qint64 maxlen)
+QByteArray core::EbDeviceManager::readResponse(qint64 maxlen, int readTimeout)
 {
-    if (!_serialPort.waitForReadyRead(1000))
+    if (!_serialPort.waitForReadyRead(readTimeout))
     {
         throw Common::Exception(QString("EbDevice read data error: waitForReadyRead timeout exceeded. Error string: %1.").arg(_serialPort.errorString()));
     }
     auto data = _serialPort.read(maxlen);
-    if (data.size() != 0 && data.at(data.size() - 1) != '\0')
+
+    auto responses = data.split('\0');
+    if (responses.size() > 1)
     {
-        throw Common::Exception("EbDevice read data error: data block MUST end with \\0.");
+        if (responses.last().size() == 0)
+        {
+            responses.pop_back();
+        }
+        if (responses.size() > 1)
+        {
+            sLogger.Debug(QString("EbDevice read notice: skipping %1 responses.").arg(responses.size() - 1));
+        }
     }
-    sLogger.Debug(QString("EbDevice got response, length = %1...").arg(data.size()));
-    return unescapeData(data);
+
+    QByteArray responseData = responses.last();
+    responseData += '\0';
+    auto rawSize = responseData.size();
+    responseData = unescapeData(responseData);
+    sLogger.Debug(QString("EbDevice got response, raw size = %1, decoded size = %2...").arg(rawSize).arg(responseData.size()));
+    return responseData;
 }
 
-QString core::EbDeviceManager::readResponseString(qint64 maxlen)
+QString core::EbDeviceManager::readResponseString(qint64 maxlen, int readTimeout)
 {
-    auto response = readResponse(maxlen);
+    auto response = readResponse(maxlen, readTimeout);
     auto responseString = QString(response);
     sLogger.Debug(QString("EbDevice got text response: '%1'").arg(responseString));
     return responseString;

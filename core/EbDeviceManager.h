@@ -88,7 +88,7 @@ namespace core
         void readSetDate();
         RangeData readGetRange();
         RangeData readSetRange();
-        Sample readSample();
+        Sample readSample(int readTimeout = 1000);
 
         bool validateSample(const Sample& sample);
         
@@ -101,8 +101,8 @@ namespace core
         Mode _mode;
 
         void sendCommand(QByteArray command, int delayMilliseconds = 500, bool escape = true);
-        QByteArray readResponse(qint64 maxlen = 256);
-        QString readResponseString(qint64 maxlen = 256);
+        QByteArray readResponse(qint64 maxlen = 256, int readTimeout = 1000);
+        QString readResponseString(qint64 maxlen = 256, int readTimeout = 1000);
         QByteArray escapeData(QByteArray data);
         QByteArray unescapeData(QByteArray data);
         void assertTrue(bool condition, QString failureComment);
