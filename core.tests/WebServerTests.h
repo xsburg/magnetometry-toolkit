@@ -46,7 +46,10 @@ namespace core
 
             void execute() override
             {
-                mg_printf_data(connection(), "{ \"result\": \"Some Test Data\" }");
+                QString content(QByteArray(connection()->content, connection()->content_len));
+                qDebug() << content;
+                
+                mg_printf_data(connection(), content.toLatin1());
             }
         };
 
@@ -78,10 +81,6 @@ namespace core
             server->addActionHandler(std::make_shared<PostTestActionHandler>());
             server->runAsync();
 
-            while (true)
-            {
-                QThread::sleep(1000);
-            }
             // Act
             auto responseText = sHelpers.postResponse("http://localhost:8000/api/test", QString("{ \"command\": \"FIRE\" }"));
 
