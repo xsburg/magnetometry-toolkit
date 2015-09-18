@@ -27,10 +27,11 @@ int ev_handler(mg_connection *connection, enum mg_event event) {
     case MG_REQUEST:
         for (auto& handler : handlers)
         {
-            if (handler->match(connection))
+            handler->connection(connection);
+            if (handler->match())
             {
                 sLogger.Info(QString("Found handler '%1' -> '%2'.").arg(connection->uri).arg(handler->name()));
-                handler->execute(connection);
+                handler->execute();
                 return MG_TRUE;
             }
         }

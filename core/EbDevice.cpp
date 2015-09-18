@@ -1,18 +1,18 @@
-﻿#include "EbDeviceManager.h"
+﻿#include "EbDevice.h"
 #include "common/Logger.h"
 #include "SerialPortBinaryStream.h"
 #include "common/InvalidOperationException.h"
 #include "common/NotSupportedException.h"
 
-core::EbDeviceManager::EbDeviceManager() : EbDeviceManager(Mode::Text)
+core::EbDevice::EbDevice() : EbDevice(Mode::Text)
 {
 }
 
-core::EbDeviceManager::EbDeviceManager(Mode mode) : _bitConverter(Common::BitConverter::EByteOrder::MostSignificantByte), _mode(mode)
+core::EbDevice::EbDevice(Mode mode) : _bitConverter(Common::BitConverter::EByteOrder::MostSignificantByte), _mode(mode)
 {
 }
 
-void core::EbDeviceManager::connect(QString portName)
+void core::EbDevice::connect(QString portName)
 {
     sLogger.Debug(QString("Connecting to port %1...").arg(portName));
     _serialPort.setPortName(portName);
@@ -130,22 +130,22 @@ void core::EbDeviceManager::connect(QString portName)
     }*/
 }
 
-void core::EbDeviceManager::sendEnq()
+void core::EbDevice::sendEnq()
 {
     sendCommand("\x05", 500, false);
 }
 
-void core::EbDeviceManager::sendNak()
+void core::EbDevice::sendNak()
 {
     sendCommand("\x15");
 }
 
-void core::EbDeviceManager::sendAbout()
+void core::EbDevice::sendAbout()
 {
     sendCommand("about");
 }
 
-void core::EbDeviceManager::sendStandBy(bool enabled)
+void core::EbDevice::sendStandBy(bool enabled)
 {
     QByteArray command("standby ");
     if (enabled)
@@ -159,12 +159,12 @@ void core::EbDeviceManager::sendStandBy(bool enabled)
     sendCommand(command);
 }
 
-void core::EbDeviceManager::sendGetMode()
+void core::EbDevice::sendGetMode()
 {
     sendCommand("mode");
 }
 
-void core::EbDeviceManager::sendSetMode(Mode mode)
+void core::EbDevice::sendSetMode(Mode mode)
 {
     switch (mode)
     {
@@ -179,12 +179,12 @@ void core::EbDeviceManager::sendSetMode(Mode mode)
     }
 }
 
-void core::EbDeviceManager::sendGetTime()
+void core::EbDevice::sendGetTime()
 {
     sendCommand("time");
 }
 
-void core::EbDeviceManager::sendSetTime(QDateTime dateTime)
+void core::EbDevice::sendSetTime(QDateTime dateTime)
 {
     switch (_mode)
     {
@@ -207,12 +207,12 @@ void core::EbDeviceManager::sendSetTime(QDateTime dateTime)
     }
 }
 
-void core::EbDeviceManager::sendGetDate()
+void core::EbDevice::sendGetDate()
 {
     sendCommand("date");
 }
 
-void core::EbDeviceManager::sendSetDate(QDateTime dateTime)
+void core::EbDevice::sendSetDate(QDateTime dateTime)
 {
     switch (_mode)
     {
@@ -231,12 +231,12 @@ void core::EbDeviceManager::sendSetDate(QDateTime dateTime)
     }
 }
 
-void core::EbDeviceManager::sendGetRange()
+void core::EbDevice::sendGetRange()
 {
     sendCommand("range");
 }
 
-void core::EbDeviceManager::sendSetRange(uint32_t center)
+void core::EbDevice::sendSetRange(uint32_t center)
 {
     switch (_mode)
     {
@@ -258,12 +258,12 @@ void core::EbDeviceManager::sendSetRange(uint32_t center)
     }
 }
 
-void core::EbDeviceManager::sendRun()
+void core::EbDevice::sendRun()
 {
     sendCommand("run", 5000);
 }
 
-void core::EbDeviceManager::sendAuto(uint32_t freq)
+void core::EbDevice::sendAuto(uint32_t freq)
 {
     switch (_mode)
     {
@@ -285,17 +285,17 @@ void core::EbDeviceManager::sendAuto(uint32_t freq)
     }
 }
 
-QString core::EbDeviceManager::readEnq()
+QString core::EbDevice::readEnq()
 {
     return readResponseString();
 }
 
-QString core::EbDeviceManager::readAbout()
+QString core::EbDevice::readAbout()
 {
     return readResponseString();
 }
 
-bool core::EbDeviceManager::readStandBy()
+bool core::EbDevice::readStandBy()
 {
     auto standByString = readResponseString();
     if (standByString == "set standby on")
@@ -309,7 +309,7 @@ bool core::EbDeviceManager::readStandBy()
     throw Common::Exception(QString("EbDevice command response: StandBy returned '%1'.").arg(standByString));
 }
 
-core::EbDeviceManager::Mode core::EbDeviceManager::readGetMode()
+core::EbDevice::Mode core::EbDevice::readGetMode()
 {
     auto modeString = readResponseString();
     if (modeString == "mode is text")
@@ -323,7 +323,7 @@ core::EbDeviceManager::Mode core::EbDeviceManager::readGetMode()
     throw Common::Exception(QString("EbDevice command response: GetMode returned '%1'.").arg(modeString));
 }
 
-core::EbDeviceManager::Mode core::EbDeviceManager::readSetMode()
+core::EbDevice::Mode core::EbDevice::readSetMode()
 {
     auto modeString = readResponseString();
     if (modeString == "set text mode")
@@ -337,14 +337,14 @@ core::EbDeviceManager::Mode core::EbDeviceManager::readSetMode()
     throw Common::Exception(QString("EbDevice command response: SetMode returned '%1'.").arg(modeString));
 }
 
-QDateTime core::EbDeviceManager::readGetTime()
+QDateTime core::EbDevice::readGetTime()
 {
     auto data = readResponse();
     uint32_t unixtime = _bitConverter.GetUInt32(data);
     return QDateTime::fromTime_t(unixtime, Qt::UTC);
 }
 
-void core::EbDeviceManager::readSetTime()
+void core::EbDevice::readSetTime()
 {
     auto setTimeString = readResponseString();
     if (setTimeString == "set time ok")
@@ -354,17 +354,17 @@ void core::EbDeviceManager::readSetTime()
     throw Common::Exception(QString("EbDevice command response: SetTime returned '%1'.").arg(setTimeString));
 }
 
-QDateTime core::EbDeviceManager::readGetDate()
+QDateTime core::EbDevice::readGetDate()
 {
     throw Common::NotSupportedException();
 }
 
-void core::EbDeviceManager::readSetDate()
+void core::EbDevice::readSetDate()
 {
     throw Common::NotSupportedException();
 }
 
-core::EbDeviceManager::RangeData core::EbDeviceManager::readGetRange()
+core::EbDevice::RangeData core::EbDevice::readGetRange()
 {
     if (_mode != Mode::Binary)
     {
@@ -377,12 +377,12 @@ core::EbDeviceManager::RangeData core::EbDeviceManager::readGetRange()
     return data;
 }
 
-core::EbDeviceManager::RangeData core::EbDeviceManager::readSetRange()
+core::EbDevice::RangeData core::EbDevice::readSetRange()
 {
     return readGetRange();
 }
 
-core::EbDeviceManager::Sample core::EbDeviceManager::readSample(int readTimeout)
+core::EbDevice::Sample core::EbDevice::readSample(int readTimeout)
 {
     Sample data;
     auto response = readResponse(256, readTimeout);
@@ -398,12 +398,12 @@ core::EbDeviceManager::Sample core::EbDeviceManager::readSample(int readTimeout)
     return data;
 }
 
-bool core::EbDeviceManager::validateSample(const Sample& sample)
+bool core::EbDevice::validateSample(const Sample& sample)
 {
     return sample.state == SampleState::Valid;
 }
 
-void core::EbDeviceManager::runDiagnosticSequence()
+void core::EbDevice::runDiagnosticSequence()
 {
     sLogger.Info("Testing ENQ...");
     sendEnq();
@@ -499,7 +499,7 @@ void core::EbDeviceManager::runDiagnosticSequence()
     //sample = readSample();
 }
 
-void core::EbDeviceManager::runTestAutoSequence()
+void core::EbDevice::runTestAutoSequence()
 {
     int intervalBetweenSamples = 1;
     sLogger.Info(QString("Testing auto mode, every %1 seconds...").arg(intervalBetweenSamples));
@@ -519,7 +519,7 @@ void core::EbDeviceManager::runTestAutoSequence()
     sLogger.Info("Done.");
 }
 
-void core::EbDeviceManager::sendCommand(QByteArray command, int delayMilliseconds, bool escape)
+void core::EbDevice::sendCommand(QByteArray command, int delayMilliseconds, bool escape)
 {
     if (escape)
     {
@@ -538,7 +538,7 @@ void core::EbDeviceManager::sendCommand(QByteArray command, int delayMillisecond
     QThread::msleep(delayMilliseconds);
 }
 
-QByteArray core::EbDeviceManager::readResponse(qint64 maxlen, int readTimeout)
+QByteArray core::EbDevice::readResponse(qint64 maxlen, int readTimeout)
 {
     if (!_serialPort.waitForReadyRead(readTimeout))
     {
@@ -567,7 +567,7 @@ QByteArray core::EbDeviceManager::readResponse(qint64 maxlen, int readTimeout)
     return responseData;
 }
 
-QString core::EbDeviceManager::readResponseString(qint64 maxlen, int readTimeout)
+QString core::EbDevice::readResponseString(qint64 maxlen, int readTimeout)
 {
     auto response = readResponse(maxlen, readTimeout);
     auto responseString = QString(response);
@@ -575,7 +575,7 @@ QString core::EbDeviceManager::readResponseString(qint64 maxlen, int readTimeout
     return responseString;
 }
 
-QByteArray core::EbDeviceManager::escapeData(QByteArray data)
+QByteArray core::EbDevice::escapeData(QByteArray data)
 {
     QByteArray result;
     for (int i = 0; i < data.size(); i++)
@@ -594,7 +594,7 @@ QByteArray core::EbDeviceManager::escapeData(QByteArray data)
     return result;
 }
 
-QByteArray core::EbDeviceManager::unescapeData(QByteArray data)
+QByteArray core::EbDevice::unescapeData(QByteArray data)
 {
     bool escaped = false;
     QByteArray result;
@@ -618,7 +618,7 @@ QByteArray core::EbDeviceManager::unescapeData(QByteArray data)
     return result;
 }
 
-void core::EbDeviceManager::assertTrue(bool condition, QString failureComment)
+void core::EbDevice::assertTrue(bool condition, QString failureComment)
 {
     if (!condition)
     {

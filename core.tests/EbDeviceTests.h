@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include "BaseTest.h"
-#include "EbDeviceManager.h"
+#include "EbDevice.h"
 
 using namespace Common;
 

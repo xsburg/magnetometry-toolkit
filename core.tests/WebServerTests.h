@@ -20,14 +20,33 @@ namespace core
                 return "TestActionHandler";
             }
 
-            bool match(mg_connection* connection) override
+            bool match() override
             {
-                return this->exactMatch(connection, "api/test");
+                return this->exactMatch( "api/test");
             }
 
-            void execute(mg_connection* connection) override
+            void execute() override
             {
-                mg_printf_data(connection, "{ \"result\": \"Some Test Data\" }");
+                mg_printf_data(connection(), "{ \"result\": \"Some Test Data\" }");
+            }
+        };
+
+        class PostTestActionHandler : public WebServerActionHandler
+        {
+        public:
+            QString name() const override
+            {
+                return "PostTestActionHandler";
+            }
+
+            bool match() override
+            {
+                return this->exactMatch( "api/test");
+            }
+
+            void execute() override
+            {
+                mg_printf_data(connection(), "{ \"result\": \"Some Test Data\" }");
             }
         };
 
@@ -45,6 +64,26 @@ namespace core
 
             // Act
             auto responseText = sHelpers.getResponse("http://localhost:8000/api/test");
+
+            // Assert
+            qDebug() << "200, data: " << responseText;
+            ASSERT_TRUE(responseText == "{ \"result\": \"Some Test Data\" }");
+        }
+
+        TEST_F(WebServerTests, ShouldStartServerAndAcceptPostRequest)
+        {
+            // Arrange
+            auto server = std::make_shared<WebServer>();
+            server->port(8000);
+            server->addActionHandler(std::make_shared<PostTestActionHandler>());
+            server->runAsync();
+
+            while (true)
+            {
+                QThread::sleep(1000);
+            }
+            // Act
+            auto responseText = sHelpers.postResponse("http://localhost:8000/api/test", QString("{ \"command\": \"FIRE\" }"));
 
             // Assert
             qDebug() << "200, data: " << responseText;

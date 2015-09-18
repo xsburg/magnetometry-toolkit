@@ -4,7 +4,7 @@
 //   Copyright (c) Stephan Burguchev 2012-2015. All rights reserved.
 // </copyright>
 // <summary>
-//   EbDeviceManager.h
+//   EbDevice.h
 // </summary>
 // ***********************************************************************
 #pragma once
@@ -17,10 +17,10 @@
 
 namespace core
 {
-    class EbDeviceManager
+    class EbDevice
     {
     public:
-        SMART_PTR_T(EbDeviceManager);
+        SMART_PTR_T(EbDevice);
 
         enum Mode
         {
@@ -55,8 +55,8 @@ namespace core
             QDateTime time;
         };
 
-        EbDeviceManager();
-        explicit EbDeviceManager(Mode mode);
+        EbDevice();
+        explicit EbDevice(Mode mode);
 
         void connect(QString portName);
 

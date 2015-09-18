@@ -23,6 +23,7 @@ namespace core
             void assertBinaryArray(const QByteArray& expected, const QByteArray& actual);
             
             QString getResponse(const QString& url);
+            QString postResponse(const QString& url, const QString& data);
         };
     }
 }

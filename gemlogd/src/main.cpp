@@ -4,7 +4,7 @@
 #include "common/Path.h"
 #include "common/Connection.h"
 #include <boost/system/system_error.hpp>
-#include <EbDeviceManager.h>
+#include <EbDevice.h>
 #include <boost/exception/diagnostic_information.hpp>
 
 using namespace Common;
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
         sLogger.Info(QString("device.portName: %1").arg(portName));
         sLogger.Info("==============");
 
-        auto device = std::make_shared<core::EbDeviceManager>();
+        auto device = std::make_shared<core::EbDevice>();
         device->connect(portName);
         device->runDiagnosticSequence();
         device->runTestAutoSequence();

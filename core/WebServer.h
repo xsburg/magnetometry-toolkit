@@ -23,10 +23,10 @@ namespace core
         WebServer();
         ~WebServer();
 
-        inline int port() const { return _port; }
-        inline void port(const int& port) { _port = port; }
+        int port() const { return _port; }
+        void port(const int& port) { _port = port; }
 
-        inline const QList<WebServerActionHandler::SharedPtr_t>& handlers() const { return _handlers; }
+        const QList<WebServerActionHandler::SharedPtr_t>& handlers() const { return _handlers; }
 
         void addActionHandler(WebServerActionHandler::SharedPtr_t handler);
 

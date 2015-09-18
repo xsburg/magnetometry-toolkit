@@ -43,7 +43,6 @@ namespace core
 
         QString Helpers::getResponse(const QString& url)
         {
-
             // create custom temporary event loop on stack
             QEventLoop eventLoop;
 
@@ -55,6 +54,29 @@ namespace core
             QNetworkRequest req(url);
             QNetworkReply* reply;
             reply = mgr.get(req);
+
+            eventLoop.exec(); // blocks stack until "finished()" has been called
+            auto success = reply->error() == QNetworkReply::NoError;
+            if (!success) {
+                sLogger.Error("Failure: " + reply->errorString());
+                throw new Exception(QString("Failed to performe web request to %1: %2").arg(url).arg(reply->errorString()));
+            }
+            return reply->readAll();
+        }
+
+        QString Helpers::postResponse(const QString& url, const QString& data)
+        {
+            // create custom temporary event loop on stack
+            QEventLoop eventLoop;
+
+            // "quit()" the event-loop, when the network request "finished()"
+            QNetworkAccessManager mgr;
+            QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+
+            // the HTTP request
+            QNetworkRequest req(url);
+            QNetworkReply* reply;
+            reply = mgr.post(req, data.toLatin1());
 
             eventLoop.exec(); // blocks stack until "finished()" has been called
             auto success = reply->error() == QNetworkReply::NoError;
