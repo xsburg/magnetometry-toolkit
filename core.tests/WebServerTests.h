@@ -86,7 +86,7 @@ namespace core
 
             // Assert
             qDebug() << "200, data: " << responseText;
-            ASSERT_TRUE(responseText == "{ \"result\": \"Some Test Data\" }");
+            ASSERT_TRUE(responseText == "{ \"command\": \"FIRE\" }");
         }
     }
 }

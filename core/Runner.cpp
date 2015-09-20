@@ -22,6 +22,17 @@ void core::RunnerActionHandler::execute()
     else if (exactMatch("api/command"))
     {
         // api/command
+        QString content(QByteArray(connection()->content, connection()->content_len));
+        QJsonDocument doc = QJsonDocument::fromJson(content.toLatin1());
+        auto root = doc.object();
+        auto command = root.value("command").toString();
+        if (command == "run")
+        {
+
+        }
+        auto interval = root.value("interval").toDouble();
+        auto active = root.value("active").toBool();
+
         mg_printf_data(connection(), "{ \"result\": \"Some Test Data\" }");
     }
 }
