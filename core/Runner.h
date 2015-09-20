@@ -8,6 +8,7 @@
 // </summary>
 // ***********************************************************************
 #pragma once
+
 #include "WebServer.h"
 
 namespace core
@@ -21,6 +22,12 @@ namespace core
         }
 
         bool match() override;
+        void executeRunCommand(QJsonObject json);
+        void executeStopCommand(QJsonObject json);
+        void executeUpdateStatusCommand(QJsonObject json);
+        void executeSetTimeCommand(QJsonObject json);
+        void executeSetRangeCommand(QJsonObject json);
+        void executeSetStandByCommand(QJsonObject json);
         void execute() override;
     };
 

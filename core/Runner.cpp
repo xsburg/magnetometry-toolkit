@@ -12,6 +12,19 @@ bool core::RunnerActionHandler::match()
         (exactMatch("api/command") && methodMatch("POST"));
 }
 
+void core::RunnerActionHandler::executeRunCommand(QJsonObject json)
+{
+    auto interval = json.value("interval").toDouble();
+    auto active = json.value("active").toBool();
+
+    {
+        auto mutex = lockSharedData();
+        _commands.push(command);
+    }
+
+    mg_printf_data(connection(), "{ \"result\": \"enqueued\" }");
+}
+
 void core::RunnerActionHandler::execute()
 {
     if (exactMatch("api/status"))
@@ -28,12 +41,28 @@ void core::RunnerActionHandler::execute()
         auto command = root.value("command").toString();
         if (command == "run")
         {
-
+            executeRunCommand(root);
         }
-        auto interval = root.value("interval").toDouble();
-        auto active = root.value("active").toBool();
-
-        mg_printf_data(connection(), "{ \"result\": \"Some Test Data\" }");
+        else if (command == "stop")
+        {
+            executeStopCommand(root);
+        }
+        else if (command == "update-status")
+        {
+            executeUpdateStatusCommand(root);
+        }
+        else if (command == "set-device-time")
+        {
+            executeSetTimeCommand(root);
+        }
+        else if (command == "set-device-range")
+        {
+            executeSetRangeCommand(root);
+        }
+        else if (command == "set-device-stand-by")
+        {
+            executeSetStandByCommand(root);
+        }
     }
 }
 
