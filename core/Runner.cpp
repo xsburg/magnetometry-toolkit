@@ -1,5 +1,6 @@
 ﻿#include "Runner.h"
 #include <mongoose.h>
+#include <common/InvalidOperationException.h>
 
 bool core::RunnerActionHandler::match()
 {
@@ -12,17 +13,44 @@ bool core::RunnerActionHandler::match()
         (exactMatch("api/command") && methodMatch("POST"));
 }
 
-void core::RunnerActionHandler::executeRunCommand(QJsonObject json)
+void core::RunnerActionHandler::addRunCommand(QJsonObject json)
 {
-    auto interval = json.value("interval").toDouble();
-    auto active = json.value("active").toBool();
+    QMutexLocker lock(dataMutex());
+    _commands.enqueue(std::make_shared<RunRunnerCommand>());
+}
 
-    {
-        auto mutex = lockSharedData();
-        _commands.push(command);
-    }
+void core::RunnerActionHandler::addStopCommand(QJsonObject json)
+{
+    QMutexLocker lock(dataMutex());
+    _commands.enqueue(std::make_shared<StopRunnerCommand>());
+}
 
-    mg_printf_data(connection(), "{ \"result\": \"enqueued\" }");
+void core::RunnerActionHandler::addUpdateStatusCommand(QJsonObject json)
+{
+    QMutexLocker lock(dataMutex());
+    _commands.enqueue(std::make_shared<UpdateStatusRunnerCommand>());
+}
+
+void core::RunnerActionHandler::addSetTimeCommand(QJsonObject json)
+{
+    auto unixTime = json.value("time").toInt();
+    auto time = QDateTime::fromTime_t(unixTime, Qt::UTC);
+    QMutexLocker lock(dataMutex());
+    _commands.enqueue(std::make_shared<SetTimeRunnerCommand>(time));
+}
+
+void core::RunnerActionHandler::addSetRangeCommand(QJsonObject json)
+{
+    auto range = json.value("range").toInt();
+    QMutexLocker lock(dataMutex());
+    _commands.enqueue(std::make_shared<SetRangeRunnerCommand>(range));
+}
+
+void core::RunnerActionHandler::addSetStandByCommand(QJsonObject json)
+{
+    auto standBy = json.value("standBy").toBool();
+    QMutexLocker lock(dataMutex());
+    _commands.enqueue(std::make_shared<SetStandByRunnerCommand>(standBy));
 }
 
 void core::RunnerActionHandler::execute()
@@ -41,29 +69,42 @@ void core::RunnerActionHandler::execute()
         auto command = root.value("command").toString();
         if (command == "run")
         {
-            executeRunCommand(root);
+            addRunCommand(root);
         }
         else if (command == "stop")
         {
-            executeStopCommand(root);
+            addStopCommand(root);
         }
         else if (command == "update-status")
         {
-            executeUpdateStatusCommand(root);
+            addUpdateStatusCommand(root);
         }
         else if (command == "set-device-time")
         {
-            executeSetTimeCommand(root);
+            addSetTimeCommand(root);
         }
         else if (command == "set-device-range")
         {
-            executeSetRangeCommand(root);
+            addSetRangeCommand(root);
         }
         else if (command == "set-device-stand-by")
         {
-            executeSetStandByCommand(root);
+            addSetStandByCommand(root);
+        } else
+        {
+            throw Common::InvalidOperationException();
         }
+        mg_printf_data(connection(), "{ \"result\": \"enqueued\" }");
     }
+    else
+    {
+        throw Common::InvalidOperationException();
+    }
+}
+
+QMutex* core::RunnerActionHandler::dataMutex()
+{
+    return &_dataMutex;
 }
 
 core::Runner::Runner(RunnerConfig config)
