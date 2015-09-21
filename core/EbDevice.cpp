@@ -263,22 +263,22 @@ void core::EbDevice::sendRun()
     sendCommand("run", 5000);
 }
 
-void core::EbDevice::sendAuto(uint32_t freq)
+void core::EbDevice::sendAuto(int32_t freq)
 {
     switch (_mode)
     {
     case Text:
     {
-                 auto centerStr = QString::number(freq);
-                 sendCommand("auto " + centerStr.toLatin1(), 5000);
-                 break;
+        auto centerStr = QString::number(freq);
+        sendCommand("auto " + centerStr.toLatin1(), 5000);
+        break;
     }
     case Binary:
     {
-                   auto command = QByteArray("auto xxxx");
-                   _bitConverter.ToByteArray(freq, command.data() + 5);
-                   sendCommand(command, 5000);
-                   break;
+        auto command = QByteArray("auto xxxx");
+        _bitConverter.ToByteArray(freq, command.data() + 5);
+        sendCommand(command, 5000);
+        break;
     }
     default:
         throw Common::InvalidOperationException();

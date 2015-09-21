@@ -50,8 +50,42 @@ void core::Runner::run()
                     auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
                     isRunning = true;
                     int runningIntervalMs = runCmd->intervalMilliseconds();
-                    sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 }...").arg(runningIntervalMs));
-                    device->sendAuto();
+                    int32_t actualIntervalVal;
+                    if (runningIntervalMs > 1000)
+                    {
+                        actualIntervalVal = runningIntervalMs / 1000;
+                        if (actualIntervalVal > 86400)
+                        {
+                            actualIntervalVal = 86400;
+                        }
+                    }
+                    else
+                    {
+                        // 5 4 3 2 Hz = 200ms, 250ms, 334ms, 500ms
+                        if (runningIntervalMs <= 200)
+                        {
+                            actualIntervalVal = -5;
+                        }
+                        else if (runningIntervalMs <= 250)
+                        {
+                            actualIntervalVal = -4;
+                        }
+                        else if (runningIntervalMs <= 334)
+                        {
+                            actualIntervalVal = -3;
+                        }
+                        else if (runningIntervalMs <= 500)
+                        {
+                            actualIntervalVal = -2;
+                        }
+                        else
+                        {
+                            actualIntervalVal = -1;
+                        }
+                    }
+                    sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
+                        .arg(runningIntervalMs).arg(actualIntervalVal));
+                    device->sendAuto(actualIntervalVal);
                     sLogger.Info(QString("Executed."));
                     break;
                 }
