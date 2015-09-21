@@ -1,113 +1,9 @@
 ﻿#include "Runner.h"
-#include <mongoose.h>
-#include <common/InvalidOperationException.h>
+#include <common/NotImplementedException.h>
+#include "RunnerCommands.h"
+#include <common/Logger.h>
 
-bool core::RunnerActionHandler::match()
-{
-    /*
-    GET api/status
-    POST api/command
-    */
-    return
-        (exactMatch("api/status") && methodMatch("GET")) ||
-        (exactMatch("api/command") && methodMatch("POST"));
-}
-
-void core::RunnerActionHandler::addRunCommand(QJsonObject json)
-{
-    QMutexLocker lock(dataMutex());
-    _commands.enqueue(std::make_shared<RunRunnerCommand>());
-}
-
-void core::RunnerActionHandler::addStopCommand(QJsonObject json)
-{
-    QMutexLocker lock(dataMutex());
-    _commands.enqueue(std::make_shared<StopRunnerCommand>());
-}
-
-void core::RunnerActionHandler::addUpdateStatusCommand(QJsonObject json)
-{
-    QMutexLocker lock(dataMutex());
-    _commands.enqueue(std::make_shared<UpdateStatusRunnerCommand>());
-}
-
-void core::RunnerActionHandler::addSetTimeCommand(QJsonObject json)
-{
-    auto unixTime = json.value("time").toInt();
-    auto time = QDateTime::fromTime_t(unixTime, Qt::UTC);
-    QMutexLocker lock(dataMutex());
-    _commands.enqueue(std::make_shared<SetTimeRunnerCommand>(time));
-}
-
-void core::RunnerActionHandler::addSetRangeCommand(QJsonObject json)
-{
-    auto range = json.value("range").toInt();
-    QMutexLocker lock(dataMutex());
-    _commands.enqueue(std::make_shared<SetRangeRunnerCommand>(range));
-}
-
-void core::RunnerActionHandler::addSetStandByCommand(QJsonObject json)
-{
-    auto standBy = json.value("standBy").toBool();
-    QMutexLocker lock(dataMutex());
-    _commands.enqueue(std::make_shared<SetStandByRunnerCommand>(standBy));
-}
-
-void core::RunnerActionHandler::execute()
-{
-    if (exactMatch("api/status"))
-    {
-        // api/status
-        mg_printf_data(connection(), "{ \"result\": \"Some Test Data\" }");
-    }
-    else if (exactMatch("api/command"))
-    {
-        // api/command
-        QString content(QByteArray(connection()->content, connection()->content_len));
-        QJsonDocument doc = QJsonDocument::fromJson(content.toLatin1());
-        auto root = doc.object();
-        auto command = root.value("command").toString();
-        if (command == "run")
-        {
-            addRunCommand(root);
-        }
-        else if (command == "stop")
-        {
-            addStopCommand(root);
-        }
-        else if (command == "update-status")
-        {
-            addUpdateStatusCommand(root);
-        }
-        else if (command == "set-device-time")
-        {
-            addSetTimeCommand(root);
-        }
-        else if (command == "set-device-range")
-        {
-            addSetRangeCommand(root);
-        }
-        else if (command == "set-device-stand-by")
-        {
-            addSetStandByCommand(root);
-        } else
-        {
-            throw Common::InvalidOperationException();
-        }
-        mg_printf_data(connection(), "{ \"result\": \"enqueued\" }");
-    }
-    else
-    {
-        throw Common::InvalidOperationException();
-    }
-}
-
-QMutex* core::RunnerActionHandler::dataMutex()
-{
-    return &_dataMutex;
-}
-
-core::Runner::Runner(RunnerConfig config)
+core::Runner::Runner(RunnerConfig config) : _config(config)
 {
     _actionHandler = std::make_shared<RunnerActionHandler>();
     _webServer = std::make_shared<WebServer>();
@@ -117,5 +13,59 @@ core::Runner::Runner(RunnerConfig config)
 
 void core::Runner::run()
 {
+    // Running commands aggregator in background thread
     _webServer->runAsync();
+    
+    // Creating a device
+    auto device = std::make_shared<core::EbDevice>();
+    device->connect(_config.devicePortName);
+    device->runDiagnosticSequence();
+    device->runTestAutoSequence();
+
+    bool isRunning = false;
+    while (true)
+    {
+        if (isRunning)
+        {
+            // receive and handle data
+
+        }
+        else
+        {
+            // sleep 1 second as a fallback for data logging
+            QThread::sleep(1);
+        }
+
+        // run commands
+        sLogger.Debug("Reading pending commands...");
+        QMutexLocker lock(_actionHandler->dataMutex());
+        while (!_actionHandler->commands().empty())
+        {
+            sLogger.Debug("Found a command...");
+            auto cmd = _actionHandler->commands().dequeue();
+            switch (cmd->type())
+            {
+            case Run:
+                {
+                    auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
+                    isRunning = true;
+                    int runningIntervalMs = runCmd->intervalMilliseconds();
+                    sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 }...").arg(runningIntervalMs));
+                    device->sendAuto();
+                    sLogger.Info(QString("Executed."));
+                    break;
+                }
+            case Stop:
+                isRunning = false;
+                break;
+            case UpdateStatus: break;
+            case SetTime: break;
+            case SetRange: break;
+            case SetStandBy: break;
+            default:
+                throw Common::NotImplementedException();
+            }
+            sLogger.Debug("Done reading command.");
+        }
+    }
 }
