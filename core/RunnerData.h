@@ -27,8 +27,17 @@ namespace core
     struct RunnerStatus : EbDeviceStatus
     {
         SMART_PTR_T(RunnerStatus);
+
+        RunnerStatus()
+        {
+            standBy = false;
+            isRunning = false;
+        }
+
+        QDateTime timeUpdated;
         QDateTime updated;
         bool standBy;
+        bool isRunning;
     };
 
     struct RunnerConfig

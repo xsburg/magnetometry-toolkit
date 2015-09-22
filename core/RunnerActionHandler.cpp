@@ -65,6 +65,7 @@ void core::RunnerActionHandler::execute()
         json["about"] = _status->about;
         json["enq"] = _status->enq;
         json["time"] = _status->time.toString(Qt::ISODate);
+        json["timeUpdated"] = _status->timeUpdated.toString(Qt::ISODate);
         json["updated"] = _status->updated.toString(Qt::ISODate);
         json["standBy"] = _status->standBy;
         QJsonObject range;

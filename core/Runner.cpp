@@ -11,10 +11,12 @@ core::Runner::Runner(RunnerConfig config) : _config(config)
     _webServer->addActionHandler(_actionHandler);
 }
 
-void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, bool* isRunning)
+void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
+    sLogger.Info(QString("Preparing command RUN..."));
     auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
-    *isRunning = true;
+    status->isRunning = true;
+    status->updated = QDateTime::currentDateTimeUtc();
     int runningIntervalMs = runCmd->intervalMilliseconds();
     int32_t actualIntervalVal;
     if (runningIntervalMs > 1000)
@@ -55,12 +57,77 @@ void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, Runner
     sLogger.Info(QString("Executed."));
 }
 
-void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, bool* isRunning)
+void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    *isRunning = false;
+    sLogger.Info(QString("Preparing command STOP..."));
+    status->isRunning = false;
+    status->updated = QDateTime::currentDateTimeUtc();
     sLogger.Info(QString("Executing command STOP..."));
     device->sendEnq();
     device->readEnq();
+    sLogger.Info(QString("Executed."));
+}
+
+void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    sLogger.Info(QString("Executing command UPDATE-STATUS..."));
+    
+    // enq
+    device->sendEnq();
+    status->enq = device->readEnq();
+    // about
+    device->sendAbout();
+    status->about = device->readAbout();
+    // range
+    device->sendGetRange();
+    status->range = device->readGetRange();
+    // time
+    device->sendGetTime();
+    status->time = device->readGetTime();
+    // timeUpdated
+    status->timeUpdated = QDateTime::currentDateTimeUtc();
+    // updated
+    status->updated = status->timeUpdated;
+
+    sLogger.Info(QString("Executed."));
+}
+
+void core::Runner::executeSetTime(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    sLogger.Info(QString("Preparing command SET-TIME..."));
+    auto timeCmd = std::static_pointer_cast<SetTimeRunnerCommand>(cmd);
+    auto time = timeCmd->time();
+    sLogger.Info(QString("Executing command SET-TIME..."));
+    device->sendSetTime(time);
+    device->readSetTime();
+    device->sendGetTime();
+    status->time = device->readGetTime();
+    status->timeUpdated = QDateTime::currentDateTimeUtc();
+    status->updated = status->timeUpdated;
+    sLogger.Info(QString("Executed."));
+}
+
+void core::Runner::executeSetRange(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    sLogger.Info(QString("Preparing command SET-RANGE..."));
+    auto rangeCmd = std::static_pointer_cast<SetRangeRunnerCommand>(cmd);
+    auto center = rangeCmd->center();
+    sLogger.Info(QString("Executing command SET-RANGE..."));
+    device->sendSetRange(center);
+    status->range = device->readSetRange();
+    status->updated = QDateTime::currentDateTimeUtc();
+    sLogger.Info(QString("Executed."));
+}
+
+void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    sLogger.Info(QString("Preparing command SET-STAND-BY..."));
+    auto standByCmd = std::static_pointer_cast<SetStandByRunnerCommand>(cmd);
+    auto standBy = standByCmd->standBy();
+    sLogger.Info(QString("Executing command SET-STAND-BY..."));
+    device->sendStandBy(standBy);
+    status->standBy = device->readStandBy();
+    status->updated = QDateTime::currentDateTimeUtc();
     sLogger.Info(QString("Executed."));
 }
 
@@ -75,14 +142,28 @@ void core::Runner::run()
     device->runDiagnosticSequence();
     device->runTestAutoSequence();
 
-    bool isRunning = false;
-    bool standBy = false;
+    // We always do status update on start
+    bool isRunning;
+    {
+        QMutexLocker lock(_actionHandler->dataMutex());
+        RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
+        executeUpdateStatus(device, updateCmd, _actionHandler->status());
+        isRunning = _actionHandler->status()->isRunning;
+    }
+
+    // Main worker loop
     while (true)
     {
         if (isRunning)
         {
             // receive and handle data
-
+            QThread::sleep(1);
+            // auto sample = readSample((intervalBetweenSamples + 1) * 1000);
+            /*auto isValid = validateSample(sample);
+            sLogger.Info(QString("Got sample #%7: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+                .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
+            assertTrue(sample.state != FatalError, "Errors if any are not fatal.");*/
         }
         else
         {
@@ -100,15 +181,25 @@ void core::Runner::run()
             switch (cmd->type())
             {
             case Run:
-                executeRunCommand(device, cmd, &isRunning);
+                executeRunCommand(device, cmd, _actionHandler->status());
+                isRunning = _actionHandler->status()->isRunning;
                 break;
             case Stop:
-                executeStopCommand(device, cmd, &isRunning);
+                executeStopCommand(device, cmd, _actionHandler->status());
+                isRunning = _actionHandler->status()->isRunning;
                 break;
-            case UpdateStatus: break;
-            case SetTime: break;
-            case SetRange: break;
-            case SetStandBy: break;
+            case UpdateStatus:
+                executeUpdateStatus(device, cmd, _actionHandler->status());
+                break;
+            case SetTime:
+                executeSetTime(device, cmd, _actionHandler->status());
+                break;
+            case SetRange:
+                executeSetRange(device, cmd, _actionHandler->status());
+                break;
+            case SetStandBy:
+                executeSetStandBy(device, cmd, _actionHandler->status());
+                break;
             default:
                 throw Common::NotImplementedException();
             }

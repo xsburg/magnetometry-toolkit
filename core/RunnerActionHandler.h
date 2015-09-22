@@ -29,7 +29,7 @@ namespace core
         void execute() override;
         QMutex* dataMutex();
 
-        RunnerStatus::SharedPtr_t status() const
+        RunnerStatus::SharedPtr_t& status()
         {
             return _status;
         }
