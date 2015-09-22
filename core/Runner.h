@@ -20,7 +20,8 @@ namespace core
     public:
         SMART_PTR_T(Runner);
         Runner(RunnerConfig config);
-
+        void executeRunCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, bool* isRunning);
+        void executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, bool* isRunning);
         void run();
     private:
         WebServer::SharedPtr_t _webServer;

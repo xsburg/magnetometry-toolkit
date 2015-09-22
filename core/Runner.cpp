@@ -11,6 +11,59 @@ core::Runner::Runner(RunnerConfig config) : _config(config)
     _webServer->addActionHandler(_actionHandler);
 }
 
+void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, bool* isRunning)
+{
+    auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
+    *isRunning = true;
+    int runningIntervalMs = runCmd->intervalMilliseconds();
+    int32_t actualIntervalVal;
+    if (runningIntervalMs > 1000)
+    {
+        actualIntervalVal = runningIntervalMs / 1000;
+        if (actualIntervalVal > 86400)
+        {
+            actualIntervalVal = 86400;
+        }
+    }
+    else
+    {
+        // 5 4 3 2 Hz = 200ms, 250ms, 334ms, 500ms
+        if (runningIntervalMs <= 200)
+        {
+            actualIntervalVal = -5;
+        }
+        else if (runningIntervalMs <= 250)
+        {
+            actualIntervalVal = -4;
+        }
+        else if (runningIntervalMs <= 334)
+        {
+            actualIntervalVal = -3;
+        }
+        else if (runningIntervalMs <= 500)
+        {
+            actualIntervalVal = -2;
+        }
+        else
+        {
+            actualIntervalVal = -1;
+        }
+    }
+    sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
+        .arg(runningIntervalMs).arg(actualIntervalVal));
+    device->sendAuto(actualIntervalVal);
+    sLogger.Info(QString("Executed."));
+}
+
+void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, bool* isRunning)
+{
+    *isRunning = false;
+    sLogger.Info(QString("Executing command STOP..."));
+    device->sendEnq();
+    device->readEnq();
+    sLogger.Info(QString("Executed."));
+}
+
 void core::Runner::run()
 {
     // Running commands aggregator in background thread
@@ -23,6 +76,7 @@ void core::Runner::run()
     device->runTestAutoSequence();
 
     bool isRunning = false;
+    bool standBy = false;
     while (true)
     {
         if (isRunning)
@@ -46,51 +100,10 @@ void core::Runner::run()
             switch (cmd->type())
             {
             case Run:
-                {
-                    auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
-                    isRunning = true;
-                    int runningIntervalMs = runCmd->intervalMilliseconds();
-                    int32_t actualIntervalVal;
-                    if (runningIntervalMs > 1000)
-                    {
-                        actualIntervalVal = runningIntervalMs / 1000;
-                        if (actualIntervalVal > 86400)
-                        {
-                            actualIntervalVal = 86400;
-                        }
-                    }
-                    else
-                    {
-                        // 5 4 3 2 Hz = 200ms, 250ms, 334ms, 500ms
-                        if (runningIntervalMs <= 200)
-                        {
-                            actualIntervalVal = -5;
-                        }
-                        else if (runningIntervalMs <= 250)
-                        {
-                            actualIntervalVal = -4;
-                        }
-                        else if (runningIntervalMs <= 334)
-                        {
-                            actualIntervalVal = -3;
-                        }
-                        else if (runningIntervalMs <= 500)
-                        {
-                            actualIntervalVal = -2;
-                        }
-                        else
-                        {
-                            actualIntervalVal = -1;
-                        }
-                    }
-                    sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
-                        .arg(runningIntervalMs).arg(actualIntervalVal));
-                    device->sendAuto(actualIntervalVal);
-                    sLogger.Info(QString("Executed."));
-                    break;
-                }
+                executeRunCommand(device, cmd, &isRunning);
+                break;
             case Stop:
-                isRunning = false;
+                executeStopCommand(device, cmd, &isRunning);
                 break;
             case UpdateStatus: break;
             case SetTime: break;
