@@ -12,7 +12,6 @@ void *serve(void *param) {
 }
 
 int ev_handler(mg_connection *connection, enum mg_event event) {
-    sLogger.Info(QString("New connection to '%1'.").arg(connection->uri));
     auto webServerPtr = static_cast<core::WebServer**>(connection->server_param);
     if (*webServerPtr == nullptr)
     {
@@ -25,6 +24,7 @@ int ev_handler(mg_connection *connection, enum mg_event event) {
     case MG_AUTH:
         return MG_TRUE;
     case MG_REQUEST:
+        sLogger.Info(QString("New connection to '%1'.").arg(connection->uri));
         for (auto& handler : handlers)
         {
             handler->connection(connection);
