@@ -69,4 +69,9 @@ namespace core
         ms_log(0, "Packed %d samples into %d records\n", _packedSamples, _packedRecords);
         return true;
     }
+
+    bool MSeedWriter::flush()
+    {
+        return _binaryStream->flush();
+    }
 }

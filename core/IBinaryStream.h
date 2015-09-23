@@ -18,5 +18,6 @@ namespace core
         virtual qint64 read(char * data, qint64 maxSize) = 0;
         virtual QByteArray peek(qint64 maxlen) = 0;
         virtual qint64 peek(char * data, qint64 maxSize) = 0;
+        virtual bool flush() = 0;
     };
 }

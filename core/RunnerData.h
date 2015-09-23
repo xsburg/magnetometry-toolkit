@@ -45,5 +45,10 @@ namespace core
     {
         int webServerPort;
         QString devicePortName;
+        QString msRecordLocation;
+        QString msRecordNetwork;
+        QString msRecordStation;
+        QString msFileName;
+        int samplesCacheMaxSize;
     };
 }

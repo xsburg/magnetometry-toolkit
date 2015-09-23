@@ -35,26 +35,29 @@ namespace core
     public:
         SMART_PTR_T(MSeedWriter);
 
-        MSeedWriter(IBinaryStream::SharedPtr_t binaryStream) : _binaryStream(binaryStream)
+        explicit MSeedWriter(IBinaryStream::SharedPtr_t binaryStream) : _binaryStream(binaryStream)
         {
             _recordLength = 512;
             _encoding = MSeedDataEncoding::Steim2;
             _verbose = All;
+            _packedRecords = 0;
+            _packedSamples = 0;
         }
 
-        inline MSeedDataEncoding encoding() const { return _encoding; }
-        inline void encoding(const MSeedDataEncoding& encoding) { _encoding = encoding; }
+        MSeedDataEncoding encoding() const { return _encoding; }
+        void encoding(const MSeedDataEncoding& encoding) { _encoding = encoding; }
 
-        inline int recordLength() const { return _recordLength; }
-        inline void recordLength(const int& recordLength) { _recordLength = recordLength; }
+        int recordLength() const { return _recordLength; }
+        void recordLength(const int& recordLength) { _recordLength = recordLength; }
 
-        inline MSeedPackVerbose verbose() const { return _verbose; }
-        inline void verbose(const MSeedPackVerbose& verbose) { _verbose = verbose; }
+        MSeedPackVerbose verbose() const { return _verbose; }
+        void verbose(const MSeedPackVerbose& verbose) { _verbose = verbose; }
 
-        inline int packedRecords() const { return _packedRecords; }
-        inline int packedSamples() const { return _packedSamples; }
+        int packedRecords() const { return _packedRecords; }
+        int packedSamples() const { return _packedSamples; }
 
         bool write(IntegerMSeedRecord::SharedPtr_t sampleRange);
+        bool flush();
         void close();
     private:
         IBinaryStream::SharedPtr_t _binaryStream;

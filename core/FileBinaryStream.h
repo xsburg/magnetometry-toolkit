@@ -65,5 +65,10 @@ namespace core
         {
             return _file->peek(data, maxSize);
         }
+
+        bool flush() override
+        {
+            return _file->flush();
+        }
     };
 }

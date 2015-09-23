@@ -6,6 +6,7 @@
 #include <boost/system/system_error.hpp>
 #include <EbDevice.h>
 #include <boost/exception/diagnostic_information.hpp>
+#include <Runner.h>
 
 using namespace Common;
 
@@ -19,7 +20,7 @@ int main(int argc, char** argv)
         QTextCodec::setCodecForLocale(codec);
 
         sIniSettings.Initialize(Path::Combine(Path::ApplicationDirPath(), "config.ini"));
-        sLogger.Initialize(sIniSettings.value("LogLevel", 5).toInt());
+        sLogger.Initialize(sIniSettings.value("logLevel", 5).toInt());
 
         sLogger.Debug("The following sqldrivers are available:");
         auto sqlDrivers = QSqlDatabase::drivers();
@@ -35,10 +36,17 @@ int main(int argc, char** argv)
         sLogger.Info(QString("device.portName: %1").arg(portName));
         sLogger.Info("==============");
 
-        auto device = std::make_shared<core::EbDevice>();
-        device->connect(portName);
-        device->runDiagnosticSequence();
-        device->runTestAutoSequence();
+        core::RunnerConfig config;
+        config.webServerPort = sIniSettings.value("webServer/port", 8000).toInt();
+        config.devicePortName = sIniSettings.value("device/portName").toString();
+        config.msRecordLocation = sIniSettings.value("mseed/location").toString();
+        config.msRecordNetwork = sIniSettings.value("mseed/network").toString();
+        config.msRecordStation = sIniSettings.value("mseed/station").toString();
+        config.msFileName = sIniSettings.value("mseed/fileName").toString();
+        config.samplesCacheMaxSize = sIniSettings.value("runner/samplesCacheMaxSize", 100).toInt();
+
+        auto runner = std::make_shared<core::Runner>(config);
+        runner->run();
 
         return 0;
     }

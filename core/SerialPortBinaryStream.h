@@ -162,5 +162,10 @@ namespace core
         {
             _serial.close();
         }
+
+        bool flush() override
+        {
+            return true;
+        }
     };
 }
