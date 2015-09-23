@@ -50,5 +50,6 @@ namespace core
         QString msRecordStation;
         QString msFileName;
         int samplesCacheMaxSize;
+        bool skipDiagnostics;
     };
 }

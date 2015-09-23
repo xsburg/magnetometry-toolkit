@@ -44,6 +44,7 @@ int main(int argc, char** argv)
         config.msRecordStation = sIniSettings.value("mseed/station").toString();
         config.msFileName = sIniSettings.value("mseed/fileName").toString();
         config.samplesCacheMaxSize = sIniSettings.value("runner/samplesCacheMaxSize", 100).toInt();
+        config.skipDiagnostics = sIniSettings.value("runner/skipDiagnostics", false).toBool();
 
         auto runner = std::make_shared<core::Runner>(config);
         runner->run();

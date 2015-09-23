@@ -193,10 +193,17 @@ void core::Runner::run()
     sLogger.Info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
     auto device = std::make_shared<core::EbDevice>();
     device->connect(_config.devicePortName);
-    sLogger.Info(QString("Running device diagnostics..."));
-    device->runDiagnosticSequence();
-    device->runTestAutoSequence();
-    sLogger.Info(QString("Diagnostics done."));
+    if (!_config.skipDiagnostics)
+    {
+        sLogger.Info(QString("Running device diagnostics..."));
+        device->runDiagnosticSequence();
+        device->runTestAutoSequence();
+        sLogger.Info(QString("Diagnostics done."));
+    }
+    else
+    {
+        sLogger.Info(QString("Skipping device diagnostics..."));
+    }
 
     // Creating an mseed writer
     auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);
@@ -256,7 +263,6 @@ void core::Runner::run()
             }
 
             // run commands
-            sLogger.Debug("Reading pending commands...");
             QMutexLocker lock(_actionHandler->dataMutex());
             while (!_actionHandler->commands().empty())
             {
