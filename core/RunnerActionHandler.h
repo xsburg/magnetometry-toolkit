@@ -20,6 +20,8 @@ namespace core
     public:
         SMART_PTR_T(RunnerActionHandler);
 
+        RunnerActionHandler();
+
         QString name() const override
         {
             return "RunnerActionHandler";

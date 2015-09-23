@@ -3,6 +3,10 @@
 #include <common/InvalidOperationException.h>
 #include "RunnerCommands.h"
 
+core::RunnerActionHandler::RunnerActionHandler() : _status(new RunnerStatus())
+{
+}
+
 bool core::RunnerActionHandler::match()
 {
     /*
