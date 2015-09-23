@@ -186,13 +186,17 @@ void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MS
 void core::Runner::run()
 {
     // Running commands aggregator in background thread
+    sLogger.Info(QString("Starting web server on port %1...").arg(_config.webServerPort));
     _webServer->runAsync();
     
     // Creating a device
+    sLogger.Info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
     auto device = std::make_shared<core::EbDevice>();
     device->connect(_config.devicePortName);
+    sLogger.Info(QString("Running device diagnostics..."));
     device->runDiagnosticSequence();
     device->runTestAutoSequence();
+    sLogger.Info(QString("Diagnostics done."));
 
     // Creating an mseed writer
     auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);
@@ -204,17 +208,20 @@ void core::Runner::run()
     bool isFlushing = false;
     int samplingIntervalMs;
     {
+        sLogger.Info(QString("Gathering device start-up config..."));
         QMutexLocker lock(_actionHandler->dataMutex());
         RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
         executeUpdateStatus(device, updateCmd, _actionHandler->status());
         isRunning = _actionHandler->status()->isRunning;
         samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+        sLogger.Info(QString("Done gathering."));
     }
 
     QVector<EbDevice::Sample> samplesCache;
     // Main worker loop
     try
     {
+        sLogger.Info(QString("Starting main logging loop..."));
         while (true)
         {
             if (isRunning)
