@@ -84,6 +84,11 @@ namespace Common
 
         void ToByteArray(int8_t val, char* dst) const
         {
+            *reinterpret_cast<int8_t*>(dst) = val;
+        }
+
+        void ToByteArray(char val, char* dst) const
+        {
             *dst = val;
         }
 
@@ -156,9 +161,14 @@ namespace Common
             return val;
         }
 
-        int8_t GetInt8(const char* data) const
+        char GetChar(const char* data) const
         {
             return *data;
+        }
+
+        int8_t GetInt8(const char* data) const
+        {
+            return *reinterpret_cast<const int8_t*>(data);
         }
 
         int16_t GetInt16(const char* data) const

@@ -164,6 +164,22 @@ void core::Runner::run()
                 .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
                 .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
             assertTrue(sample.state != FatalError, "Errors if any are not fatal.");*/
+
+/*QVector<IntegerMSeedRecord::SharedPtr_t> data(4);
+            for (int i = 0; i < 4; i++)
+            {
+                auto range = data[i] = std::make_shared<IntegerMSeedRecord>();
+                range->channelName(QString("CH") + QString::number(i));
+                range->location("MS");
+                range->network("IF");
+                range->station("IFZMK");
+                range->samplingRateHz(3);
+                range->startTime(QDateTime(QDate(2015, 6, 4), QTime(13, 44), Qt::UTC));
+                for (int j = 0; j < 500; j++)
+                {
+                    range->data().push_back(j * (i + 1));
+                }
+            }*/
         }
         else
         {

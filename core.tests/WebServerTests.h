@@ -77,12 +77,12 @@ namespace core
         {
             // Arrange
             auto server = std::make_shared<WebServer>();
-            server->port(8000);
+            server->port(8001);
             server->addActionHandler(std::make_shared<PostTestActionHandler>());
             server->runAsync();
 
             // Act
-            auto responseText = sHelpers.postResponse("http://localhost:8000/api/test", QString("{ \"command\": \"FIRE\" }"));
+            auto responseText = sHelpers.postResponse("http://localhost:8001/api/test", QString("{ \"command\": \"FIRE\" }"));
 
             // Assert
             qDebug() << "200, data: " << responseText;
