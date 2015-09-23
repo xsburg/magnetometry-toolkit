@@ -17,42 +17,50 @@ void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, Runner
     auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
     status->isRunning = true;
     status->updated = QDateTime::currentDateTimeUtc();
-    int runningIntervalMs = runCmd->intervalMilliseconds();
+    int samplingIntervalMs = runCmd->intervalMilliseconds();
+    int actualSamplingIntervalMs;
     int32_t actualIntervalVal;
-    if (runningIntervalMs > 1000)
+    if (samplingIntervalMs > 1000)
     {
-        actualIntervalVal = runningIntervalMs / 1000;
+        actualIntervalVal = samplingIntervalMs / 1000;
         if (actualIntervalVal > 86400)
         {
             actualIntervalVal = 86400;
         }
+        actualSamplingIntervalMs = actualIntervalVal * 1000;
     }
     else
     {
         // 5 4 3 2 Hz = 200ms, 250ms, 334ms, 500ms
-        if (runningIntervalMs <= 200)
+        if (samplingIntervalMs <= 200)
         {
             actualIntervalVal = -5;
+            actualSamplingIntervalMs = 200;
         }
-        else if (runningIntervalMs <= 250)
+        else if (samplingIntervalMs <= 250)
         {
             actualIntervalVal = -4;
+            actualSamplingIntervalMs = 250;
         }
-        else if (runningIntervalMs <= 334)
+        else if (samplingIntervalMs <= 334)
         {
             actualIntervalVal = -3;
+            actualSamplingIntervalMs = 334;
         }
-        else if (runningIntervalMs <= 500)
+        else if (samplingIntervalMs <= 500)
         {
             actualIntervalVal = -2;
+            actualSamplingIntervalMs = 500;
         }
         else
         {
             actualIntervalVal = -1;
+            actualSamplingIntervalMs = 1000;
         }
     }
+    status->samplingIntervalMs = actualSamplingIntervalMs;
     sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
-        .arg(runningIntervalMs).arg(actualIntervalVal));
+        .arg(samplingIntervalMs).arg(actualIntervalVal));
     device->sendAuto(actualIntervalVal);
     sLogger.Info(QString("Executed."));
 }
@@ -144,11 +152,13 @@ void core::Runner::run()
 
     // We always do status update on start
     bool isRunning;
+    int samplingIntervalMs;
     {
         QMutexLocker lock(_actionHandler->dataMutex());
         RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
         executeUpdateStatus(device, updateCmd, _actionHandler->status());
         isRunning = _actionHandler->status()->isRunning;
+        samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
     }
 
     // Main worker loop
@@ -157,6 +167,18 @@ void core::Runner::run()
         if (isRunning)
         {
             // receive and handle data
+            const int acceptableDelay = 1000;
+            auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
+            auto isValid = device->validateSample(sample);
+            sLogger.Info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+                .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+
+            _config.miniSeedLocation;
+            _config.miniSeedNetwork;
+            _config.miniSeedStation;
+
+
             QThread::sleep(1);
             // auto sample = readSample((intervalBetweenSamples + 1) * 1000);
             /*auto isValid = validateSample(sample);
@@ -199,6 +221,7 @@ void core::Runner::run()
             case Run:
                 executeRunCommand(device, cmd, _actionHandler->status());
                 isRunning = _actionHandler->status()->isRunning;
+                samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
                 break;
             case Stop:
                 executeStopCommand(device, cmd, _actionHandler->status());

@@ -38,6 +38,7 @@ namespace core
         QDateTime updated;
         bool standBy;
         bool isRunning;
+        int samplingIntervalMs;
     };
 
     struct RunnerConfig
