@@ -82,7 +82,7 @@ void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, Runne
 void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
     sLogger.Info(QString("Executing command UPDATE-STATUS..."));
-    
+
     // enq
     device->sendEnq();
     status->enq = device->readEnq();
@@ -188,7 +188,7 @@ void core::Runner::run()
     // Running commands aggregator in background thread
     sLogger.Info(QString("Starting web server on port %1...").arg(_config.webServerPort));
     _webServer->runAsync();
-    
+
     // Creating a device
     sLogger.Info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
     auto device = std::make_shared<core::EbDevice>();
@@ -233,25 +233,30 @@ void core::Runner::run()
         {
             if (isRunning)
             {
-                // receive data sample and write it into mini-seed stream
-                const int acceptableDelay = 1000;
-                auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
-                auto isValid = device->validateSample(sample);
-                sLogger.Info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
-                    .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
-                    .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+                if (!isStopping)
+                {
+                    // receive data sample and write it into mini-seed stream
+                    const int acceptableDelay = 1000;
+                    auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
+                    auto isValid = device->validateSample(sample);
+                    sLogger.Info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+                        .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
 
-                samplesCache.push_back(sample);
+                    samplesCache.push_back(sample);
 
-                if (samplesCache.size() > _config.samplesCacheMaxSize || isStopping)
+                    if (samplesCache.size() >= _config.samplesCacheMaxSize)
+                    {
+                        isFlushing = true;
+                        flushSamplesCache(samplesCache, writer, samplingIntervalMs);
+                        isFlushing = false;
+                    }
+                }
+                else
                 {
                     isFlushing = true;
                     flushSamplesCache(samplesCache, writer, samplingIntervalMs);
                     isFlushing = false;
-                }
-
-                if (isStopping)
-                {
                     isStopping = false;
                     isRunning = false;
                 }
@@ -276,8 +281,11 @@ void core::Runner::run()
                     samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
                     break;
                 case Stop:
-                    executeStopCommand(device, cmd, _actionHandler->status());
-                    isStopping = true;
+                    if (isRunning)
+                    {
+                        executeStopCommand(device, cmd, _actionHandler->status());
+                        isStopping = true;
+                    }
                     break;
                 case UpdateStatus:
                     executeUpdateStatus(device, cmd, _actionHandler->status());

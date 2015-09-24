@@ -23,7 +23,10 @@ void core::EbDevice::connect(QString portName)
     _serialPort.setStopBits(QSerialPort::OneStop);
     _serialPort.open(QIODevice::ReadWrite);
     _serialPort.setBreakEnabled(false);
-    sLogger.Debug("Connected, sending setMode : binary...");
+    sLogger.Debug("Connected, sending ENQ to interrupt auto mode that might be running...");
+    sendEnq();
+    readEnq();
+    sLogger.Debug("Sending setMode : binary...");
     sendSetMode(Mode::Binary);
     _mode = readSetMode();
     sLogger.Debug("Done connecting.");
