@@ -32,6 +32,7 @@ namespace core
         {
             standBy = false;
             isRunning = false;
+            samplingIntervalMs = 0;
         }
 
         QDateTime timeUpdated;

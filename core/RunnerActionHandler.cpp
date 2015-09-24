@@ -72,6 +72,8 @@ void core::RunnerActionHandler::execute()
         json["timeUpdated"] = _status->timeUpdated.toString(Qt::ISODate);
         json["updated"] = _status->updated.toString(Qt::ISODate);
         json["standBy"] = _status->standBy;
+        json["isRunning"] = _status->isRunning;
+        json["samplingIntervalMs"] = _status->samplingIntervalMs;
         QJsonObject range;
         range["minField"] = _status->range.minField;
         range["maxField"] = _status->range.maxField;
