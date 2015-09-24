@@ -306,5 +306,6 @@ void core::Runner::run()
             sLogger.Debug("Trying to flush samples cache...");
             flushSamplesCache(samplesCache, writer, samplingIntervalMs);
         }
+        throw;
     }
 }
