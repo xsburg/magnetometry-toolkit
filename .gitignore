@@ -44,7 +44,7 @@ common.tests/common.tests.vcxproj
 common.tests/common.tests.vcxproj.filters
 common/common.vcxproj.filters
 logger/logger.vcxproj
-build/
+/build/
 logger/logger.sln
 core.tests/core.tests.sln
 core.tests/core.tests.vcxproj
@@ -77,3 +77,7 @@ mongoose/mongoose.vcxproj
 gemlogd/gemlogd.dir/
 *.vcxproj.user
 web/node_modules/
+web/.sass-cache/
+web/public/styles/generated.css
+web/public/styles/generated.css.map
+web/.idea/

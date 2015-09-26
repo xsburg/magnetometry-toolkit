@@ -1,0 +1,46 @@
+{
+  "name": "comindware.tracker.portal",
+  "version": "0.0.1",
+  "description": "The following packages are managed directly (by hands): backbone-forms, backbone.trackit, jquery.caret.1.02.min, jquery.autosize",
+  "dependencies": {
+    "requirejs-bower": "2.1.20",
+    "domReady": "2.0.1",
+    "text": "2.0.14",
+    "underscore": "1.6.0",
+	"underscore.string": "3.2.0",
+    "marionette": "2.2.0",
+    "backbone": "1.1.2",
+    "backbone-associations": "0.6.2",
+    "backbone-computedfields": "0.0.9",
+	"backbone.radio": "1.0.2",
+    "jquery": "1.10.2",
+    "bluebird": "2.9.24",
+    "Keypress": "2.1.0",
+    "handlebars": "3.0.3",
+    "jquery-mousewheel": "3.1.13",
+    "moment": "2.10.6"
+  },
+  "exportsOverride": {
+    "moment": {
+      "": "moment.js",
+      "js/../locale": [
+        "locale/en-gb.js",
+        "locale/ru.js",
+        "locale/de.js"
+      ]
+    },
+    "Keypress": {
+      "js/../../keypress": "keypress.js"
+    },
+    "domReady": {
+      "js/../../require": "domReady.js"
+    },
+    "text": {
+      "js/../../require": "text.js"
+    },
+    "requirejs-bower": {
+      "js/../../require": "require.js"
+    }
+  },
+  "private": true
+}
