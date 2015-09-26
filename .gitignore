@@ -81,3 +81,4 @@ web/.sass-cache/
 web/public/styles/generated.css
 web/public/styles/generated.css.map
 web/.idea/
+web/bower_components/
