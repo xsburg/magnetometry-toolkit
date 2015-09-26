@@ -23,11 +23,9 @@
             backbone: 'lib/backbone/backbone',
             backbone_associations: 'lib/backbone-associations/backbone-associations',
             backbone_forms: 'lib/backbone-forms/backbone-forms',
-            backbone_computedfields: 'lib/backbone-computedfields/backbone.computedfields',
             backbone_trackit: 'lib/backbone.trackit/backbone.trackit',
             'backbone.babysitter': 'lib/backbone.babysitter/backbone.babysitter',
             'backbone.wreqr': 'lib/backbone.wreqr/backbone.wreqr',
-            'backbone.radio': 'lib/backbone.radio/backbone.radio',
 
             marionette: 'lib/marionette/backbone.marionette',
 
@@ -46,18 +44,9 @@
             moment_ru: 'lib/moment/locale/ru',
             moment_de: 'lib/moment/locale/de',
 
-            'module/lib': 'lib/libApi',
-
-            'commonApi': 'module/common/commonApi',
-            'historyApi': 'module/history/historyApi',
-            'caseCreationApi': 'module/caseCreation/caseCreationApi',
-
-            localizationMap: global.compiled ?
-                (global.langCode ? 'localizationMap.' + global.langCode : 'empty:') :
-                (global.langCode ? 'compiled/localizationMap.' + global.langCode : 'empty:'),
-            ajaxMap: global.compiled ? 'ajaxMap?noext' : 'compiled/ajaxMap?noext',
-
-            'core': 'module/core'
+            'lib': 'lib/libApi',
+            'core': 'module/core/coreApi',
+            'common': 'module/common/commonApi'
         },
         shim: {
             marionette: {
@@ -89,7 +78,6 @@
 
             backbone_associations: [ 'backbone' ],
             backbone_forms: [ 'backbone' ],
-            backbone_computedfields: [ 'backbone' ],
             backbone_trackit: [ 'backbone', 'backbone_associations' ],
 
             jquery_caret: [ 'jquery' ],
@@ -107,15 +95,12 @@
         "text", // it's required to correctly build with r.js
         "Application",
         "AppRouter",
-        "AppController",
-        "commonApi"
-    ], function (text, Application, AppRouter, AppController, commonApi) {
+        "AppController"
+    ], function (text, Application, AppRouter, AppController) {
+        debugger;
         Application.appRouter = new AppRouter({
             controller: new AppController()
         });
-        //Promise.all(Application.navigation.load(), commonApi.services.ClassifierService.load()).then(function () {
-        Application.navigation.load().then(function () {
-            Application.start();
-        });
+        Application.start();
     });
 })(this);

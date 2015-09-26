@@ -8,17 +8,14 @@
 /* global define, require, Handlebars, Backbone, Marionette, $, _, Localizer */
 
 define([
-    'module/lib'
+    'lib'
 ], function () {
     'use strict';
 
     return Marionette.AppRouter.extend({
         appRoutes: {
             "": "index",
-            "Dashboard": "showDashboard",
-            "Case/:id": "showCase",
-            "Demo/Core": "showCoreDemo",
-            "CaseList/:id": "showCaseList"
+            "Dashboard": "showDashboard"
         }
     });
 });

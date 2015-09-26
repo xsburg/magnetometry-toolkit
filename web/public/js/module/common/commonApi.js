@@ -10,14 +10,10 @@
 define([
     'module/common/services/RoutingService',
     'module/common/services/UrlService',
-    'module/common/services/ClassifierService',
-    'module/common/header/views/HeaderView',
     'module/common/meta'
 ], function (
     RoutingService,
     UrlService,
-    ClassifierService,
-    HeaderView,
     meta
 ) {
     'use strict';
@@ -25,11 +21,7 @@ define([
     return {
         services: {
             RoutingService: RoutingService,
-            UrlService: UrlService,
-            ClassifierService: ClassifierService
-        },
-        header: {
-            View: HeaderView
+            UrlService: UrlService
         },
         meta: meta
     };

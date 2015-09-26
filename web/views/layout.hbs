@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    {{{body}}}
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <title>Device Management Console</title>
+        <meta name="description" content="Device Management Console Application">
+        <script>
+            window.langCode = 'en';
+            window.compiled = {{compiled}}{{title}};
+        </script>
+        {{#if compiled}}
+            <link rel='stylesheet' href='/styles/generated.min.css' />
+            <script type="text/javascript" src="/js/lib/require/require.js" data-main="js/compiled/Init.js"></script>
+        {{else}}
+            <link rel='stylesheet' href='/styles/generated.css' />
+            <script type="text/javascript" src="/js/lib/require/require.js" data-main="js/Init.js"></script>
+        {{/if}}
+    </head>
+    <body>
+        {{{body}}}
+    </body>
 </html>

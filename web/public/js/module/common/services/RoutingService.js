@@ -8,7 +8,7 @@
 /* global define, require, Handlebars, Backbone, Marionette, $, _, Localizer */
 
 define([
-    'module/lib'
+    'lib'
 ], function () {
     'use strict';
 
