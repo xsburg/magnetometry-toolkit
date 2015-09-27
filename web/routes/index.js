@@ -1,9 +1,13 @@
 var express = require('express');
+var cfg = require('../config');
 var router = express.Router();
 
-/* GET home page. */
+/* GET single page application index. */
 router.get('/', function(req, res, next) {
-  res.render('index', { compiled: false });
+    res.render('index', {
+        compiled: cfg.compiled,
+        layout: null
+    });
 });
 
 module.exports = router;

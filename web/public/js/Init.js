@@ -97,7 +97,6 @@
         "AppRouter",
         "AppController"
     ], function (text, Application, AppRouter, AppController) {
-        debugger;
         Application.appRouter = new AppRouter({
             controller: new AppController()
         });

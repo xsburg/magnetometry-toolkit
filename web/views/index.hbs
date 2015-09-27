@@ -1,2 +1,30 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Device Management Console</title>
+    <meta name="description" content="Device Management Console Application">
+    <script>
+        window.langCode = 'en';
+        window.compiled = {{compiled}};
+    </script>
+    {{#if compiled}}
+        <link rel='stylesheet' href='/styles/generated.min.css' />
+        <script type="text/javascript" src="/js/lib/require/require.js" data-main="js/compiled/Init.js"></script>
+    {{else}}
+        <link rel='stylesheet' href='/styles/generated.css' />
+        <script type="text/javascript" src="/js/lib/require/require.js" data-main="js/Init.js"></script>
+    {{/if}}
+</head>
+<body>
+    <div class="js-application-login-region"></div>
+    <div class="js-application-fading-region hidden"></div>
+    <div class="js-application-popup-region dev-popup-container hidden"></div>
+    <div class="js-application-side-navigation-region"></div>
+    <div class="js-application-loading-region l-loader"></div>
+    <div class="js-application-content-region layout"></div>
+    <div class="js-startup-loading">
+        INITIAL LOADING...
+    </div>
+</body>
+</html>

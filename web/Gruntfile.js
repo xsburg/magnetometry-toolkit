@@ -45,10 +45,10 @@
             requirejs: {
                 compile: {
                     options: {
-                        baseUrl: "./public",
-                        mainConfigFile: "./public/js/Init.js",
+                        baseUrl: "public/js",
+                        mainConfigFile: "public/js/Init.js",
                         name: 'Init',
-                        out: './public/js/compiled/Init.js',
+                        out: 'public/js/compiled/Init.js',
                         wrapShim: true,
                         optimize: "none"
                         //optimize: "uglify2"
