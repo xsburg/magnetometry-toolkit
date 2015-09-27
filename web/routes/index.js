@@ -5,7 +5,7 @@ var router = express.Router();
 /* GET single page application index. */
 router.get('/', function(req, res, next) {
     res.render('index', {
-        compiled: cfg.compiled,
+        compiled: req.app.get('env') === 'production' || cfg.compiled,
         layout: null
     });
 });
