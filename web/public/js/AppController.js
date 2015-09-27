@@ -11,8 +11,9 @@ define([
     'lib',
     'core',
     'common',
-    'Application'
-], function (lib, core, common, Application) {
+    'Application',
+    'app/dashboard/dashboardApi'
+], function (lib, core, common, Application, dashboardApi) {
     'use strict';
 
     return Marionette.Object.extend({
@@ -21,9 +22,8 @@ define([
         },
 
         showDashboard: function () {
-            debugger;
-            //var dashboardController = new DashboardController();
-            //Application.contentRegion.show(dashboardController.view);
+            var dashboardController = new dashboardApi.Controller();
+            Application.contentRegion.show(dashboardController.view);
         }
     });
 });
