@@ -9,9 +9,13 @@
         window.compiled = {{compiled}};
     </script>
     {{#if compiled}}
+        <link rel='stylesheet' href='/styles/bootstrap.min.css' />
+        <link rel='stylesheet' href='/styles/bootstrap-theme.min.css' />
         <link rel='stylesheet' href='/styles/generated.min.css' />
         <script type="text/javascript" src="/js/lib/require/require.js" data-main="js/compiled/Init.js"></script>
     {{else}}
+        <link rel='stylesheet' href='/styles/bootstrap.css' />
+        <link rel='stylesheet' href='/styles/bootstrap-theme.css' />
         <link rel='stylesheet' href='/styles/generated.css' />
         <script type="text/javascript" src="/js/lib/require/require.js" data-main="js/Init.js"></script>
     {{/if}}

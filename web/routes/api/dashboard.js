@@ -12,14 +12,14 @@ var router = express.Router();
 
 router.get('/eb-device/status', function(req, res, next) {
 
-    request({
+    /*request({
         url: 'http://myUrl.com/api/status',
         json: true
     }, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             console.log(body) // Print the json response
         }
-    });
+    });*/
 
 
     res.json({ isRunning: true, errorText: 'testtesttest' });

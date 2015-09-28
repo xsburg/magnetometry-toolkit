@@ -1,7 +1,7 @@
 {
   "name": "comindware.tracker.portal",
   "version": "0.0.1",
-  "description": "The following packages are managed directly (by hands): backbone-forms, backbone.trackit, jquery.caret.1.02.min, jquery.autosize",
+  "description": "The following packages are managed directly (by hands): backbone-forms, backbone.trackit, jquery.caret.1.02.min, jquery.autosize, bootstrap 3.3.5",
   "dependencies": {
     "requirejs-bower": "2.1.20",
     "domReady": "2.0.1",

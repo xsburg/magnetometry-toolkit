@@ -6,6 +6,8 @@
 
     module.exports = function (grunt) {
         var _ = require('underscore');
+        var autoprefixer = require('autoprefixer');
+        var cssnano = require('cssnano');
 
         grunt.loadNpmTasks('grunt-bower-task');
         grunt.loadNpmTasks('grunt-contrib-sass');
@@ -13,6 +15,7 @@
         grunt.loadNpmTasks('grunt-contrib-requirejs');
         grunt.loadNpmTasks('grunt-contrib-cssmin');
         grunt.loadNpmTasks('grunt-shell');
+        grunt.loadNpmTasks('grunt-postcss');
 
         // SASS requirements:
         // http://dl.bintray.com/oneclick/rubyinstaller/rubyinstaller-2.2.2.exe
@@ -36,10 +39,24 @@
                     }
                 }
             },
+            postcss: {
+                options: {
+                    map: true,
+                    processors: [
+                        autoprefixer({
+                            browsers: ['last 2 versions']
+                        }),
+                        cssnano()
+                    ]
+                },
+                dist: {
+                    src: 'public/styles/generated.css'
+                }
+            },
             watch: {
                 css: {
                     files: './sass/**/*.scss',
-                    tasks: [ 'sass' ]
+                    tasks: [ 'sass', 'postcss' ]
                 }
             },
             requirejs: {
@@ -54,21 +71,12 @@
                         //optimize: "uglify2"
                     }
                 }
-            },
-            cssmin: {
-                options: {
-                },
-                target: {
-                    files: {
-                        './public/styles/generated.min.css': './public/styles/generated.css'
-                    }
-                }
             }
         });
 
         grunt.registerTask('update', [ 'bower' ]);
-        grunt.registerTask('development', [ 'sass' ]);
-        grunt.registerTask('production', [ 'sass', 'requirejs', 'cssmin' ]);
+        grunt.registerTask('development', [ 'sass', 'postcss' ]);
+        grunt.registerTask('production', [ 'requirejs', 'sass', 'postcss' ]);
 
         grunt.registerTask('default', [ 'watch' ]);
     };

@@ -44,6 +44,8 @@
             moment_ru: 'lib/moment/locale/ru',
             moment_de: 'lib/moment/locale/de',
 
+            bootstrap: 'lib/bootstrap/bootstrap',
+
             'lib': 'lib/libApi',
             'core': 'module/core/coreApi',
             'common': 'module/common/commonApi'
@@ -73,6 +75,10 @@
             },
 
             datetimePicker: {
+                deps: ['jquery']
+            },
+
+            bootstrap: {
                 deps: ['jquery']
             },
 
