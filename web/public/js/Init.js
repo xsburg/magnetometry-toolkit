@@ -45,6 +45,7 @@
             moment_de: 'lib/moment/locale/de',
 
             bootstrap: 'lib/bootstrap/bootstrap',
+            metisMenu: '../components/metisMenu/dist/metisMenu',
 
             'lib': 'lib/libApi',
             'core': 'module/core/coreApi',
@@ -82,6 +83,10 @@
                 deps: ['jquery']
             },
 
+            metisMenu: {
+                deps: ['jquery']
+            },
+
             backbone_associations: [ 'backbone' ],
             backbone_forms: [ 'backbone' ],
             backbone_trackit: [ 'backbone', 'backbone_associations' ],
@@ -101,7 +106,8 @@
         "text", // it's required to correctly build with r.js
         "Application",
         "AppRouter",
-        "AppController"
+        "AppController",
+        "metisMenu"
     ], function (text, Application, AppRouter, AppController) {
         Application.appRouter = new AppRouter({
             controller: new AppController()
