@@ -1,1 +1,24 @@
 @import "sb-admin-2";
+
+$sideBarLength: 250px;
+
+body {
+  background-color: #fff;
+}
+
+.dev-sidebar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 51px;
+  width: $sideBarLength;
+  background-color: #f8f8f8;
+}
+
+.dev-content {
+  position: absolute;
+  left: $sideBarLength;
+  top: 51px;
+  right: 0;
+  bottom: 0;
+}
