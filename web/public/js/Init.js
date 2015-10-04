@@ -48,8 +48,7 @@
             metisMenu: '../components/metisMenu/dist/metisMenu',
 
             'lib': 'lib/libApi',
-            'core': 'module/core/coreApi',
-            'common': 'module/common/commonApi'
+            'core': 'module/core/coreApi'
         },
         shim: {
             marionette: {

@@ -1,15 +1,76 @@
-<div class="panel panel-default">
-    <div class="panel-heading">Commands</div>
-    <div class="panel-body">
-        // Start/Stop service
-        // Force status update
-        // set time
-        // set range
-        // set standby
-        <div>
-            <button type="button" class="btn btn-primary">Primary</button>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="page-header">Dashboard</h2>
         </div>
-        <div>DASHBOARD</div>
-        <div class="js-is-running"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Mag Device Status</div>
+                <div class="panel-body eb-device__panel-body">
+                    <div class="eb-device__loading-panel">
+                        <div class="eb-device__loading-panel__fill"></div>
+                        <div class="eb-device__loading-panel__text">
+                            <div class="fa fa-cog fa-spin fa-2x"></div>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <!--<caption><button type="button" class="btn btn-primary btn-xs">Force Update</button></caption>-->
+                        <thead>
+                        <tr>
+                            <th>Property Name</th>
+                            <th>Property Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Updated</td>
+                            <td>29.02.2008 15:55:54 UTC <button type="button" class="btn btn-primary btn-xs">Update now</button></td>
+                        </tr>
+                        <tr>
+                            <td>Registration Status</td>
+                            <td>Stopped <button type="button" class="btn btn-success btn-xs">Start</button></td>
+                        </tr>
+                        <tr>
+                            <td>Sampling Interval (ms)</td>
+                            <td>500</td>
+                        </tr>
+                        <tr>
+                            <td>Stand By</td>
+                            <td>True <button type="button" class="btn btn-primary btn-xs">Turn off</button></td>
+                        </tr>
+                        <tr>
+                            <td>Device Time</td>
+                            <td>29.02.2008 15:55:54.123 UTC <button type="button" class="btn btn-primary btn-xs">Fix</button></td>
+                        </tr>
+                        <tr>
+                            <td>Range (pT)</td>
+                            <td>
+                                [ 47500, 56000 ] <button type="button" class="btn btn-primary btn-xs">Change</button>
+                                <div class="form-group eb-device__update-range-container">
+                                    <label for="newCenterRange">Center range (pT)</label>
+                                    <input id="newCenterRange" type="number" class="form-control" placeholder="Range">
+                                    <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn">Update</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ENQ</td>
+                            <td>MagState version 3.03</td>
+                        </tr>
+                        <tr>
+                            <td>About</td>
+                            <td>MagState version 3.03<br>
+                                Quantum Magnetometry Laboratory<br>
+                                Urals State Technical University<br>
+                                Copyright 2013.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="js-is-running"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

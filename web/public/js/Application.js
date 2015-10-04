@@ -14,13 +14,15 @@
     define([
         'lib',
         'core',
-        'module/common/services/RoutingService'
-    ], function (lib, core, RoutingService) {
+        'module/common/commonApi',
+        'module/navigation/navigationApi'
+    ], function (lib, core, commonApi, navigationApi) {
         var App = new Marionette.Application();
 
         App.addRegions({
             loginRegion: ".js-application-login-region",
-            navigationRegion: ".js-application-side-navigation-region",
+            navbarRegion: ".js-application-navbar-region",
+            sidebarRegion: ".js-application-sidebar-region",
             contentRegion: ".js-application-content-region",
             loadingRegion: ".js-application-loading-region",
             fadingRegion: ".js-application-fading-region",
@@ -29,15 +31,16 @@
 
         App.ui = {
             loginRegion: $(".js-application-login-region"),
-            navigationRegion: $(".js-application-side-navigation-region"),
+            navbarRegion: $(".js-application-navbar-region"),
+            sidebarRegion: $(".js-application-sidebar-region"),
             contentRegion: $(".js-application-content-region"),
             loadingRegion: $(".js-application-loading-region"),
             fadingRegion: $(".js-application-fading-region"),
             popupRegion: $(".js-application-popup-region")
         };
 
-        //App.navigation = new navigationApi.Controller();
-        //App.login = new loginApi.Controller();
+        App.sidebarRegion.show(new navigationApi.views.SidebarView());
+        App.navbarRegion.show(new navigationApi.views.NavbarView());
 
         function configure() {
             //noinspection JSUnresolvedVariable
@@ -49,37 +52,10 @@
         App.addInitializer(function () {
             configure();
 
-            RoutingService.initialize();
+            commonApi.services.RoutingService.initialize();
 
             // Removing startup loading element when everything is ready
             $('.js-startup-loading').remove();
-        });
-
-        // Loading view on application level
-        App.addInitializer(function() {
-            var loadingViewOptions = {
-                text: 'Loading'
-            };
-
-            this.setLoading = function(visible) {
-                if (_.isBoolean(visible)) {
-                    if (visible) {
-                        this.loadingRegion.show(new core.views.LoadingView(loadingViewOptions));
-                    } else {
-                        this.loadingRegion.reset();
-                    }
-                } else if (_.isObject(visible)) {
-                    this.setLoading(true);
-
-                    Promise.resolve(visible).bind(this).then(function() {
-                        this.setLoading(false);
-                    }, function() {
-                        this.setLoading(false);
-                    });
-                } else {
-                    core.helpers.throwError('Invalid argument format.', 'FormatError');
-                }
-            };
         });
 
         return App;

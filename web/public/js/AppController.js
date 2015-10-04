@@ -10,7 +10,7 @@
 define([
     'lib',
     'core',
-    'common',
+    'module/common/commonApi',
     'Application',
     'app/dashboard/dashboardApi'
 ], function (lib, core, common, Application, dashboardApi) {

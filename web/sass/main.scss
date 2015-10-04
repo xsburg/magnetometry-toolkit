@@ -10,7 +10,39 @@ body {
   box-shadow: none;
 }
 
-.dev-sidebar {
+.app-startup-loading-panel {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.app-startup-loading-panel__fill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  background-color: #fff;
+  opacity: 0.8;
+}
+
+.app-startup-loading-panel__text {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  align-self: center;
+}
+
+.app-nav__navbar {
+  margin-bottom: 0
+}
+
+.app-sidebar {
   position: absolute;
   left: 0;
   bottom: 0;
@@ -21,7 +53,7 @@ body {
   border-right-width: 1px;
 }
 
-.dev-content {
+.app-content {
   position: absolute;
   left: $sideBarLength;
   top: 51px;
