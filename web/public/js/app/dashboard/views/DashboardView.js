@@ -19,12 +19,14 @@ define([
             core.utils.helpers.ensureOption(options, 'model');
             core.utils.helpers.ensureOption(options, 'reqres');
 
-            _.bindAll(this, '__updateEbDeviceStatus');
+            _.bindAll(this, '__updateEbDevice');
 
-            this.listenTo(this.model.get('ebDevice'), 'change', this.__updateEbDeviceStatus)
+            this.listenTo(this.model.get('ebDevice'), 'change', this.__updateEbDevice)
         },
 
         template: Handlebars.compile(template),
+
+        className: 'container-fluid',
 
         ui: {
             isRunning: '.js-is-running'
@@ -36,7 +38,7 @@ define([
             // show regions
         },
 
-        __updateEbDeviceStatus: function () {
+        __updateEbDevice: function () {
             this.ui.isRunning.text(this.model.get('ebDevice').get('isRunning'));
         }
     });

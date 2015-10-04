@@ -9,8 +9,8 @@
 
 define([
     'lib',
-    '../models/EbDeviceStatusModel'
-], function (lib, EbDeviceStatusModel) {
+    '../models/EbDeviceModel'
+], function (lib, EbDeviceModel) {
     'use strict';
 
     return Marionette.Controller.extend({
@@ -22,7 +22,7 @@ define([
         },
 
         createModel: function () {
-            this.model = new EbDeviceStatusModel();
+            this.model = new EbDeviceModel();
         },
 
         updateStatus: function () {
