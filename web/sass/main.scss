@@ -6,6 +6,10 @@ body {
   background-color: #fff;
 }
 
+.navbar-default {
+  box-shadow: none;
+}
+
 .dev-sidebar {
   position: absolute;
   left: 0;
@@ -13,6 +17,8 @@ body {
   top: 0;
   width: $sideBarLength;
   background-color: #f8f8f8;
+  border: 0 solid #e7e7e7;
+  border-right-width: 1px;
 }
 
 .dev-content {
