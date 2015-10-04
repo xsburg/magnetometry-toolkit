@@ -10,7 +10,7 @@ body {
   position: absolute;
   left: 0;
   bottom: 0;
-  top: 51px;
+  top: 0;
   width: $sideBarLength;
   background-color: #f8f8f8;
 }
@@ -21,4 +21,43 @@ body {
   top: 51px;
   right: 0;
   bottom: 0;
+}
+
+.eb-device__update-range-container {
+  margin-top: 10px;
+}
+
+.eb-device__update-range-btn {
+  margin-top: 10px;
+}
+
+.eb-device__panel-body {
+  position: relative;
+}
+
+.eb-device__loading-panel {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  z-index: 1;
+  text-align: center;
+}
+
+.eb-device__loading-panel__fill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  background-color: #fff;
+  opacity: 0.8;
+}
+
+.eb-device__loading-panel__text {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin: 250px 0 0 -30px;
 }
