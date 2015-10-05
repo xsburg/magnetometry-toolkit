@@ -15,28 +15,26 @@ define([
 
     return Marionette.Controller.extend({
         initialize: function (options) {
-            _.bindAll(this, 'bar');
-
             this.bindReqres();
-            this.createNestedControllers();
             this.createModel();
             this.createView();
-            this.load();
         },
 
         bindReqres: function () {
             this.reqres = new Backbone.Wreqr.RequestResponse();
-
-            this.reqres.setHandler('foo', this.bar);
+            this.reqres.setHandler('ebDeviceView', this.__createEbDeviceView, this);
         },
 
-        createNestedControllers: function () {
+        __createEbDeviceView: function () {
+            if (this.ebDeviceController) {
+                this.ebDeviceController.destroy();
+            }
             this.ebDeviceController = new EbDeviceController();
+            return this.ebDeviceController.view;
         },
 
         createModel: function () {
             this.model = new Backbone.Model({
-                ebDevice: this.ebDeviceController.model
             });
         },
 
@@ -45,14 +43,6 @@ define([
                 model: this.model,
                 reqres: this.reqres
             });
-        },
-
-        load: function () {
-            return this.ebDeviceController.updateStatus();
-        },
-
-        bar: function () {
-            // TODO
         }
     });
 });

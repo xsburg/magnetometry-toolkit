@@ -33,6 +33,7 @@ namespace core
             standBy = false;
             isRunning = false;
             samplingIntervalMs = 0;
+            commandQueueSize = 0;
         }
 
         QDateTime timeUpdated;
@@ -40,6 +41,7 @@ namespace core
         bool standBy;
         bool isRunning;
         int samplingIntervalMs;
+        int commandQueueSize;
     };
 
     struct RunnerConfig

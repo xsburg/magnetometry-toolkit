@@ -99,6 +99,8 @@ void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, Runn
     status->timeUpdated = QDateTime::currentDateTimeUtc();
     // updated
     status->updated = status->timeUpdated;
+    // commands size
+    _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
 
     sLogger.Info(QString("Executed."));
 }
@@ -302,6 +304,7 @@ void core::Runner::run()
                 default:
                     throw Common::NotImplementedException();
                 }
+                _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
                 sLogger.Debug("Done reading command.");
             }
         }

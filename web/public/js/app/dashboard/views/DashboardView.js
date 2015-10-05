@@ -10,8 +10,9 @@
 define([
     'lib',
     'core',
-    'text!../templates/dashboard.html'
-], function (lib, core, template) {
+    'text!../templates/dashboard.html',
+    './EbDeviceView'
+], function (lib, core, template, EbDeviceView) {
     'use strict';
 
     return Marionette.LayoutView.extend({
@@ -19,27 +20,20 @@ define([
             core.utils.helpers.ensureOption(options, 'model');
             core.utils.helpers.ensureOption(options, 'reqres');
 
-            _.bindAll(this, '__updateEbDevice');
-
-            this.listenTo(this.model.get('ebDevice'), 'change', this.__updateEbDevice)
+            this.reqres = options.reqres;
         },
 
         template: Handlebars.compile(template),
 
         className: 'container-fluid',
 
-        ui: {
-            isRunning: '.js-is-running'
+        regions: {
+            ebDeviceRegion: '.js-eb-device-region'
         },
-
-        regions: {},
 
         onRender: function () {
-            // show regions
-        },
-
-        __updateEbDevice: function () {
-            this.ui.isRunning.text(this.model.get('ebDevice').get('isRunning'));
+            var ebDeviceView = this.reqres.request('ebDeviceView');
+            this.ebDeviceRegion.show(ebDeviceView);
         }
     });
 });

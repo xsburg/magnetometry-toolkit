@@ -10,7 +10,7 @@ body {
   box-shadow: none;
 }
 
-.app-startup-loading-panel {
+.loading-panel {
   position: absolute;
   left: 0;
   width: 100%;
@@ -21,7 +21,7 @@ body {
   justify-content: center;
 }
 
-.app-startup-loading-panel__fill {
+.loading-panel__fill {
   position: absolute;
   left: 0;
   width: 100%;
@@ -31,11 +31,23 @@ body {
   opacity: 0.8;
 }
 
-.app-startup-loading-panel__text {
+.loading-panel__text {
   position: relative;
   z-index: 1;
   display: inline-block;
   align-self: center;
+}
+
+.app-startup-loading-panel {
+  @extend .loading-panel;
+}
+
+.app-startup-loading-panel__fill {
+  @extend .loading-panel__fill;
+}
+
+.app-startup-loading-panel__text {
+  @extend .loading-panel__text;
 }
 
 .app-nav__navbar {
@@ -71,31 +83,25 @@ body {
 
 .eb-device__panel-body {
   position: relative;
+  min-height: 100px;
 }
 
 .eb-device__loading-panel {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  top: 0;
-  height: 100%;
-  z-index: 1;
-  text-align: center;
+  @extend .loading-panel;
 }
 
 .eb-device__loading-panel__fill {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  top: 0;
-  height: 100%;
-  background-color: #fff;
-  opacity: 0.8;
+  @extend .loading-panel__fill;
 }
 
 .eb-device__loading-panel__text {
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-  margin: 250px 0 0 -30px;
+  @extend .loading-panel__text;
+}
+
+.eb-device__start-logging-container {
+  margin-top: 10px;
+}
+
+.eb-device__start-logging-btn {
+  margin-top: 10px;
 }

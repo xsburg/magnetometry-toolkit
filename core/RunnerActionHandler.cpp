@@ -21,19 +21,16 @@ bool core::RunnerActionHandler::match()
 void core::RunnerActionHandler::addRunCommand(QJsonObject json)
 {
     auto intervalMilliseconds = json.value("intervalMilliseconds").toInt();
-    QMutexLocker lock(dataMutex());
     _commands.enqueue(std::make_shared<RunRunnerCommand>(intervalMilliseconds));
 }
 
 void core::RunnerActionHandler::addStopCommand(QJsonObject json)
 {
-    QMutexLocker lock(dataMutex());
     _commands.enqueue(std::make_shared<StopRunnerCommand>());
 }
 
 void core::RunnerActionHandler::addUpdateStatusCommand(QJsonObject json)
 {
-    QMutexLocker lock(dataMutex());
     _commands.enqueue(std::make_shared<UpdateStatusRunnerCommand>());
 }
 
@@ -41,21 +38,18 @@ void core::RunnerActionHandler::addSetTimeCommand(QJsonObject json)
 {
     auto unixTime = json.value("time").toInt();
     auto time = QDateTime::fromTime_t(unixTime, Qt::UTC);
-    QMutexLocker lock(dataMutex());
     _commands.enqueue(std::make_shared<SetTimeRunnerCommand>(time));
 }
 
 void core::RunnerActionHandler::addSetRangeCommand(QJsonObject json)
 {
     auto range = json.value("range").toInt();
-    QMutexLocker lock(dataMutex());
     _commands.enqueue(std::make_shared<SetRangeRunnerCommand>(range));
 }
 
 void core::RunnerActionHandler::addSetStandByCommand(QJsonObject json)
 {
     auto standBy = json.value("standBy").toBool();
-    QMutexLocker lock(dataMutex());
     _commands.enqueue(std::make_shared<SetStandByRunnerCommand>(standBy));
 }
 
@@ -87,6 +81,7 @@ void core::RunnerActionHandler::execute()
     else if (exactMatch("api/command"))
     {
         // api/command
+        QMutexLocker lock(dataMutex());
         QString content(QByteArray(connection()->content, connection()->content_len));
         QJsonDocument doc = QJsonDocument::fromJson(content.toLatin1());
         auto root = doc.object();
@@ -119,6 +114,8 @@ void core::RunnerActionHandler::execute()
         {
             throw Common::InvalidOperationException();
         }
+
+        _status->commandQueueSize++;
         mg_printf_data(connection(), "{ \"result\": \"enqueued\" }");
     }
     else
