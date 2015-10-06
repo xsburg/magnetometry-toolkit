@@ -31,10 +31,7 @@ define([
         },
 
         createModel: function () {
-            this.model = new Backbone.Model({
-                status: new EbDeviceStatusModel(),
-                loading: true
-            });
+            this.model = new EbDeviceStatusModel();
         },
 
         createView: function () {

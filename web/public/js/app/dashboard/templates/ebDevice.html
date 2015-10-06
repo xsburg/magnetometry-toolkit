@@ -22,11 +22,11 @@
         <tr>
             <td>Registration Status</td>
             <td>
-                <div class="js-cond-stopped">Stopped <button type="button" class="btn btn-danger btn-xs">Stop</button></div>
+                <div class="js-cond-stopped">Running <button type="button" class="btn btn-danger btn-xs">Stop</button></div>
                 <div class="js-cond-running">
-                    Running
+                    Stopped
                     <div class="form-group eb-device__start-logging-container">
-                        <label for="newSamplingIntervalMs">Sampling Interval (ms)</label>
+                        <!--<label for="newSamplingIntervalMs">Sampling Interval (ms)</label>-->
                         <input id="newSamplingIntervalMs" type="number" class="form-control" placeholder="Sampling Interval (ms)">
                         <button type="button" class="btn btn-success btn-sm eb-device__start-logging-btn">Start</button>
                     </div>
@@ -50,9 +50,9 @@
             <td>
                 [ <span class="js-status-range-min"></span>, <span class="js-status-range-max"></span> ]
                 <div class="form-group eb-device__update-range-container">
-                    <label for="newCenterRange">Center range (pT)</label>
-                    <input id="newCenterRange" type="number" class="form-control" placeholder="Range">
-                    <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn">Set</button>
+                    <!--<label for="newCenterRange">Center range (pT)</label>-->
+                    <input id="newCenterRange" type="number" class="form-control js-status-center-range-input" placeholder="Center range (pT)">
+                    <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn js-set-range-button">Set</button>
                 </div>
             </td>
         </tr>

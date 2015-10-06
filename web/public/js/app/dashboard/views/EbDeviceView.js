@@ -36,7 +36,20 @@ define([
         ui: {
             loadingPanel: '.js-loading-panel',
             dataTable: '.js-data-table',
-
+            statusUpdated: '.js-status-updated',
+            condStopped: '.js-cond-stopped',
+            condRunning: '.js-cond-running',
+            condSamplingIntervalRow: '.js-cond-sampling-interval-row',
+            statusSamplingInterval: '.js-status-sampling-interval',
+            statusStandBy: '.js-status-stand-by',
+            statusStandByButton: '.js-status-stand-by-button',
+            statusDeviceTime: '.js-status-device-time',
+            statusRangeMin: '.js-status-range-min',
+            statusRangeMax: '.js-status-range-max',
+            statusCenterRangeInput: '.js-status-center-range-input',
+            setRangeButton: '.js-set-range-button',
+            statusEnq: '.js-status-enq',
+            statusAbout: '.js-status-about'
         },
 
         onRender: function () {
@@ -45,6 +58,7 @@ define([
 
         displayData: function () {
             this.ui.dataTable.show();
+            this.__updateData();
         },
 
         setLoading: function (isLoading) {
@@ -53,6 +67,11 @@ define([
             } else {
                 this.ui.loadingPanel.hide();
             }
+        },
+
+        __updateData: function () {
+            var data = this.model.toJSON();
+            debugger;
         }
     });
 });
