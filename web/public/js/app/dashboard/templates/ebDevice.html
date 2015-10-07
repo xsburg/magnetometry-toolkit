@@ -7,7 +7,7 @@
         </div>
     </div>
     <table class="table js-data-table">
-        <caption>The values here are updated in real time.</caption>
+        <caption>The values here are updated in real time <span class="fa fa-circle-o-notch fa-spin js-data-update-spinner eb-device__data-update-spinner"></span></caption>
         <thead>
         <tr>
             <th>Property Name</th>
@@ -17,18 +17,21 @@
         <tbody>
         <tr>
             <td>Device Status Updated</td>
-            <td><span class="js-status-updated"></span> <button type="button" class="btn btn-primary btn-xs">Update now</button></td>
+            <td><span class="js-status-updated"></span> <button type="button" class="btn btn-primary btn-xs js-force-update-button">Force device update</button></td>
         </tr>
         <tr>
             <td>Registration Status</td>
             <td>
-                <div class="js-cond-stopped">Running <button type="button" class="btn btn-danger btn-xs">Stop</button></div>
+                <div class="js-cond-stopped">Running <button type="button" class="btn btn-danger btn-xs js-stop-logging-button">Stop</button></div>
                 <div class="js-cond-running">
                     Stopped
                     <div class="form-group eb-device__start-logging-container">
-                        <!--<label for="newSamplingIntervalMs">Sampling Interval (ms)</label>-->
-                        <input id="newSamplingIntervalMs" type="number" class="form-control" placeholder="Sampling Interval (ms)">
-                        <button type="button" class="btn btn-success btn-sm eb-device__start-logging-btn">Start</button>
+                        <select class="form-control js-status-sampling-interval-input">
+                            {{#each samplingIntervalOptions}}
+                                <option value="{{value}}">{{name}}</option>
+                            {{/each}}
+                        </select>
+                        <button type="button" class="btn btn-success btn-sm eb-device__start-logging-btn js-start-logging-button">Start</button>
                     </div>
                 </div>
             </td>
@@ -39,18 +42,17 @@
         </tr>
         <tr>
             <td>Stand By</td>
-            <td><span class="js-status-stand-by"></span> <button type="button" class="btn btn-primary btn-xs js-status-stand-by-button">Turn off</button></td>
+            <td><span class="js-status-stand-by"></span> <button type="button" class="btn btn-primary btn-xs js-status-stand-by-button"></button></td>
         </tr>
         <tr>
             <td>Device Time</td>
-            <td><span class="js-status-device-time"></span> <button type="button" class="btn btn-primary btn-xs">Fix</button></td>
+            <td><span class="js-status-device-time"></span> <button type="button" class="btn btn-primary btn-xs js-fix-device-time-button">Fix</button></td>
         </tr>
         <tr>
             <td>Range (pT)</td>
             <td>
                 [ <span class="js-status-range-min"></span>, <span class="js-status-range-max"></span> ]
                 <div class="form-group eb-device__update-range-container">
-                    <!--<label for="newCenterRange">Center range (pT)</label>-->
                     <input id="newCenterRange" type="number" class="form-control js-status-center-range-input" placeholder="Center range (pT)">
                     <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn js-set-range-button">Set</button>
                 </div>

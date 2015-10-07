@@ -15,7 +15,7 @@ define([
     'use strict';
 
     var config = {
-        UPDATER_INTERVAL: 1000
+        UPDATER_INTERVAL: 1500
     };
 
     return Marionette.Controller.extend({
@@ -57,8 +57,10 @@ define([
 
         __startBackgroundUpdater: function () {
             setTimeout(function () {
+                this.view.setDataUpdating(true);
                 this.__updateStatus().finally(function () {
                     if (!this.isDestroyed) {
+                        this.view.setDataUpdating(false);
                         this.__startBackgroundUpdater();
                     }
                 }.bind(this));
@@ -69,7 +71,7 @@ define([
             return new Promise(function (resolve) {
                 setTimeout(function () {
                     resolve();
-                }.bind(this), 1000);
+                }.bind(this), 600);
             }.bind(this));
             //return Promise.resolve(this.model.fetch());
         },

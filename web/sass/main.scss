@@ -105,3 +105,13 @@ body {
 .eb-device__start-logging-btn {
   margin-top: 10px;
 }
+
+.eb-device__data-update-spinner {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.eb-device__data-update-spinner_visible {
+  opacity: 1;
+  transition: opacity 0.3s;
+}

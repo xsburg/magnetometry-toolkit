@@ -10,13 +10,16 @@
 define([
     'lib',
     'module/core/utils/helpers',
+    'module/core/utils/htmlHelpers',
+    'module/core/utils/handlebarsHelpers',
     'module/core/utils/keyCode'
-], function (lib, helpers, keyCode) {
+], function (lib, helpers, htmlHelpers, handlebarsHelpers, keyCode) {
     'use strict';
 
     return {
         utils: {
             helpers: helpers,
+            htmlHelpers: htmlHelpers,
             keyCode: keyCode
         }
     };

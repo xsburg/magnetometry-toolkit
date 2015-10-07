@@ -26,9 +26,9 @@ define([
                 maxField: 55000
             },
             enq: 'MagState version 3.03',
-            about: 'MagState version 3.03<br>\
-            Quantum Magnetometry Laboratory<br>\
-        Urals State Technical University<br>\
+            about: 'MagState version 3.03\r\n\
+            Quantum Magnetometry Laboratory\r\n\
+        Urals State Technical University\r\n\
         Copyright 2013.',
             time: new Date(),
             commandQueueSize: 2
