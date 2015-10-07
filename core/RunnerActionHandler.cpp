@@ -72,6 +72,7 @@ void core::RunnerActionHandler::execute()
         range["minField"] = _status->range.minField;
         range["maxField"] = _status->range.maxField;
         json["range"] = range;
+        json["commandQueueSize"] = _status->commandQueueSize;
 
         document.setObject(json);
         auto jsonData = document.toJson(QJsonDocument::JsonFormat::Indented);

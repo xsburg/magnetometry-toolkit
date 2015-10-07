@@ -32,7 +32,9 @@
         'datetimePicker',
         'moment_en',
         'moment_ru',
-        'moment_de'
+        'moment_de',
+        'bootstrap',
+        'bootstrapSelect'
     ], function (keypress, moment, Handlebars, Promise, _, underscoreString) {
         'use strict';
 

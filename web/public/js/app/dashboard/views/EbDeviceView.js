@@ -46,30 +46,45 @@ define([
                 };
             };
 
-            var samplingIntervalOptions = [
-                optionMs(5, 200),
-                optionMs(4, 250),
-                optionMs(3, 334),
-                optionMs(2, 500)
-            ].concat(_.map(range60, function (sec) {
-                return {
-                    name: core.utils.helpers.format('{0} second(s)', sec),
-                    value: sec * 1000
-                };
-            })).concat(_.map(range60, function (min) {
-                return {
-                    name: core.utils.helpers.format('{0} minute(s)', min),
-                    value: min * 60 * 1000
-                };
-            })).concat(_.map(range24, function (hour) {
-                return {
-                    name: core.utils.helpers.format('{0} hour(s)', hour),
-                    value: hour * 60 * 60 * 1000
-                };
-            }));
-
             return {
-                samplingIntervalOptions: samplingIntervalOptions
+                samplingIntervalOptions: [
+                    {
+                        groupName: '< 1 second',
+                        options: [
+                            optionMs(5, 200),
+                            optionMs(4, 250),
+                            optionMs(3, 334),
+                            optionMs(2, 500)
+                        ]
+                    },
+                    {
+                        groupName: 'Seconds',
+                        options: _.map(range60, function (sec) {
+                            return {
+                                name: core.utils.helpers.format('{0} second(s)', sec),
+                                value: sec * 1000
+                            };
+                        })
+                    },
+                    {
+                        groupName: 'Minutes',
+                        options: _.map(range60, function (min) {
+                            return {
+                                name: core.utils.helpers.format('{0} minute(s)', min),
+                                value: min * 60 * 1000
+                            };
+                        })
+                    },
+                    {
+                        groupName: 'Hours',
+                        options: _.map(range24, function (hour) {
+                            return {
+                                name: core.utils.helpers.format('{0} hour(s)', hour),
+                                value: hour * 60 * 60 * 1000
+                            };
+                        })
+                    }
+                ]
             };
         },
 
@@ -112,6 +127,7 @@ define([
         onRender: function () {
             this.ui.dataTable.hide();
             this.ui.statusSamplingIntervalInput.val(1000);
+            this.ui.statusSamplingIntervalInput.selectpicker();
         },
 
         displayData: function () {
@@ -159,6 +175,10 @@ define([
         },
 
         __onDataChange: function () {
+            var queueSize = this.model.get('commandQueueSize');
+            if (queueSize === 0) {
+                this.setLoading(false);
+            }
             this.__updateData();
         },
 
@@ -167,30 +187,31 @@ define([
         },
 
         __onToggleStandBy: function () {
+            this.setLoading(true);
             var newValue = !this.model.get('standBy');
-            debugger;
+            this.reqres.request('standBy', newValue);
         },
 
         __onFixDeviceTime: function () {
-            debugger;
+            this.reqres.request('deviceTime:fix');
         },
 
         __onSetRange: function () {
-            var centerValue = this.ui.statusCenterRangeInput.val();
-            debugger;
+            var centerValue = Number(this.ui.statusCenterRangeInput.val());
+            this.reqres.request('range:set', centerValue);
         },
 
         __onStartLogging: function () {
-            var centerValue = this.ui.statusSamplingIntervalInput.val();
-            debugger;
+            var samplingIntervalMs = Number(this.ui.statusSamplingIntervalInput.val());
+            this.reqres.request('logging:start', samplingIntervalMs);
         },
 
         __onStopLogging: function () {
-            debugger;
+            this.reqres.request('logging:stop');
         },
 
         __onForceUpdate: function () {
-            debugger;
+            this.reqres.request('device:update');
         }
     });
 });

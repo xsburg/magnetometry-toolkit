@@ -46,6 +46,7 @@
 
             bootstrap: 'lib/bootstrap/bootstrap',
             metisMenu: '../components/metisMenu/dist/metisMenu',
+            bootstrapSelect: '../components/bootstrap-select/dist/js/bootstrap-select',
 
             'lib': 'lib/libApi',
             'core': 'module/core/coreApi'
@@ -80,6 +81,10 @@
 
             bootstrap: {
                 deps: ['jquery']
+            },
+
+            bootstrapSelect: {
+                deps: ['bootstrap', 'jquery']
             },
 
             metisMenu: {

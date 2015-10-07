@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "Device management console",
   "version": "0.0.1",
   "description": "The following packages are managed directly (by hands): backbone-forms, backbone.trackit, jquery.caret.1.02.min, jquery.autosize, bootstrap 3.3.5",
   "dependencies": {
@@ -18,7 +18,8 @@
     "jquery-mousewheel": "3.1.13",
     "moment": "2.10.6",
     "font-awesome": "~4.2.0",
-    "metisMenu": "~2.2.0"
+    "metisMenu": "~2.2.0",
+    "bootstrap-select": "~1.7.4"
   },
   "exportsOverride": {
     "moment": {

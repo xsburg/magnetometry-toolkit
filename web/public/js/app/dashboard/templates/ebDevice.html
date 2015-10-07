@@ -28,7 +28,11 @@
                     <div class="form-group eb-device__start-logging-container">
                         <select class="form-control js-status-sampling-interval-input">
                             {{#each samplingIntervalOptions}}
-                                <option value="{{value}}">{{name}}</option>
+                                <optgroup label="{{groupName}}">
+                                    {{#each options}}
+                                        <option value="{{value}}">{{name}}</option>
+                                    {{/each}}
+                                </optgroup>
                             {{/each}}
                         </select>
                         <button type="button" class="btn btn-success btn-sm eb-device__start-logging-btn js-start-logging-button">Start</button>
@@ -53,7 +57,7 @@
             <td>
                 [ <span class="js-status-range-min"></span>, <span class="js-status-range-max"></span> ]
                 <div class="form-group eb-device__update-range-container">
-                    <input id="newCenterRange" type="number" class="form-control js-status-center-range-input" placeholder="Center range (pT)">
+                    <input id="newCenterRange" type="number" min="1" max="10000000" class="form-control js-status-center-range-input" placeholder="Center range (pT)">
                     <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn js-set-range-button">Set</button>
                 </div>
             </td>

@@ -48,7 +48,8 @@ define([
             this.reqres.setHandler('logging:stop', this.__stopLogging, this);
             this.reqres.setHandler('standBy', this.__setStandBy, this);
             this.reqres.setHandler('deviceTime:fix', this.__fixDeviceTime, this);
-            this.reqres.setHandler('status:update', this.__updateStatus, this);
+            this.reqres.setHandler('device:update', this.__forceDeviceUpdate, this);
+            this.reqres.setHandler('range:set', this.__setRange, this);
         },
 
         onDestroy: function () {
@@ -68,12 +69,7 @@ define([
         },
 
         __updateStatus: function () {
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 600);
-            }.bind(this));
-            //return Promise.resolve(this.model.fetch());
+            return Promise.resolve(this.model.fetch());
         },
 
         __startLogging: function (samplingIntervalMs) {
@@ -93,6 +89,7 @@ define([
         },
 
         __setStandBy: function (enabled) {
+            return Promise.resolve($.post('api/dashboard/eb-device/command', { someData: 123 }));
             return new Promise(function (resolve) {
                 setTimeout(function () {
                     resolve();
@@ -101,6 +98,22 @@ define([
         },
 
         __fixDeviceTime: function () {
+            return new Promise(function (resolve) {
+                setTimeout(function () {
+                    resolve();
+                }.bind(this), 1000);
+            }.bind(this));
+        },
+
+        __setRange: function (center) {
+            return new Promise(function (resolve) {
+                setTimeout(function () {
+                    resolve();
+                }.bind(this), 1000);
+            }.bind(this));
+        },
+
+        __forceDeviceUpdate: function () {
             return new Promise(function (resolve) {
                 setTimeout(function () {
                     resolve();
