@@ -12,11 +12,12 @@ var router = express.Router();
 router.get('/eb-device/status', function(req, res) {
 
     request({
-        url: 'http://simba.adm:8000/api/status'//,
-        //json: true
+        url: 'http://simba.adm:8000/api/status',
+        json: true
     }, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             console.log(body) // Print the json response
+            res.json(body);
         }
     });
 

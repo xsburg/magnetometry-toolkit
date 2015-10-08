@@ -77,7 +77,7 @@ void core::RunnerActionHandler::execute()
         document.setObject(json);
         auto jsonData = document.toJson(QJsonDocument::JsonFormat::Indented);
 
-        mg_write(connection(), jsonData.data(), jsonData.size());
+        mg_send_data(connection(), jsonData.data(), jsonData.size());
     }
     else if (exactMatch("api/command"))
     {
