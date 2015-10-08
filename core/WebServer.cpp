@@ -2,6 +2,7 @@
 #include "common/Logger.h"
 
 #include <mongoose.h>
+#include <common/Exception.h>
 
 void *serve(void *param) {
     auto server = static_cast<mg_server*>(param);
@@ -31,7 +32,18 @@ int ev_handler(mg_connection *connection, enum mg_event event) {
             if (handler->match())
             {
                 sLogger.Info(QString("Found handler '%1' -> '%2'.").arg(connection->uri).arg(handler->name()));
-                handler->execute();
+                try
+                {
+                    handler->execute();
+                }
+                catch (Common::Exception& ex)
+                {
+                    sLogger.Error(QString("Handler error (Common::Exception): %1").arg(ex.what()));
+                }
+                catch (std::exception& ex)
+                {
+                    sLogger.Error(QString("Handler error (std::exception): %1").arg(ex.what()));
+                }
                 return MG_TRUE;
             }
         }

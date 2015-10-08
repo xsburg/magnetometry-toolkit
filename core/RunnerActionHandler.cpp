@@ -113,7 +113,7 @@ void core::RunnerActionHandler::execute()
         }
         else
         {
-            throw Common::InvalidOperationException();
+            throw Common::InvalidOperationException(QString("Command `%1` is not supported.").arg(command));
         }
 
         _status->commandQueueSize++;

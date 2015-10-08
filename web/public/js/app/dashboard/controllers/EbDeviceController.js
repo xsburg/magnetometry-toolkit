@@ -9,9 +9,10 @@
 
 define([
     'lib',
+    'core',
     '../models/EbDeviceStatusModel',
     '../views/EbDeviceView'
-], function (lib, EbDeviceStatusModel, EbDeviceView) {
+], function (lib, core, EbDeviceStatusModel, EbDeviceView) {
     'use strict';
 
     var config = {
@@ -73,52 +74,50 @@ define([
         },
 
         __startLogging: function (samplingIntervalMs) {
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 1000);
-            }.bind(this));
+            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+                command: 'run',
+                intervalMilliseconds: samplingIntervalMs
+            }));
         },
 
         __stopLogging: function () {
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 1000);
-            }.bind(this));
+            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+                command: 'stop'
+            }));
         },
 
         __setStandBy: function (enabled) {
-            return Promise.resolve($.post('api/dashboard/eb-device/command', { someData: 123 }));
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 1000);
-            }.bind(this));
+            return core.services.AjaxService;
+            return Promise.resolve($.ajax({
+                method: 'POST',
+                url: 'api/dashboard/eb-device/command',
+                data: JSON.stringify({
+                    command: 'set-device-stand-by',
+                    standBy: enabled
+                }),
+                dataType: 'json',
+                contentType: 'application/json'
+            }));
         },
 
         __fixDeviceTime: function () {
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 1000);
-            }.bind(this));
+            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+                command: 'set-device-time',
+                time: Number(new Date())
+            }));
         },
 
         __setRange: function (center) {
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 1000);
-            }.bind(this));
+            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+                command: 'set-device-range',
+                range: center
+            }));
         },
 
         __forceDeviceUpdate: function () {
-            return new Promise(function (resolve) {
-                setTimeout(function () {
-                    resolve();
-                }.bind(this), 1000);
-            }.bind(this));
+            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+                command: 'update-status'
+            }));
         }
     });
 });

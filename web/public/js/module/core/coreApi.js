@@ -9,14 +9,18 @@
 
 define([
     'lib',
+    'module/core/services/AjaxService',
     'module/core/utils/helpers',
     'module/core/utils/htmlHelpers',
     'module/core/utils/handlebarsHelpers',
     'module/core/utils/keyCode'
-], function (lib, helpers, htmlHelpers, handlebarsHelpers, keyCode) {
+], function (lib, AjaxService, helpers, htmlHelpers, handlebarsHelpers, keyCode) {
     'use strict';
 
     return {
+        services: {
+            AjaxService: AjaxService
+        },
         utils: {
             helpers: helpers,
             htmlHelpers: htmlHelpers,

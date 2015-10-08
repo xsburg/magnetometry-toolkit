@@ -11,12 +11,16 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/eb-device/status', function(req, res) {
-    request({
+    request.get({
         url: 'http://simba.adm:8000/api/status',
-        json: true
+        json: true,
+        timeout: 50000
     }, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             res.json(body);
+        } else {
+            res.status(500);
+            res.send('Device has failed to process the data.');
         }
     });
 });
@@ -36,12 +40,17 @@ router.post('/eb-device/command', function (req, res) {
         res.send('Invalid command');
         return;
     }
-    request({
+    request.post({
         url: 'http://simba.adm:8000/api/command',
-        json: true
+        json: true,
+        body: data,
+        timeout: 50000
     }, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             res.json(body);
+        } else {
+            res.status(500);
+            res.send('Device has failed to process the data.');
         }
     });
 });

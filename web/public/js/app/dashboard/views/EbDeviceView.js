@@ -110,6 +110,7 @@ define([
             setRangeButton: '.js-set-range-button',
             statusEnq: '.js-status-enq',
             statusAbout: '.js-status-about',
+            statusCommandQueue: '.js-status-command-queue',
             startLoggingButton: '.js-start-logging-button',
             stopLoggingButton: '.js-stop-logging-button',
             forceUpdateButton: '.js-force-update-button'
@@ -146,8 +147,10 @@ define([
         __updateData: function () {
             var data = this.model.toJSON();
             
+            //noinspection JSUnresolvedVariable
             this.ui.statusSamplingInterval.text(data.samplingIntervalMs);
             if (!this.ui.statusSamplingIntervalInput.val()) {
+                //noinspection JSUnresolvedVariable
                 this.ui.statusSamplingIntervalInput.text(data.samplingIntervalMs);
             }
             if (data.standBy) {
@@ -158,9 +161,12 @@ define([
                 this.ui.statusStandByButton.text('Turn on');
             }
             this.ui.statusDeviceTime.text(moment(data.time).format('lll'));
+            //noinspection JSUnresolvedVariable
             this.ui.statusRangeMin.text(data.range.minField);
+            //noinspection JSUnresolvedVariable
             this.ui.statusRangeMax.text(data.range.maxField);
             this.ui.statusEnq.text(data.enq);
+            //noinspection JSUnresolvedVariable
             this.ui.statusAbout.html(core.utils.htmlHelpers.textToHtml(data.about));
             if (data.isRunning) {
                 this.ui.condStopped.show();
@@ -171,14 +177,17 @@ define([
                 this.ui.condRunning.show();
                 this.ui.condSamplingIntervalRow.hide();
             }
+            //noinspection JSUnresolvedVariable
             this.ui.statusUpdated.text(moment(data.updated).format('lll'));
+            //noinspection JSUnresolvedVariable
+            this.ui.statusCommandQueue.text(data.commandQueueSize);
         },
 
         __onDataChange: function () {
-            var queueSize = this.model.get('commandQueueSize');
+            /*var queueSize = this.model.get('commandQueueSize');
             if (queueSize === 0) {
                 this.setLoading(false);
-            }
+            }*/
             this.__updateData();
         },
 
@@ -187,7 +196,7 @@ define([
         },
 
         __onToggleStandBy: function () {
-            this.setLoading(true);
+            //this.setLoading(true);
             var newValue = !this.model.get('standBy');
             this.reqres.request('standBy', newValue);
         },
