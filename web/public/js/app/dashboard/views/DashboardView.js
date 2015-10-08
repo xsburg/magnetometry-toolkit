@@ -28,12 +28,14 @@ define([
         className: 'container-fluid',
 
         regions: {
-            ebDeviceRegion: '.js-eb-device-region'
+            ebDeviceRegion: '.js-eb-device-region',
+            ebDeviceDiagnosticsRegion: '.js-eb-device-diagnostics-region'
         },
 
         onRender: function () {
-            var ebDeviceView = this.reqres.request('ebDeviceView');
-            this.ebDeviceRegion.show(ebDeviceView);
+            var views = this.reqres.request('ebDeviceViews');
+            this.ebDeviceRegion.show(views.view);
+            this.ebDeviceDiagnosticsRegion.show(views.diagnosticsView);
         }
     });
 });

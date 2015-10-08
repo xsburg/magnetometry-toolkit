@@ -22,15 +22,18 @@ define([
 
         bindReqres: function () {
             this.reqres = new Backbone.Wreqr.RequestResponse();
-            this.reqres.setHandler('ebDeviceView', this.__createEbDeviceView, this);
+            this.reqres.setHandler('ebDeviceViews', this.__createEbDeviceViews, this);
         },
 
-        __createEbDeviceView: function () {
+        __createEbDeviceViews: function () {
             if (this.ebDeviceController) {
                 this.ebDeviceController.destroy();
             }
             this.ebDeviceController = new EbDeviceController();
-            return this.ebDeviceController.view;
+            return {
+                view: this.ebDeviceController.view,
+                diagnosticsView: this.ebDeviceController.diagnosticsView
+            };
         },
 
         createModel: function () {

@@ -195,6 +195,17 @@ define([
             this.ui.dataUpdateSpinner.toggleClass(classes.DATA_UPDATE_SPINNER_VISIBLE, isUpdating);
         },
 
+        setEnabled: function (enabled) {
+            this.ui.fixDeviceTimeButton[0].disabled = !enabled;
+            this.ui.statusStandByButton[0].disabled = !enabled;
+            this.ui.setRangeButton[0].disabled = !enabled;
+            this.ui.startLoggingButton[0].disabled = !enabled;
+            this.ui.stopLoggingButton[0].disabled = !enabled;
+            this.ui.forceUpdateButton[0].disabled = !enabled;
+            this.ui.statusCenterRangeInput[0].disabled = !enabled;
+            this.ui.statusSamplingIntervalInput[0].disabled = !enabled;
+        },
+
         __onToggleStandBy: function () {
             //this.setLoading(true);
             var newValue = !this.model.get('standBy');

@@ -11,8 +11,9 @@ define([
     'lib',
     'core',
     '../models/EbDeviceStatusModel',
-    '../views/EbDeviceView'
-], function (lib, core, EbDeviceStatusModel, EbDeviceView) {
+    '../views/EbDeviceView',
+    '../views/EbDeviceDiagnosticsView'
+], function (lib, core, EbDeviceStatusModel, EbDeviceView, EbDeviceDiagnosticsView) {
     'use strict';
 
     var config = {
@@ -40,6 +41,8 @@ define([
                 model: this.model,
                 reqres: this.reqres
             });
+            this.diagnosticsView = new EbDeviceDiagnosticsView({
+            });
         },
 
         bindReqres: function () {
@@ -60,9 +63,19 @@ define([
         __startBackgroundUpdater: function () {
             setTimeout(function () {
                 this.view.setDataUpdating(true);
+                var commandSendLock = this.commandSendLock;
                 this.__updateStatus().finally(function () {
                     if (!this.isDestroyed) {
                         this.view.setDataUpdating(false);
+                        var triggeredWhileQuery = !commandSendLock && this.commandSendLock;
+                        if (this.model.get('commandQueueSize') > 0 || triggeredWhileQuery) {
+                            // lock everything until queue is empty
+                            this.view.setEnabled(false);
+                            this.commandSendLock = false;
+                        } else {
+                            // unlock if queue is empty
+                            this.view.setEnabled(true);
+                        }
                         this.__startBackgroundUpdater();
                     }
                 }.bind(this));
@@ -74,50 +87,49 @@ define([
         },
 
         __startLogging: function (samplingIntervalMs) {
-            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+            return this.__sendCommand({
                 command: 'run',
                 intervalMilliseconds: samplingIntervalMs
-            }));
+            });
         },
 
         __stopLogging: function () {
-            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+            return this.__sendCommand({
                 command: 'stop'
-            }));
+            });
         },
 
         __setStandBy: function (enabled) {
-            return core.services.AjaxService;
-            return Promise.resolve($.ajax({
-                method: 'POST',
-                url: 'api/dashboard/eb-device/command',
-                data: JSON.stringify({
-                    command: 'set-device-stand-by',
-                    standBy: enabled
-                }),
-                dataType: 'json',
-                contentType: 'application/json'
-            }));
+            return this.__sendCommand({
+                command: 'set-device-stand-by',
+                standBy: enabled
+            });
         },
 
         __fixDeviceTime: function () {
-            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+            return this.__sendCommand({
                 command: 'set-device-time',
-                time: Number(new Date())
-            }));
+                time: Math.floor(Number(new Date()) / 1000)
+            });
         },
 
         __setRange: function (center) {
-            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+            return this.__sendCommand({
                 command: 'set-device-range',
                 range: center
-            }));
+            });
         },
 
         __forceDeviceUpdate: function () {
-            return Promise.resolve($.post('api/dashboard/eb-device/command', {
+            return this.__sendCommand({
                 command: 'update-status'
-            }));
+            });
+        },
+
+        __sendCommand: function (data) {
+            this.commandSendLock = true;
+            this.view.setEnabled(false);
+            return core.services.AjaxService.post('api/dashboard/eb-device/command', data);
         }
     });
 });

@@ -107,11 +107,11 @@ body {
 }
 
 .eb-device__data-update-spinner {
-  opacity: 0;
-  //transition: opacity 0.1s;
+  opacity: 0.2;
+  transition: opacity 0.1s;
 }
 
 .eb-device__data-update-spinner_visible {
-  opacity: 1;
-  //transition: opacity 0.1s;
+  opacity: 0.6;
+  transition: opacity 0.1s;
 }
