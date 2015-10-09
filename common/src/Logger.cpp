@@ -5,11 +5,11 @@
 
 namespace Common
 {
-    void Logger::Initialize(int logLevel)
+    void Logger::Initialize(LogLevel logLevel)
     {
         if (logLevel < 0)
         {
-            logLevel = 5;
+            logLevel = LogLevel::Debug;
         }
 
         this->logLevel = logLevel;
@@ -17,7 +17,7 @@ namespace Common
 
     void Logger::Debug(const QString& message)
     {
-        if (this->logLevel >= 5)
+        if (this->logLevel >= LogLevel::Debug)
         {
             std::cerr << message.toStdString() << std::endl;
         }
@@ -25,7 +25,7 @@ namespace Common
 
     void Logger::Trace(const QString& message)
     {
-        if (this->logLevel >= 4)
+        if (this->logLevel >= LogLevel::Trace)
         {
             std::cerr << message.toStdString() << std::endl;
         }
@@ -33,7 +33,7 @@ namespace Common
 
     void Logger::Info(const QString& message)
     {
-        if (this->logLevel >= 3)
+        if (this->logLevel >= LogLevel::Info)
         {
             std::cout << message.toStdString() << std::endl;
         }
@@ -41,7 +41,7 @@ namespace Common
 
     void Logger::Warn(const QString& message)
     {
-        if (this->logLevel >= 2)
+        if (this->logLevel >= LogLevel::Warn)
         {
             std::cerr << message.toStdString() << std::endl;
         }
@@ -49,7 +49,7 @@ namespace Common
 
     void Logger::Error(const QString& message)
     {
-        if (this->logLevel >= 1)
+        if (this->logLevel >= LogLevel::Error)
         {
             std::cerr << message.toStdString() << std::endl;
         }
@@ -57,7 +57,7 @@ namespace Common
 
     void Logger::Fatal(const QString& message)
     {
-        if (this->logLevel >= 0)
+        if (this->logLevel >= LogLevel::Fatal)
         {
             std::cerr << "FATAL:" << message.toStdString() << std::endl;
         }

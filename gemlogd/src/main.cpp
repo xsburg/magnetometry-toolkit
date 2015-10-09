@@ -20,7 +20,7 @@ int main(int argc, char** argv)
         QTextCodec::setCodecForLocale(codec);
 
         sIniSettings.Initialize(Path::Combine(Path::ApplicationDirPath(), "config.ini"));
-        sLogger.Initialize(sIniSettings.value("logLevel", 5).toInt());
+        sLogger.Initialize((LogLevel)sIniSettings.value("logLevel", 5).toInt());
 
         sLogger.Debug("The following sqldrivers are available:");
         auto sqlDrivers = QSqlDatabase::drivers();

@@ -9,6 +9,16 @@
 
 namespace Common
 {
+    enum LogLevel
+    {
+        Debug = 5,
+        Trace = 4,
+        Info = 3,
+        Warn = 2,
+        Error = 1,
+        Fatal = 0
+    };
+
     class Logger : boost::noncopyable
     {
         SINGLETON_BLOCK(Logger)
@@ -17,9 +27,12 @@ namespace Common
 
         int logLevel;
     public:
-        Logger() {}
+        Logger()
+        {
+            logLevel = LogLevel::Debug;
+        }
 
-        void Initialize(int logLevel);
+        void Initialize(LogLevel logLevel);
 
         void Debug(const QString& message);
         void Trace(const QString& message);
