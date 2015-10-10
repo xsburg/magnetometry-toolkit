@@ -20,21 +20,21 @@ int main(int argc, char** argv)
         QTextCodec::setCodecForLocale(codec);
 
         sIniSettings.Initialize(Path::Combine(Path::ApplicationDirPath(), "config.ini"));
-        sLogger.Initialize((LogLevel)sIniSettings.value("logLevel", 5).toInt());
+        sLogger.initialize((LogLevel)sIniSettings.value("logLevel", 5).toInt());
 
-        sLogger.Debug("The following sqldrivers are available:");
+        sLogger.debug("The following sqldrivers are available:");
         auto sqlDrivers = QSqlDatabase::drivers();
         for (auto it = sqlDrivers.begin(); it != sqlDrivers.end(); ++it)
         {
             QString sqlDriverName = *it;
-            sLogger.Debug(sqlDriverName);
+            sLogger.debug(sqlDriverName);
         }
 
         auto portName = sIniSettings.value("device/portName").toString();
 
-        sLogger.Info("=== Config ===");
-        sLogger.Info(QString("device.portName: %1").arg(portName));
-        sLogger.Info("==============");
+        sLogger.info("=== Config ===");
+        sLogger.info(QString("device.portName: %1").arg(portName));
+        sLogger.info("==============");
 
         core::RunnerConfig config;
         config.webServerPort = sIniSettings.value("webServer/port", 8000).toInt();
@@ -53,23 +53,23 @@ int main(int argc, char** argv)
     }
     catch (boost::system::system_error& ex)
     {
-        sLogger.Error(QString("Error: %1").arg(ex.what()));
+        sLogger.error(QString("Error: %1").arg(ex.what()));
         auto info = boost::diagnostic_information(ex);
-        sLogger.Error(QString("Info: %1").arg(info.c_str()));
+        sLogger.error(QString("Info: %1").arg(info.c_str()));
         if (ex.code().value() == 2) {
-            sLogger.Error("Connection to receiver could not be made.");
-            sLogger.Error("The application could not find the port specified.");
-            sLogger.Error("It is ether wrong configuration or the receiver moved to another port.");
+            sLogger.error("Connection to receiver could not be made.");
+            sLogger.error("The application could not find the port specified.");
+            sLogger.error("It is ether wrong configuration or the receiver moved to another port.");
         }
         else
         {
-            sLogger.Error("No connection to receiver, code: " + QString::number(ex.code().value()));
+            sLogger.error("No connection to receiver, code: " + QString::number(ex.code().value()));
         }
         return 1;
     }
     catch (Exception& e)
     {
-        sLogger.Error(e.what());
+        sLogger.error(e.what());
         return 1;
     }
 }

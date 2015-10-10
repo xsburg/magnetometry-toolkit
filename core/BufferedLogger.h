@@ -28,6 +28,8 @@ namespace core
         int id;
         QList<BufferMessage> messageBuffer;
     public:
+        SMART_PTR_T(BufferedLogger);
+
         explicit BufferedLogger(int maxBufferSize = 1000)
         {
             this->id = 1;
@@ -40,7 +42,11 @@ namespace core
         void warn(const QString& message);
         void error(const QString& message);
         void fatal(const QString& message);
-    private:
-        void write(const QString& message, Common::LogLevel logLevel);
+        void write(Common::LogLevel logLevel, const QString& message);
+
+        const QList<BufferMessage>& buffer() const
+        {
+            return messageBuffer;
+        }
     };
 }

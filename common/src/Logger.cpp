@@ -1,65 +1,77 @@
 #include "Logger.h"
 
-#include <QtCore/QtCore>
 #include <iostream>
 
 namespace Common
 {
-    void Logger::Initialize(LogLevel logLevel)
+    void Logger::initialize(LogLevel logLevel)
     {
         if (logLevel < 0)
         {
-            logLevel = LogLevel::Debug;
+            logLevel = Debug;
         }
-
         this->logLevel = logLevel;
     }
 
-    void Logger::Debug(const QString& message)
+    void Logger::debug(const QString& message)
     {
-        if (this->logLevel >= LogLevel::Debug)
-        {
-            std::cerr << message.toStdString() << std::endl;
-        }
+        write(Debug, message);
     }
 
-    void Logger::Trace(const QString& message)
+    void Logger::trace(const QString& message)
     {
-        if (this->logLevel >= LogLevel::Trace)
-        {
-            std::cerr << message.toStdString() << std::endl;
-        }
+        write(Trace, message);
     }
 
-    void Logger::Info(const QString& message)
+    void Logger::info(const QString& message)
     {
-        if (this->logLevel >= LogLevel::Info)
-        {
-            std::cout << message.toStdString() << std::endl;
-        }
+        write(Info, message);
     }
 
-    void Logger::Warn(const QString& message)
+    void Logger::warn(const QString& message)
     {
-        if (this->logLevel >= LogLevel::Warn)
-        {
-            std::cerr << message.toStdString() << std::endl;
-        }
+        write(Warn, message);
     }
 
-    void Logger::Error(const QString& message)
+    void Logger::error(const QString& message)
     {
-        if (this->logLevel >= LogLevel::Error)
-        {
-            std::cerr << message.toStdString() << std::endl;
-        }
+        write(Error, message);
     }
 
-    void Logger::Fatal(const QString& message)
+    void Logger::fatal(const QString& message)
     {
-        if (this->logLevel >= LogLevel::Fatal)
+        write(Fatal, message);
+    }
+
+    void Logger::write(LogLevel logLevel, const QString& message)
+    {
+        if (this->logLevel >= logLevel)
         {
-            std::cerr << "FATAL:" << message.toStdString() << std::endl;
+            QString levelMsg;
+            switch (logLevel)
+            {
+            case Debug:
+                levelMsg = "DEBUG";
+                break;
+            case Trace:
+                levelMsg = "TRACE";
+                break;
+            case Info:
+                levelMsg = "INFO";
+                break;
+            case Warn:
+                levelMsg = "WARN";
+                break;
+            case Error:
+                levelMsg = "ERROR";
+                break;
+            case Fatal:
+                levelMsg = "FATAL";
+                break;
+            default:
+                break;
+            }
+            std::cerr << levelMsg.toStdString() << ": " << message.toStdString() << std::endl;
         }
     }
 }

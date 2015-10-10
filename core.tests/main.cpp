@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     QTextCodec::setCodecForLocale(codec);
 
     //sLogger.Initialize(Path::Combine(Path::ApplicationDirPath(), "logger.config.xml"));
-    sLogger.Initialize(LogLevel::Debug);
+    sLogger.initialize(LogLevel::Debug);
     sIniSettings.Initialize(Path::Combine(Path::ApplicationDirPath(), "config.test.ini"));
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

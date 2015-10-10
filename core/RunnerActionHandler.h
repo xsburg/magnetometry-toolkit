@@ -36,6 +36,11 @@ namespace core
             return _status;
         }
 
+        BufferedLogger::SharedPtr_t& logger()
+        {
+            return _logger;
+        }
+
         void setStatus(RunnerStatus::SharedPtr_t runnerStatus)
         {
             _status = runnerStatus;
@@ -52,6 +57,7 @@ namespace core
 
         QQueue<RunnerCommand::SharedPtr_t> _commands;
         RunnerStatus::SharedPtr_t _status;
+        BufferedLogger::SharedPtr_t _logger;
         QMutex _dataMutex;
     };
 }

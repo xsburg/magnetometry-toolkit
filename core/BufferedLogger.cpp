@@ -2,35 +2,35 @@
 
 void core::BufferedLogger::debug(const QString& message)
 {
-    write(message, Common::Debug);
+    write(Common::Debug, message);
 }
 
 void core::BufferedLogger::trace(const QString& message)
 {
-    write(message, Common::Trace);
+    write(Common::Trace, message);
 }
 
 void core::BufferedLogger::info(const QString& message)
 {
-    write(message, Common::Info);
+    write(Common::Info, message);
 }
 
 void core::BufferedLogger::warn(const QString& message)
 {
-    write(message, Common::Warn);
+    write(Common::Warn, message);
 }
 
 void core::BufferedLogger::error(const QString& message)
 {
-    write(message, Common::Error);
+    write(Common::Error, message);
 }
 
 void core::BufferedLogger::fatal(const QString& message)
 {
-    write(message, Common::Fatal);
+    write(Common::Fatal, message);
 }
 
-void core::BufferedLogger::write(const QString& message, Common::LogLevel logLevel)
+void core::BufferedLogger::write(Common::LogLevel logLevel, const QString& message)
 {
     QString levelMsg;
     switch (logLevel)

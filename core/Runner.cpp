@@ -8,6 +8,7 @@
 
 core::Runner::Runner(RunnerConfig config) : _config(config)
 {
+    _logger = std::make_shared<BufferedLogger>();
     _actionHandler = std::make_shared<RunnerActionHandler>();
     _webServer = std::make_shared<WebServer>();
     _webServer->port(config.webServerPort);
@@ -16,7 +17,7 @@ core::Runner::Runner(RunnerConfig config) : _config(config)
 
 void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    sLogger.Info(QString("Preparing command RUN..."));
+    logInfo(QString("Preparing command RUN..."));
     auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
     status->isRunning = true;
     status->updated = QDateTime::currentDateTimeUtc();
@@ -62,26 +63,26 @@ void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, Runner
         }
     }
     status->samplingIntervalMs = actualSamplingIntervalMs;
-    sLogger.Info(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
+    logInfo(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
         .arg(samplingIntervalMs).arg(actualIntervalVal));
     device->sendAuto(actualIntervalVal);
-    sLogger.Info(QString("Executed."));
+    logInfo(QString("Executed."));
 }
 
 void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    sLogger.Info(QString("Preparing command STOP..."));
+    logInfo(QString("Preparing command STOP..."));
     status->isRunning = false;
     status->updated = QDateTime::currentDateTimeUtc();
-    sLogger.Info(QString("Executing command STOP..."));
+    logInfo(QString("Executing command STOP..."));
     device->sendEnq();
     device->readEnq();
-    sLogger.Info(QString("Executed."));
+    logInfo(QString("Executed."));
 }
 
 void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    sLogger.Info(QString("Executing command UPDATE-STATUS..."));
+    logInfo(QString("Executing command UPDATE-STATUS..."));
 
     // enq
     device->sendEnq();
@@ -102,46 +103,46 @@ void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, Runn
     // commands size
     _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
 
-    sLogger.Info(QString("Executed."));
+    logInfo(QString("Executed."));
 }
 
 void core::Runner::executeSetTime(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    sLogger.Info(QString("Preparing command SET-TIME..."));
+    logInfo(QString("Preparing command SET-TIME..."));
     auto timeCmd = std::static_pointer_cast<SetTimeRunnerCommand>(cmd);
     auto time = timeCmd->time();
-    sLogger.Info(QString("Executing command SET-TIME..."));
+    logInfo(QString("Executing command SET-TIME..."));
     device->sendSetTime(time);
     device->readSetTime();
     device->sendGetTime();
     status->time = device->readGetTime();
     status->timeUpdated = QDateTime::currentDateTimeUtc();
     status->updated = status->timeUpdated;
-    sLogger.Info(QString("Executed."));
+    logInfo(QString("Executed."));
 }
 
 void core::Runner::executeSetRange(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    sLogger.Info(QString("Preparing command SET-RANGE..."));
+    logInfo(QString("Preparing command SET-RANGE..."));
     auto rangeCmd = std::static_pointer_cast<SetRangeRunnerCommand>(cmd);
     auto center = rangeCmd->center();
-    sLogger.Info(QString("Executing command SET-RANGE..."));
+    logInfo(QString("Executing command SET-RANGE..."));
     device->sendSetRange(center);
     status->range = device->readSetRange();
     status->updated = QDateTime::currentDateTimeUtc();
-    sLogger.Info(QString("Executed."));
+    logInfo(QString("Executed."));
 }
 
 void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
 {
-    sLogger.Info(QString("Preparing command SET-STAND-BY..."));
+    logInfo(QString("Preparing command SET-STAND-BY..."));
     auto standByCmd = std::static_pointer_cast<SetStandByRunnerCommand>(cmd);
     auto standBy = standByCmd->standBy();
-    sLogger.Info(QString("Executing command SET-STAND-BY..."));
+    logInfo(QString("Executing command SET-STAND-BY..."));
     device->sendStandBy(standBy);
     status->standBy = device->readStandBy();
     status->updated = QDateTime::currentDateTimeUtc();
-    sLogger.Info(QString("Executed."));
+    logInfo(QString("Executed."));
 }
 
 core::IntegerMSeedRecord::SharedPtr_t core::Runner::createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time)
@@ -162,7 +163,7 @@ void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MS
     {
         return;
     }
-    sLogger.Debug(QString("Flushing samples cache (%1 samples)...").arg(samplesCache.size()));
+    logDebug(QString("Flushing samples cache (%1 samples)...").arg(samplesCache.size()));
     double samplingRateHz = 1000.0 / samplingIntervalMs;
 
     for (auto& sample : samplesCache)
@@ -182,29 +183,29 @@ void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MS
 
     writer->flush();
     samplesCache.clear();
-    sLogger.Debug(QString("Done flushing."));
+    logDebug(QString("Done flushing."));
 }
 
 void core::Runner::run()
 {
     // Running commands aggregator in background thread
-    sLogger.Info(QString("Starting web server on port %1...").arg(_config.webServerPort));
+    sLogger.info(QString("Starting web server on port %1...").arg(_config.webServerPort));
     _webServer->runAsync();
 
     // Creating a device
-    sLogger.Info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
-    auto device = std::make_shared<core::EbDevice>();
+    sLogger.info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
+    auto device = std::make_shared<EbDevice>(_logger);
     device->connect(_config.devicePortName);
     if (!_config.skipDiagnostics)
     {
-        sLogger.Info(QString("Running device diagnostics..."));
+        sLogger.info(QString("Running device diagnostics..."));
         device->runDiagnosticSequence();
         device->runTestAutoSequence();
-        sLogger.Info(QString("Diagnostics done."));
+        sLogger.info(QString("Diagnostics done."));
     }
     else
     {
-        sLogger.Info(QString("Skipping device diagnostics..."));
+        sLogger.info(QString("Skipping device diagnostics..."));
     }
 
     // Creating an mseed writer
@@ -217,20 +218,20 @@ void core::Runner::run()
     bool isFlushing = false;
     int samplingIntervalMs;
     {
-        sLogger.Info(QString("Gathering device start-up config..."));
+        sLogger.info(QString("Gathering device start-up config..."));
         QMutexLocker lock(_actionHandler->dataMutex());
         RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
         executeUpdateStatus(device, updateCmd, _actionHandler->status());
         isRunning = _actionHandler->status()->isRunning;
         samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
-        sLogger.Info(QString("Done gathering."));
+        sLogger.info(QString("Done gathering."));
     }
 
     QVector<EbDevice::Sample> samplesCache;
     // Main worker loop
     try
     {
-        sLogger.Info(QString("Starting main logging loop..."));
+        sLogger.info(QString("Starting main logging loop..."));
         while (true)
         {
             if (isRunning)
@@ -241,7 +242,7 @@ void core::Runner::run()
                     const int acceptableDelay = 1000;
                     auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
                     auto isValid = device->validateSample(sample);
-                    sLogger.Info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                    sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
                         .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
                         .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
 
@@ -257,6 +258,7 @@ void core::Runner::run()
                 else
                 {
                     isFlushing = true;
+                    QMutexLocker lock(_actionHandler->dataMutex());
                     flushSamplesCache(samplesCache, writer, samplingIntervalMs);
                     isFlushing = false;
                     isStopping = false;
@@ -273,7 +275,7 @@ void core::Runner::run()
             QMutexLocker lock(_actionHandler->dataMutex());
             while (!_actionHandler->commands().empty())
             {
-                sLogger.Debug("Found a command...");
+                sLogger.debug("Found a command...");
                 auto cmd = _actionHandler->commands().dequeue();
                 switch (cmd->type())
                 {
@@ -305,18 +307,42 @@ void core::Runner::run()
                     throw Common::NotImplementedException();
                 }
                 _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
-                sLogger.Debug("Done reading command.");
+                sLogger.debug("Done reading command.");
             }
         }
     }
     catch (...)
     {
-        sLogger.Debug("Main runner loop has been broken by exception...");
+        sLogger.debug("Main runner loop has been broken by exception...");
         if (!isFlushing)
         {
-            sLogger.Debug("Trying to flush samples cache...");
+            sLogger.debug("Trying to flush samples cache...");
             flushSamplesCache(samplesCache, writer, samplingIntervalMs);
         }
         throw;
     }
+}
+
+void core::Runner::log(Common::LogLevel level, const QString& message)
+{
+    if (_logger.get())
+    {
+        _logger->write(level, message);
+    }
+    sLogger.write(level, message);
+}
+
+void core::Runner::logInfo(const QString& message)
+{
+    log(Common::Info, message);
+}
+
+void core::Runner::logDebug(const QString& message)
+{
+    log(Common::Debug, message);
+}
+
+void core::Runner::logError(const QString& message)
+{
+    log(Common::Error, message);
 }

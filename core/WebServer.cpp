@@ -25,29 +25,29 @@ int ev_handler(mg_connection *connection, enum mg_event event) {
     case MG_AUTH:
         return MG_TRUE;
     case MG_REQUEST:
-        sLogger.Info(QString("New connection to '%1'.").arg(connection->uri));
+        sLogger.info(QString("New connection to '%1'.").arg(connection->uri));
         for (auto& handler : handlers)
         {
             handler->connection(connection);
             if (handler->match())
             {
-                sLogger.Info(QString("Found handler '%1' -> '%2'.").arg(connection->uri).arg(handler->name()));
+                sLogger.info(QString("Found handler '%1' -> '%2'.").arg(connection->uri).arg(handler->name()));
                 try
                 {
                     handler->execute();
                 }
                 catch (Common::Exception& ex)
                 {
-                    sLogger.Error(QString("Handler error (Common::Exception): %1").arg(ex.what()));
+                    sLogger.error(QString("Handler error (Common::Exception): %1").arg(ex.what()));
                 }
                 catch (std::exception& ex)
                 {
-                    sLogger.Error(QString("Handler error (std::exception): %1").arg(ex.what()));
+                    sLogger.error(QString("Handler error (std::exception): %1").arg(ex.what()));
                 }
                 return MG_TRUE;
             }
         }
-        sLogger.Info(QString("No handlers found for url '%1'.").arg(connection->uri));
+        sLogger.info(QString("No handlers found for url '%1'.").arg(connection->uri));
         return MG_FALSE;
     default:
         return MG_FALSE;

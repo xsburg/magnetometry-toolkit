@@ -17,13 +17,13 @@ namespace core
 
         void BaseTest::SetUp()
         {
-            sLogger.Info("Connecting to the test database...");
+            sLogger.info("Connecting to the test database...");
             this->_connection = Common::Connection::FromSettings("Db");
             this->_connection->Connect();
 
             this->_connection->DbHelper()->ExecuteQuery("SET autocommit=0;");
 
-            sLogger.Info("Starting a new transaction...");
+            sLogger.info("Starting a new transaction...");
             ASSERT_TRUE(this->_connection->Database().driver()->hasFeature(QSqlDriver::Transactions));
             bool transactionStarted = this->_connection->Database().transaction();
             if (!transactionStarted)
@@ -34,13 +34,13 @@ namespace core
             /*sLogger.Info("Testing that database is empty...");
             auto source = std::make_shared<Greis::MySqlSource>(this->Connection().get());
             ASSERT_EQ(source->ReadAll()->Body().size(), 0);*/
-            sLogger.Info("SetUp Succeeded...");
+            sLogger.info("SetUp Succeeded...");
         }
 
         void BaseTest::TearDown()
         {
             this->_connection->Database().rollback();
-            sLogger.Info("Transaction has been reverted.");
+            sLogger.info("Transaction has been reverted.");
         }
 
         const std::shared_ptr<Common::Connection>& BaseTest::Connection() const

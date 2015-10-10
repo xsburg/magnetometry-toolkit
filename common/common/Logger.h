@@ -32,14 +32,15 @@ namespace Common
             logLevel = LogLevel::Debug;
         }
 
-        void Initialize(LogLevel logLevel);
+        void initialize(LogLevel logLevel);
 
-        void Debug(const QString& message);
-        void Trace(const QString& message);
-        void Info(const QString& message);
-        void Warn(const QString& message);
-        void Error(const QString& message);
-        void Fatal(const QString& message);
+        void debug(const QString& message);
+        void trace(const QString& message);
+        void info(const QString& message);
+        void warn(const QString& message);
+        void error(const QString& message);
+        void fatal(const QString& message);
+        void write(LogLevel logLevel, const QString& message);
     };
 }
 

@@ -72,7 +72,7 @@ namespace Common
                 DatabaseHelper::ThrowIfError(query);
 
                 _resultInsertQuery = _insertTemplate;
-                sLogger.Trace(QString("Inserted %1 rows...").arg(_rowsAdded));
+                sLogger.trace(QString("Inserted %1 rows...").arg(_rowsAdded));
                 _rowsAdded = 0;
                 _boundValues.clear();
             }

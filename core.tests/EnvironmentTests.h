@@ -21,7 +21,7 @@ namespace core
         TEST_F(EnvironmentTests, ShouldConnect)
         {
             this->Connection()->DbHelper()->ExecuteQuery("SHOW TABLES;");
-            sLogger.Info("Connection succeeded.");
+            sLogger.info("Connection succeeded.");
         }
     }
 }

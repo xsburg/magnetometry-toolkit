@@ -3,7 +3,7 @@
 #include <common/InvalidOperationException.h>
 #include "RunnerCommands.h"
 
-core::RunnerActionHandler::RunnerActionHandler() : _status(new RunnerStatus())
+core::RunnerActionHandler::RunnerActionHandler() : _status(new RunnerStatus()), _logger(new BufferedLogger())
 {
 }
 
@@ -15,6 +15,7 @@ bool core::RunnerActionHandler::match()
     */
     return
         (exactMatch("api/status") && methodMatch("GET")) ||
+        (exactMatch("api/log") && methodMatch("GET")) ||
         (exactMatch("api/command") && methodMatch("POST"));
 }
 
@@ -55,6 +56,7 @@ void core::RunnerActionHandler::addSetStandByCommand(QJsonObject json)
 
 void core::RunnerActionHandler::execute()
 {
+    QMutexLocker lock(dataMutex());
     if (exactMatch("api/status"))
     {
         // api/status
@@ -82,7 +84,6 @@ void core::RunnerActionHandler::execute()
     else if (exactMatch("api/command"))
     {
         // api/command
-        QMutexLocker lock(dataMutex());
         QString content(QByteArray(connection()->content, connection()->content_len));
         QJsonDocument doc = QJsonDocument::fromJson(content.toLatin1());
         auto root = doc.object();
@@ -118,6 +119,29 @@ void core::RunnerActionHandler::execute()
 
         _status->commandQueueSize++;
         mg_printf_data(connection(), "{ \"result\": \"enqueued\" }");
+    }
+    else if (exactMatch("api/log"))
+    {
+        // api/log
+        QJsonDocument document;
+        QJsonObject json;
+        QJsonArray messages;
+        json["messages"] = messages;
+
+        for (auto& msg : _logger->buffer())
+        {
+            QJsonObject messageObject;
+            messageObject["time"] = msg.time.toString(Qt::ISODate);
+            messageObject["id"] = qint64(msg.id);
+            messageObject["logLevel"] = msg.logLevel;
+            messageObject["message"] = msg.message;
+            messages.append(messageObject);
+        }
+
+        document.setObject(json);
+        auto jsonData = document.toJson(QJsonDocument::JsonFormat::Indented);
+
+        mg_send_data(connection(), jsonData.data(), jsonData.size());
     }
     else
     {

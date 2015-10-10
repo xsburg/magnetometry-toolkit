@@ -24,7 +24,7 @@ namespace core
             {
                 if (expected[i] != actual[i])
                 {
-                    sLogger.Info(QString("Bytes mismatch at %1.").arg(i));
+                    sLogger.info(QString("Bytes mismatch at %1.").arg(i));
                     bad = true;
                     badIndex = i;
                     break;
@@ -58,7 +58,7 @@ namespace core
             eventLoop.exec(); // blocks stack until "finished()" has been called
             auto success = reply->error() == QNetworkReply::NoError;
             if (!success) {
-                sLogger.Error("Failure: " + reply->errorString());
+                sLogger.error("Failure: " + reply->errorString());
                 throw new Exception(QString("Failed to performe web request to %1: %2").arg(url).arg(reply->errorString()));
             }
             return reply->readAll();
@@ -81,7 +81,7 @@ namespace core
             eventLoop.exec(); // blocks stack until "finished()" has been called
             auto success = reply->error() == QNetworkReply::NoError;
             if (!success) {
-                sLogger.Error("Failure: " + reply->errorString());
+                sLogger.error("Failure: " + reply->errorString());
                 throw new Exception(QString("Failed to performe web request to %1: %2").arg(url).arg(reply->errorString()));
             }
             return reply->readAll();

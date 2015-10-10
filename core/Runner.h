@@ -31,11 +31,17 @@ namespace core
         void executeSetRange(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status);
         void executeSetStandBy(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status);
 
+        void log(Common::LogLevel level, const QString& message);
+        void logInfo(const QString& message);
+        void logDebug(const QString& message);
+        void logError(const QString& message);
+
         IntegerMSeedRecord::SharedPtr_t createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time);
         void flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MSeedWriter::SharedPtr_t writer, int samplingIntervalMs);
 
         WebServer::SharedPtr_t _webServer;
         RunnerActionHandler::SharedPtr_t _actionHandler;
         RunnerConfig _config;
+        BufferedLogger::SharedPtr_t _logger;
     };
 }

@@ -14,6 +14,7 @@
 #include "SerialPortBinaryStream.h"
 #include <common/BitConverter.h>
 #include <QtSerialPort/QSerialPort>
+#include "BufferedLogger.h"
 
 namespace core
 {
@@ -55,8 +56,7 @@ namespace core
             QDateTime time;
         };
 
-        EbDevice();
-        explicit EbDevice(Mode mode);
+        explicit EbDevice(BufferedLogger::SharedPtr_t logger = BufferedLogger::SharedPtr_t());
 
         void connect(QString portName);
 
@@ -99,12 +99,16 @@ namespace core
         Common::BitConverter _bitConverter;
         QSerialPort _serialPort;
         Mode _mode;
-
+        BufferedLogger::SharedPtr_t _logger;
         void sendCommand(QByteArray command, int delayMilliseconds = 500, bool escape = true);
         QByteArray readResponse(qint64 maxlen = 256, int readTimeout = 1000);
         QString readResponseString(qint64 maxlen = 256, int readTimeout = 1000);
         QByteArray escapeData(QByteArray data);
         QByteArray unescapeData(QByteArray data);
         void assertTrue(bool condition, QString failureComment);
+        void log(Common::LogLevel level, const QString& message);
+        void logInfo(const QString& message);
+        void logDebug(const QString& message);
+        void logError(const QString& message);
     };
 }
