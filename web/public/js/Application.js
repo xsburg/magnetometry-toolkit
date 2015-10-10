@@ -36,17 +36,34 @@
             contentRegion: $(".js-application-content-region"),
             loadingRegion: $(".js-application-loading-region"),
             fadingRegion: $(".js-application-fading-region"),
-            popupRegion: $(".js-application-popup-region")
+            popupRegion: $(".js-application-popup-region"),
+            fatalErrorModal: $(".js-fatal-error-modal")
         };
 
         App.sidebarRegion.show(new navigationApi.views.SidebarView());
         App.navbarRegion.show(new navigationApi.views.NavbarView());
+
+        App.ui.fatalErrorModal.modal({
+            keyboard: false
+        });
+        App.ui.fatalErrorModal.on('hide.bs.modal', function () {
+            document.location.reload(true);
+        });
 
         function configure() {
             //noinspection JSUnresolvedVariable
             var langCode = window.langCode;
             //noinspection JSUnresolvedVariable
             lib.moment.locale(langCode);
+
+            Promise.onPossiblyUnhandledRejection(function(error, promise) {
+                var reason = promise.reason();
+                var isAuthenticationError = (reason && reason.status === 401);
+                if (!isAuthenticationError) {
+                    App.ui.fatalErrorModal.modal("show");
+                }
+                throw error;
+            });
         }
 
         App.addInitializer(function () {

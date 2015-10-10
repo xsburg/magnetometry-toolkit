@@ -25,7 +25,7 @@ define([
             this.bindReqres();
             this.createModel();
             this.createView();
-            this.__updateStatus().finally(function () {
+            this.__updateStatus().then(function () {
                 this.view.displayData();
                 this.view.setLoading(false);
                 this.__startBackgroundUpdater();
