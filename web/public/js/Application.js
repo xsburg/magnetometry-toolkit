@@ -44,7 +44,9 @@
         App.navbarRegion.show(new navigationApi.views.NavbarView());
 
         App.ui.fatalErrorModal.modal({
-            keyboard: false
+            keyboard: false,
+            backdrop: "static",
+            show: false
         });
         App.ui.fatalErrorModal.on('hide.bs.modal', function () {
             document.location.reload(true);
