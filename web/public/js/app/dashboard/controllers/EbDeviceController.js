@@ -64,6 +64,8 @@ define([
             this.reqres.setHandler('deviceTime:fix', this.__fixDeviceTime, this);
             this.reqres.setHandler('device:update', this.__forceDeviceUpdate, this);
             this.reqres.setHandler('range:set', this.__setRange, this);
+            this.reqres.setHandler('run:diagnostics', this.__runDiagnostics, this);
+            this.reqres.setHandler('run:autoTest', this.__runAutoTest, this);
         },
 
         onDestroy: function () {
@@ -155,9 +157,22 @@ define([
             });
         },
 
+        __runDiagnostics: function () {
+            return this.__sendCommand({
+                command: 'run-diagnostics'
+            });
+        },
+
+        __runAutoTest: function () {
+            return this.__sendCommand({
+                command: 'run-mode-auto-test'
+            });
+        },
+
         __sendCommand: function (data) {
             this.commandSendLock = true;
             this.view.setEnabled(false);
+            this.diagnosticsView.setEnabled(false);
             return core.services.AjaxService.post('api/dashboard/eb-device/command', data);
         }
     });

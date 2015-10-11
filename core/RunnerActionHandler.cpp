@@ -54,6 +54,16 @@ void core::RunnerActionHandler::addSetStandByCommand(QJsonObject json)
     _commands.enqueue(std::make_shared<SetStandByRunnerCommand>(standBy));
 }
 
+void core::RunnerActionHandler::addRunDiagnosticsCommand(QJsonObject json)
+{
+    _commands.enqueue(std::make_shared<RunDiagnosticsRunnerCommand>());
+}
+
+void core::RunnerActionHandler::addRunModeAutoTestCommand(QJsonObject json)
+{
+    _commands.enqueue(std::make_shared<RunModeAutoTestRunnerCommand>());
+}
+
 void core::RunnerActionHandler::execute()
 {
     QMutexLocker lock(dataMutex());
@@ -111,6 +121,14 @@ void core::RunnerActionHandler::execute()
         else if (command == "set-device-stand-by")
         {
             addSetStandByCommand(root);
+        }
+        else if (command == "run-diagnostics")
+        {
+            addRunDiagnosticsCommand(root);
+        }
+        else if (command == "run-mode-auto-test")
+        {
+            addRunModeAutoTestCommand(root);
         }
         else
         {

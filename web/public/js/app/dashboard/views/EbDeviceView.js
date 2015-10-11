@@ -113,7 +113,9 @@ define([
             statusCommandQueue: '.js-status-command-queue',
             startLoggingButton: '.js-start-logging-button',
             stopLoggingButton: '.js-stop-logging-button',
-            forceUpdateButton: '.js-force-update-button'
+            forceUpdateButton: '.js-force-update-button',
+            runDiagnosticsButton: '.js-run-diagnostics-button',
+            runAutoTestButton: '.js-run-auto-test-button'
         },
 
         events: {
@@ -122,7 +124,9 @@ define([
             'click @ui.setRangeButton': '__onSetRange',
             'click @ui.startLoggingButton': '__onStartLogging',
             'click @ui.stopLoggingButton': '__onStopLogging',
-            'click @ui.forceUpdateButton': '__onForceUpdate'
+            'click @ui.forceUpdateButton': '__onForceUpdate',
+            'click @ui.runDiagnosticsButton': '__onRunDiagnostics',
+            'click @ui.runAutoTestButton': '__onRunAutoTest'
         },
 
         onRender: function () {
@@ -183,6 +187,14 @@ define([
             this.ui.statusCommandQueue.text(data.commandQueueSize);
         },
 
+        __onRunDiagnostics: function () {
+            this.reqres.request('run:diagnostics');
+        },
+
+        __onRunAutoTest: function () {
+            this.reqres.request('run:autoTest');
+        },
+
         __onDataChange: function () {
             /*var queueSize = this.model.get('commandQueueSize');
             if (queueSize === 0) {
@@ -204,6 +216,8 @@ define([
             this.ui.forceUpdateButton[0].disabled = !enabled;
             this.ui.statusCenterRangeInput[0].disabled = !enabled;
             this.ui.statusSamplingIntervalInput[0].disabled = !enabled;
+            this.ui.runDiagnosticsButton[0].disabled = !enabled;
+            this.ui.runAutoTestButton[0].disabled = !enabled;
         },
 
         __onToggleStandBy: function () {

@@ -24,7 +24,9 @@ namespace core
         UpdateStatus,
         SetTime,
         SetRange,
-        SetStandBy
+        SetStandBy,
+        RunDiagnostics,
+        RunModeAutoTest
     };
 
     class RunnerCommand
@@ -78,6 +80,24 @@ namespace core
         RunnerCommandType type() const override
         {
             return RunnerCommandType::UpdateStatus;
+        }
+    };
+
+    class RunDiagnosticsRunnerCommand : public RunnerCommand
+    {
+    public:
+        RunnerCommandType type() const override
+        {
+            return RunnerCommandType::RunDiagnostics;
+        }
+    };
+
+    class RunModeAutoTestRunnerCommand : public RunnerCommand
+    {
+    public:
+        RunnerCommandType type() const override
+        {
+            return RunnerCommandType::RunModeAutoTest;
         }
     };
 

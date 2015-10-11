@@ -54,6 +54,8 @@ namespace core
         void addSetTimeCommand(QJsonObject json);
         void addSetRangeCommand(QJsonObject json);
         void addSetStandByCommand(QJsonObject json);
+        void addRunDiagnosticsCommand(QJsonObject json);
+        void addRunModeAutoTestCommand(QJsonObject json);
 
         QQueue<RunnerCommand::SharedPtr_t> _commands;
         RunnerStatus::SharedPtr_t _status;

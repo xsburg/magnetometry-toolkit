@@ -145,6 +145,20 @@ void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, Runner
     logInfo(QString("Executed."));
 }
 
+void core::Runner::executeDiagnostics(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    logInfo(QString("Executing command RUN-DIAGNOSTICS..."));
+    device->runDiagnosticSequence();
+    logInfo(QString("Executed."));
+}
+
+void core::Runner::executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    logInfo(QString("Executing command AUTO-TEST..."));
+    device->runTestAutoSequence();
+    logInfo(QString("Executed."));
+}
+
 core::IntegerMSeedRecord::SharedPtr_t core::Runner::createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time)
 {
     auto record = std::make_shared<IntegerMSeedRecord>();
@@ -302,6 +316,13 @@ void core::Runner::run()
                     break;
                 case SetStandBy:
                     executeSetStandBy(device, cmd, _actionHandler->status());
+                    break;
+                case RunDiagnostics:
+                    executeDiagnostics(device, cmd, _actionHandler->status());
+                    executeUpdateStatus(device, cmd, _actionHandler->status());
+                    break;
+                case RunModeAutoTest:
+                    executeAutoTest(device, cmd, _actionHandler->status());
                     break;
                 default:
                     throw Common::NotImplementedException();
