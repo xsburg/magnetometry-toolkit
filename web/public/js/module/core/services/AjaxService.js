@@ -22,7 +22,7 @@ define([
             return Promise.resolve($.ajax({
                 method: method,
                 url: url,
-                data: JSON.stringify(data || {}),
+                data: data != null ? JSON.stringify(data || {}) : null,
                 dataType: 'json',
                 contentType: 'application/json'
             }));

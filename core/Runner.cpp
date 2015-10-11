@@ -8,8 +8,8 @@
 
 core::Runner::Runner(RunnerConfig config) : _config(config)
 {
-    _logger = std::make_shared<BufferedLogger>();
     _actionHandler = std::make_shared<RunnerActionHandler>();
+    _logger = _actionHandler->logger();
     _webServer = std::make_shared<WebServer>();
     _webServer->port(config.webServerPort);
     _webServer->addActionHandler(_actionHandler);

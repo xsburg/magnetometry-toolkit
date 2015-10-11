@@ -8,5 +8,6 @@
 /* global define, require, Handlebars, Backbone, Marionette, $, _, Localizer */
 
 module.exports = {
-    compiled: false
+    compiled: false,
+    ebDeviceUrl: 'http://simba.adm:8000'
 };

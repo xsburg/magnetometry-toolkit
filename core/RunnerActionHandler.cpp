@@ -126,7 +126,6 @@ void core::RunnerActionHandler::execute()
         QJsonDocument document;
         QJsonObject json;
         QJsonArray messages;
-        json["messages"] = messages;
 
         for (auto& msg : _logger->buffer())
         {
@@ -138,6 +137,7 @@ void core::RunnerActionHandler::execute()
             messages.append(messageObject);
         }
 
+        json["messages"] = messages;
         document.setObject(json);
         auto jsonData = document.toJson(QJsonDocument::JsonFormat::Indented);
 
