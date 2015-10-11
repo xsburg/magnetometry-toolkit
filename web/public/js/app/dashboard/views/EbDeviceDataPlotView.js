@@ -44,7 +44,7 @@ define([
         onShow: function () {
             var data = _.times(100, function (i) {
                 return {
-                    year: '' + (2000+i),
+                    year: Number(new Date()) + i * 1000,//'' + (2000+i),
                     value: Math.floor(20 + 20 * Math.random())
                 };
             });/*
@@ -68,7 +68,14 @@ define([
                 ykeys: ['value'],
                 // Labels for the ykeys -- will be displayed when you hover over the
                 // chart.
-                labels: ['Value']
+                labels: ['Field'],
+                dateFormat: function (x) {
+                    return lib.moment(x).format();
+                },
+                resize: true/*,
+                hoverCallback: function (index, options, content, row) {
+                    return "sin(" + row.x + ") = " + row.y;
+                }*/
             });
 
         },
