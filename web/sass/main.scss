@@ -1,6 +1,6 @@
 @import "sb-admin-2";
 
-$sideBarLength: 250px;
+$sideBarLength: 230px;
 
 body {
   background-color: #fff;
@@ -114,4 +114,22 @@ body {
 .eb-device__data-update-spinner_visible {
   opacity: 0.6;
   transition: opacity 0.1s;
+}
+
+.eb-device__diagnostics-log-list {
+  height: 500px;
+  overflow-y: auto;
+}
+
+.eb-device__diagnostics-log-list-item__time {
+  border-bottom: dotted rgba(51, 51, 51, 0.4) thin;
+}
+
+.eb-device__control-panel-block {
+  min-width: 500px;
+  max-width: 600px;
+}
+
+.eb-device__diagnostics-block {
+  min-width: 520px;
 }

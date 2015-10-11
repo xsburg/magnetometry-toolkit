@@ -30,10 +30,18 @@ define([
                 this.view.setLoading(false);
                 this.__startBackgroundUpdater();
             }.bind(this));
+            this.__updateDiagnosticsLog().then(function () {
+                this.diagnosticsView.displayData();
+                this.diagnosticsView.setLoading(false);
+                this.__startDiagnosticsBackgroundUpdater();
+            }.bind(this));
         },
 
         createModel: function () {
             this.model = new EbDeviceStatusModel();
+            this.diagnosticsModel = new Backbone.Model({
+                logList: new Backbone.Collection()
+            });
         },
 
         createView: function () {
@@ -42,6 +50,8 @@ define([
                 reqres: this.reqres
             });
             this.diagnosticsView = new EbDeviceDiagnosticsView({
+                model: this.diagnosticsModel,
+                reqres: this.reqres
             });
         },
 
@@ -80,6 +90,25 @@ define([
                     }
                 }.bind(this));
             }.bind(this), config.UPDATER_INTERVAL);
+        },
+
+        __startDiagnosticsBackgroundUpdater: function () {
+            setTimeout(function () {
+                this.diagnosticsView.setDataUpdating(true);
+                this.__updateDiagnosticsLog().finally(function () {
+                    if (!this.isDestroyed) {
+                        this.diagnosticsView.setDataUpdating(false);
+                        this.__startDiagnosticsBackgroundUpdater();
+                    }
+                }.bind(this));
+            }.bind(this), config.UPDATER_INTERVAL);
+        },
+
+        __updateDiagnosticsLog: function () {
+            return core.services.AjaxService.get('api/dashboard/eb-device/log').then(function (data) {
+                //noinspection JSUnresolvedVariable
+                this.diagnosticsModel.get('logList').reset(data.messages);
+            }.bind(this));
         },
 
         __updateStatus: function () {
