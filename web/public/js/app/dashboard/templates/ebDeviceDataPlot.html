@@ -1,6 +1,15 @@
 <div class="panel-heading">Data Plot</div>
 <div class="panel-body eb-device__panel-body">
-    <div class="js-data-plot" style="height: 350px"></div>
+    <div class="eb-device__loading-panel js-loading-panel">
+        <div class="eb-device__loading-panel__fill"></div>
+        <div class="eb-device__loading-panel__text">
+            <div class="fa fa-cog fa-spin fa-2x"></div>
+        </div>
+    </div>
+    <div class="js-data-panel">
+        <h4><small>The data is updated manually <button type="button" class="btn btn-primary btn-xs js-refresh-button">Refresh</button></small></h4>
+        <div class="js-data-plot" style="height: 350px"></div>
+    </div>
     <!--<div class="eb-device__loading-panel js-loading-panel">
         <div class="eb-device__loading-panel__fill"></div>
         <div class="eb-device__loading-panel__text">

@@ -73,10 +73,26 @@ define([
             this.reqres.setHandler('range:set', this.__setRange, this);
             this.reqres.setHandler('run:diagnostics', this.__runDiagnostics, this);
             this.reqres.setHandler('run:autoTest', this.__runAutoTest, this);
+            this.reqres.setHandler('data:reload', this.__reloadData, this);
         },
 
         onDestroy: function () {
             this.isDestroyed = true;
+        },
+
+        __reloadData: function () {
+            return core.services.AjaxService.get('api/dashboard/eb-device/data').then(function (data) {
+                //noinspection JSUnresolvedVariable
+                _.each(data.samples, function (s) {
+                    s.time = Number(new Date(s.time));
+                });
+                //noinspection JSUnresolvedVariable
+                data.samples = _.filter(data.samples, function (s) {
+                    // valid data only (0x80 = valid flag)
+                    return s.state & 0x80;
+                });
+                return data;
+            }.bind(this));
         },
 
         __startBackgroundUpdater: function () {

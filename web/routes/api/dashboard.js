@@ -41,6 +41,21 @@ router.get('/eb-device/log', function(req, res) {
     });
 });
 
+router.get('/eb-device/data', function(req, res) {
+    request.get({
+        url: appConfig.ebDeviceUrl + '/api/data',
+        json: true,
+        timeout: 50000
+    }, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            res.json(body);
+        } else {
+            res.status(500);
+            res.send('Device has failed to process the data.');
+        }
+    });
+});
+
 router.post('/eb-device/command', function (req, res) {
     request.post({
         url: appConfig.ebDeviceUrl + '/api/command',
