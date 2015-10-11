@@ -34,7 +34,9 @@
         'moment_ru',
         'moment_de',
         'bootstrap',
-        'bootstrapSelect'
+        'bootstrapSelect',
+        'raphael',
+        'morris'
     ], function (keypress, moment, Handlebars, Promise, _, underscoreString) {
         'use strict';
 

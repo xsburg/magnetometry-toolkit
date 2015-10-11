@@ -12,8 +12,9 @@ define([
     'core',
     '../models/EbDeviceStatusModel',
     '../views/EbDeviceView',
-    '../views/EbDeviceDiagnosticsView'
-], function (lib, core, EbDeviceStatusModel, EbDeviceView, EbDeviceDiagnosticsView) {
+    '../views/EbDeviceDiagnosticsView',
+    '../views/EbDeviceDataPlotView'
+], function (lib, core, EbDeviceStatusModel, EbDeviceView, EbDeviceDiagnosticsView, EbDeviceDataPlotView) {
     'use strict';
 
     var config = {
@@ -42,6 +43,8 @@ define([
             this.diagnosticsModel = new Backbone.Model({
                 logList: new Backbone.Collection()
             });
+            this.dataPlotModel = new Backbone.Model({
+            });
         },
 
         createView: function () {
@@ -51,6 +54,10 @@ define([
             });
             this.diagnosticsView = new EbDeviceDiagnosticsView({
                 model: this.diagnosticsModel,
+                reqres: this.reqres
+            });
+            this.dataPlotView = new EbDeviceDataPlotView({
+                model: this.dataPlotModel,
                 reqres: this.reqres
             });
         },
@@ -172,7 +179,6 @@ define([
         __sendCommand: function (data) {
             this.commandSendLock = true;
             this.view.setEnabled(false);
-            this.diagnosticsView.setEnabled(false);
             return core.services.AjaxService.post('api/dashboard/eb-device/command', data);
         }
     });

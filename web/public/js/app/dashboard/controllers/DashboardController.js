@@ -32,7 +32,8 @@ define([
             this.ebDeviceController = new EbDeviceController();
             return {
                 view: this.ebDeviceController.view,
-                diagnosticsView: this.ebDeviceController.diagnosticsView
+                diagnosticsView: this.ebDeviceController.diagnosticsView,
+                dataPlotView: this.ebDeviceController.dataPlotView
             };
         },
 

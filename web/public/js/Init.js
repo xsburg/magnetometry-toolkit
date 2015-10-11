@@ -47,6 +47,8 @@
             bootstrap: 'lib/bootstrap/bootstrap',
             metisMenu: '../components/metisMenu/dist/metisMenu',
             bootstrapSelect: '../components/bootstrap-select/dist/js/bootstrap-select',
+            morris: 'lib/morris.js/morris',
+            raphael: 'lib/raphael/raphael',
 
             'lib': 'lib/libApi',
             'core': 'module/core/coreApi'
@@ -89,6 +91,14 @@
 
             metisMenu: {
                 deps: ['jquery']
+            },
+
+            raphael: {
+                deps: ['jquery']
+            },
+
+            morris: {
+                deps: ['jquery','raphael']
             },
 
             backbone_associations: [ 'backbone' ],

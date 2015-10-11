@@ -29,13 +29,15 @@ define([
 
         regions: {
             ebDeviceRegion: '.js-eb-device-region',
-            ebDeviceDiagnosticsRegion: '.js-eb-device-diagnostics-region'
+            ebDeviceDiagnosticsRegion: '.js-eb-device-diagnostics-region',
+            ebDeviceDataPlotRegion: '.js-eb-device-data-plot-region'
         },
 
-        onRender: function () {
+        onShow: function () {
             var views = this.reqres.request('ebDeviceViews');
             this.ebDeviceRegion.show(views.view);
             this.ebDeviceDiagnosticsRegion.show(views.diagnosticsView);
+            this.ebDeviceDataPlotRegion.show(views.dataPlotView);
         }
     });
 });

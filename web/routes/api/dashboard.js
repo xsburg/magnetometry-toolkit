@@ -42,24 +42,10 @@ router.get('/eb-device/log', function(req, res) {
 });
 
 router.post('/eb-device/command', function (req, res) {
-    var data = req.body;
-    var availableCommands = [
-        'run',
-        'stop',
-        'update-status',
-        'set-device-time',
-        'set-device-range',
-        'set-device-stand-by'
-    ];
-    if (!_.contains(availableCommands, data.command)) {
-        res.status(500);
-        res.send('Invalid command');
-        return;
-    }
     request.post({
         url: appConfig.ebDeviceUrl + '/api/command',
         json: true,
-        body: data,
+        body: req.body,
         timeout: 50000
     }, function (error, response, body) {
         if (!error && response.statusCode === 200) {
