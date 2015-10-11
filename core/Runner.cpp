@@ -261,10 +261,15 @@ void core::Runner::run()
                         .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
 
                     samplesCache.push_back(sample);
+                    {
+                        QMutexLocker lock(_actionHandler->dataMutex());
+                        _actionHandler->addToDataBuffer(sample);
+                    }
 
                     if (samplesCache.size() >= _config.samplesCacheMaxSize)
                     {
                         isFlushing = true;
+                        QMutexLocker lock(_actionHandler->dataMutex());
                         flushSamplesCache(samplesCache, writer, samplingIntervalMs);
                         isFlushing = false;
                     }

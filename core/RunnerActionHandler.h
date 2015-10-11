@@ -47,6 +47,8 @@ namespace core
         }
 
         QQueue<RunnerCommand::SharedPtr_t>& commands() { return _commands; }
+
+        void addToDataBuffer(const EbDevice::Sample& sample);
     private:
         void addRunCommand(QJsonObject json);
         void addStopCommand(QJsonObject json);
@@ -57,6 +59,9 @@ namespace core
         void addRunDiagnosticsCommand(QJsonObject json);
         void addRunModeAutoTestCommand(QJsonObject json);
 
+        static const int maxDataSamplesListSize = 100;
+
+        QList<EbDevice::Sample> dataSamples;
         QQueue<RunnerCommand::SharedPtr_t> _commands;
         RunnerStatus::SharedPtr_t _status;
         BufferedLogger::SharedPtr_t _logger;

@@ -16,7 +16,17 @@ bool core::RunnerActionHandler::match()
     return
         (exactMatch("api/status") && methodMatch("GET")) ||
         (exactMatch("api/log") && methodMatch("GET")) ||
+        (exactMatch("api/data") && methodMatch("GET")) ||
         (exactMatch("api/command") && methodMatch("POST"));
+}
+
+void core::RunnerActionHandler::addToDataBuffer(const EbDevice::Sample& sample)
+{
+    dataSamples.append(sample);
+    while (dataSamples.size() > maxDataSamplesListSize)
+    {
+        dataSamples.pop_back();
+    }
 }
 
 void core::RunnerActionHandler::addRunCommand(QJsonObject json)
@@ -156,6 +166,29 @@ void core::RunnerActionHandler::execute()
         }
 
         json["messages"] = messages;
+        document.setObject(json);
+        auto jsonData = document.toJson(QJsonDocument::JsonFormat::Indented);
+
+        mg_send_data(connection(), jsonData.data(), jsonData.size());
+    }
+    else if (exactMatch("api/data"))
+    {
+        // api/data
+        QJsonDocument document;
+        QJsonObject json;
+        QJsonArray samples;
+
+        for (auto& sample : dataSamples)
+        {
+            QJsonObject messageObject;
+            messageObject["time"] = sample.time.toString(Qt::ISODate);
+            messageObject["field"] = sample.field;
+            messageObject["qmc"] = sample.qmc;
+            messageObject["state"] = sample.state;
+            samples.append(messageObject);
+        }
+
+        json["samples"] = samples;
         document.setObject(json);
         auto jsonData = document.toJson(QJsonDocument::JsonFormat::Indented);
 
