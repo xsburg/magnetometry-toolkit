@@ -24,6 +24,15 @@ namespace core
         QDateTime time;
     };
 
+    struct MSeedSettings
+    {
+        QString location;
+        QString network;
+        QString station;
+        QString fileName;
+        int samplesInRecord;
+    };
+
     struct RunnerStatus : EbDeviceStatus
     {
         SMART_PTR_T(RunnerStatus);
@@ -42,6 +51,7 @@ namespace core
         bool isRunning;
         int samplingIntervalMs;
         int commandQueueSize;
+        MSeedSettings mseedSettings;
     };
 
     struct RunnerConfig

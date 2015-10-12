@@ -74,6 +74,7 @@ define([
             this.reqres.setHandler('run:diagnostics', this.__runDiagnostics, this);
             this.reqres.setHandler('run:autoTest', this.__runAutoTest, this);
             this.reqres.setHandler('data:reload', this.__reloadData, this);
+            this.reqres.setHandler('mseed:updateSettings', this.__updateMSeedSettings, this);
         },
 
         onDestroy: function () {
@@ -190,6 +191,12 @@ define([
             return this.__sendCommand({
                 command: 'run-mode-auto-test'
             });
+        },
+
+        __updateMSeedSettings: function (settings) {
+            return this.__sendCommand(_.extend({
+                command: 'update-mseed-settings'
+            }, settings));
         },
 
         __sendCommand: function (data) {

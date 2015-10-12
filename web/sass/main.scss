@@ -73,8 +73,17 @@ body {
   bottom: 0;
 }
 
+.form-label {
+  margin-top: 10px;
+  margin-bottom: 2px;
+}
+
 .eb-device__update-range-container {
   margin-top: 10px;
+}
+
+.eb-device__mseed-settings-buttons {
+  margin: 10px 0 0 0;
 }
 
 .eb-device__update-range-btn {

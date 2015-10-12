@@ -115,7 +115,16 @@ define([
             stopLoggingButton: '.js-stop-logging-button',
             forceUpdateButton: '.js-force-update-button',
             runDiagnosticsButton: '.js-run-diagnostics-button',
-            runAutoTestButton: '.js-run-auto-test-button'
+            runAutoTestButton: '.js-run-auto-test-button',
+            applyMseedSettingsButton: '.js-apply-mseed-settings-button',
+            editMseedSettingsButton: '.js-edit-mseed-settings-button',
+            cancelMseedSettingsButton: '.js-cancel-mseed-settings-button',
+            mseedSettingsPanel: '.js-mseed-settings-panel',
+            mseedSettingsFileNameInput: '.js-mseed-settings-fileName-input',
+            mseedSettingsNetworkInput: '.js-mseed-settings-network-input',
+            mseedSettingsStationInput: '.js-mseed-settings-station-input',
+            mseedSettingsLocationInput: '.js-mseed-settings-location-input',
+            mseedSettingsSamplesInRecordInput: '.js-mseed-settings-samplesInRecord-input'
         },
 
         events: {
@@ -126,13 +135,17 @@ define([
             'click @ui.stopLoggingButton': '__onStopLogging',
             'click @ui.forceUpdateButton': '__onForceUpdate',
             'click @ui.runDiagnosticsButton': '__onRunDiagnostics',
-            'click @ui.runAutoTestButton': '__onRunAutoTest'
+            'click @ui.runAutoTestButton': '__onRunAutoTest',
+            'click @ui.applyMseedSettingsButton': '__onApplyMSeedSettings',
+            'click @ui.editMseedSettingsButton': '__onEditMSeedSettings',
+            'click @ui.cancelMseedSettingsButton': '__onCancelMSeedSettings'
         },
 
         onRender: function () {
             this.ui.dataTable.hide();
             this.ui.statusSamplingIntervalInput.val(1000);
             this.ui.statusSamplingIntervalInput.selectpicker();
+            this.ui.mseedSettingsPanel.hide();
         },
 
         displayData: function () {
@@ -185,6 +198,27 @@ define([
             this.ui.statusUpdated.text(moment(data.updated).format('lll'));
             //noinspection JSUnresolvedVariable
             this.ui.statusCommandQueue.text(data.commandQueueSize);
+            // mseed settings
+            if (!this.ui.mseedSettingsFileNameInput.val()) {
+                //noinspection JSUnresolvedVariable
+                this.ui.mseedSettingsFileNameInput.val(data.mseedSettings.fileName);
+            }
+            if (!this.ui.mseedSettingsStationInput.val()) {
+                //noinspection JSUnresolvedVariable
+                this.ui.mseedSettingsStationInput.val(data.mseedSettings.station);
+            }
+            if (!this.ui.mseedSettingsLocationInput.val()) {
+                //noinspection JSUnresolvedVariable
+                this.ui.mseedSettingsLocationInput.val(data.mseedSettings.location);
+            }
+            if (!this.ui.mseedSettingsNetworkInput.val()) {
+                //noinspection JSUnresolvedVariable
+                this.ui.mseedSettingsNetworkInput.val(data.mseedSettings.network);
+            }
+            if (!this.ui.mseedSettingsSamplesInRecordInput.val()) {
+                //noinspection JSUnresolvedVariable
+                this.ui.mseedSettingsSamplesInRecordInput.val(data.mseedSettings.samplesInRecord);
+            }
         },
 
         __onRunDiagnostics: function () {
@@ -218,6 +252,12 @@ define([
             this.ui.statusSamplingIntervalInput[0].disabled = !enabled;
             this.ui.runDiagnosticsButton[0].disabled = !enabled;
             this.ui.runAutoTestButton[0].disabled = !enabled;
+            // mseed settings
+            this.ui.mseedSettingsFileNameInput[0].disabled = !enabled;
+            this.ui.mseedSettingsNetworkInput[0].disabled = !enabled;
+            this.ui.mseedSettingsStationInput[0].disabled = !enabled;
+            this.ui.mseedSettingsLocationInput[0].disabled = !enabled;
+            this.ui.mseedSettingsSamplesInRecordInput[0].disabled = !enabled;
         },
 
         __onToggleStandBy: function () {
@@ -246,6 +286,32 @@ define([
 
         __onForceUpdate: function () {
             this.reqres.request('device:update');
+        },
+
+        __onApplyMSeedSettings: function () {
+            this.reqres.request('mseed:updateSettings', {
+                fileName: this.ui.mseedSettingsFileNameInput.val(),
+                station: this.ui.mseedSettingsStationInput.val(),
+                location: this.ui.mseedSettingsLocationInput.val(),
+                network: this.ui.mseedSettingsNetworkInput.val(),
+                samplesInRecord: Number(this.ui.mseedSettingsSamplesInRecordInput.val())
+            }).then(function () {
+                this.__closeMSeedSettingsPanel();
+            }.bind(this));
+        },
+
+        __onEditMSeedSettings: function () {
+            this.ui.editMseedSettingsButton.hide();
+            this.ui.mseedSettingsPanel.slideDown();
+        },
+
+        __onCancelMSeedSettings: function () {
+            this.__closeMSeedSettingsPanel();
+        },
+
+        __closeMSeedSettingsPanel: function () {
+            this.ui.editMseedSettingsButton.show();
+            this.ui.mseedSettingsPanel.slideUp();
         }
     });
 });

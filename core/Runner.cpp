@@ -238,6 +238,11 @@ void core::Runner::run()
         executeUpdateStatus(device, updateCmd, _actionHandler->status());
         isRunning = _actionHandler->status()->isRunning;
         samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+        _actionHandler->status()->mseedSettings.fileName = _config.msFileName;
+        _actionHandler->status()->mseedSettings.network = _config.msRecordNetwork;
+        _actionHandler->status()->mseedSettings.station = _config.msRecordStation;
+        _actionHandler->status()->mseedSettings.location = _config.msRecordLocation;
+        _actionHandler->status()->mseedSettings.samplesInRecord = _config.samplesCacheMaxSize;
         sLogger.info(QString("Done gathering."));
     }
 

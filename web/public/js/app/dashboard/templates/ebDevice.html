@@ -56,6 +56,28 @@
             </td>
         </tr>
         <tr>
+            <td>MiniSEED settings</td>
+            <td>
+                <button type="button" class="btn btn-primary btn-xs js-edit-mseed-settings-button">Edit</button>
+                <div class="js-mseed-settings-panel">
+                    <label for="mseedSettingsFileName" class="form-label">File Name</label>
+                    <input id="mseedSettingsFileName" type="text" class="form-control js-mseed-settings-fileName-input" placeholder="data.mseed">
+                    <label for="mseedSettingsNetwork" class="form-label">Network</label>
+                    <input id="mseedSettingsNetwork" type="text" class="form-control js-mseed-settings-network-input" placeholder="RU">
+                    <label for="mseedSettingsStation" class="form-label">Station</label>
+                    <input id="mseedSettingsStation" type="text" class="form-control js-mseed-settings-station-input" placeholder="IFZ">
+                    <label for="mseedSettingsLocation" class="form-label">location</label>
+                    <input id="mseedSettingsLocation" type="text" class="form-control js-mseed-settings-location-input" placeholder="SK">
+                    <label for="mseedSettingsSamplesInRecord" class="form-label">Samples in MiniSEED record</label>
+                    <input id="mseedSettingsSamplesInRecord" type="number" class="form-control js-mseed-settings-samplesInRecord-input" placeholder="2">
+                    <div class="eb-device__mseed-settings-buttons">
+                        <button type="button" class="btn btn-primary btn-sm js-apply-mseed-settings-button">Apply</button>
+                        <button type="button" class="btn btn-link btn-sm js-cancel-mseed-settings-button">Cancel</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
             <td>Stand By</td>
             <td><span class="js-status-stand-by"></span> <button type="button" class="btn btn-primary btn-xs js-status-stand-by-button"></button></td>
         </tr>
@@ -69,7 +91,7 @@
                 [ <span class="js-status-range-min"></span>, <span class="js-status-range-max"></span> ]
                 <div class="form-group eb-device__update-range-container">
                     <input id="newCenterRange" type="number" min="1" max="10000000" class="form-control js-status-center-range-input" placeholder="Center range (pT)">
-                    <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn js-set-range-button">Set</button>
+                    <button type="button" class="btn btn-primary btn-sm eb-device__update-range-btn js-set-range-button">Apply</button>
                 </div>
             </td>
         </tr>

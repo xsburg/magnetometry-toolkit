@@ -90,10 +90,20 @@ void core::RunnerActionHandler::execute()
         json["standBy"] = _status->standBy;
         json["isRunning"] = _status->isRunning;
         json["samplingIntervalMs"] = _status->samplingIntervalMs;
+        
         QJsonObject range;
         range["minField"] = _status->range.minField;
         range["maxField"] = _status->range.maxField;
         json["range"] = range;
+        
+        QJsonObject mseedSettings;
+        range["fileName"] = _status->mseedSettings.fileName;
+        range["location"] = _status->mseedSettings.location;
+        range["network"] = _status->mseedSettings.network;
+        range["station"] = _status->mseedSettings.station;
+        range["samplesInRecord"] = _status->mseedSettings.samplesInRecord;
+        json["mseedSettings"] = mseedSettings;
+
         json["commandQueueSize"] = _status->commandQueueSize;
 
         document.setObject(json);
