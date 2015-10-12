@@ -159,6 +159,25 @@ void core::Runner::executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerCo
     logInfo(QString("Executed."));
 }
 
+void core::Runner::executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+{
+    logInfo(QString("Executing command APPLY-MSEED-SETTINGS..."));
+    auto applyMSeedSettingsCmd = std::static_pointer_cast<ApplyMSeedSettingsRunnerCommand>(cmd);
+    auto newSettings = applyMSeedSettingsCmd->settings();
+    logInfo(QString("Arguments: { fileName: '%1', network: '%2', station: '%3', location: '%4', samplesInRecord: %5 }")
+        .arg(newSettings.fileName)
+        .arg(newSettings.network)
+        .arg(newSettings.station)
+        .arg(newSettings.location)
+        .arg(newSettings.samplesInRecord));
+    _actionHandler->status()->mseedSettings.fileName = newSettings.fileName;
+    _actionHandler->status()->mseedSettings.network = newSettings.network;
+    _actionHandler->status()->mseedSettings.station = newSettings.station;
+    _actionHandler->status()->mseedSettings.location = newSettings.location;
+    _actionHandler->status()->mseedSettings.samplesInRecord = newSettings.samplesInRecord;
+    logInfo(QString("Executed."));
+}
+
 core::IntegerMSeedRecord::SharedPtr_t core::Runner::createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time)
 {
     auto record = std::make_shared<IntegerMSeedRecord>();
@@ -333,6 +352,9 @@ void core::Runner::run()
                     break;
                 case RunModeAutoTest:
                     executeAutoTest(device, cmd, _actionHandler->status());
+                    break;
+                case ApplyMSeedSettings:
+                    executeApplyMSeedSettings(device, cmd, _actionHandler->status());
                     break;
                 default:
                     throw Common::NotImplementedException();

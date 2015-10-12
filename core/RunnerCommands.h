@@ -26,7 +26,8 @@ namespace core
         SetRange,
         SetStandBy,
         RunDiagnostics,
-        RunModeAutoTest
+        RunModeAutoTest,
+        ApplyMSeedSettings
     };
 
     class RunnerCommand
@@ -98,6 +99,26 @@ namespace core
         RunnerCommandType type() const override
         {
             return RunnerCommandType::RunModeAutoTest;
+        }
+    };
+
+    class ApplyMSeedSettingsRunnerCommand : public RunnerCommand
+    {
+        MSeedSettings _settings;
+    public:
+        explicit ApplyMSeedSettingsRunnerCommand(const MSeedSettings& settings)
+            : _settings(settings)
+        {
+        }
+
+        MSeedSettings settings() const
+        {
+            return _settings;
+        }
+
+        RunnerCommandType type() const override
+        {
+            return RunnerCommandType::ApplyMSeedSettings;
         }
     };
 

@@ -74,6 +74,17 @@ void core::RunnerActionHandler::addRunModeAutoTestCommand(QJsonObject json)
     _commands.enqueue(std::make_shared<RunModeAutoTestRunnerCommand>());
 }
 
+void core::RunnerActionHandler::addApplyMSeedSettingsCommand(QJsonObject json)
+{
+    MSeedSettings settings;
+    settings.fileName = json.value("fileName").toString();
+    settings.location = json.value("location").toString();
+    settings.network = json.value("network").toString();
+    settings.station = json.value("station").toString();
+    settings.samplesInRecord = json.value("samplesInRecord").toInt();
+    _commands.enqueue(std::make_shared<ApplyMSeedSettingsRunnerCommand>(settings));
+}
+
 void core::RunnerActionHandler::execute()
 {
     QMutexLocker lock(dataMutex());
@@ -149,6 +160,10 @@ void core::RunnerActionHandler::execute()
         else if (command == "run-mode-auto-test")
         {
             addRunModeAutoTestCommand(root);
+        }
+        else if (command == "apply-mseed-settings")
+        {
+            addApplyMSeedSettingsCommand(root);
         }
         else
         {

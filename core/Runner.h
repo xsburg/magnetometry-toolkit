@@ -32,6 +32,7 @@ namespace core
         void executeSetStandBy(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status);
         void executeDiagnostics(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status);
         void executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status);
+        void executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status);
 
         void log(Common::LogLevel level, const QString& message);
         void logInfo(const QString& message);

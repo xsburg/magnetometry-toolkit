@@ -58,6 +58,7 @@ namespace core
         void addSetStandByCommand(QJsonObject json);
         void addRunDiagnosticsCommand(QJsonObject json);
         void addRunModeAutoTestCommand(QJsonObject json);
+        void addApplyMSeedSettingsCommand(QJsonObject json);
 
         static const int maxDataSamplesListSize = 100;
 
