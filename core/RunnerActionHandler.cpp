@@ -25,7 +25,7 @@ void core::RunnerActionHandler::addToDataBuffer(const EbDevice::Sample& sample)
     dataSamples.append(sample);
     while (dataSamples.size() > maxDataSamplesListSize)
     {
-        dataSamples.pop_back();
+        dataSamples.pop_front();
     }
 }
 
