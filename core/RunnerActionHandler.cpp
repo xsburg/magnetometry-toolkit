@@ -97,11 +97,11 @@ void core::RunnerActionHandler::execute()
         json["range"] = range;
         
         QJsonObject mseedSettings;
-        range["fileName"] = _status->mseedSettings.fileName;
-        range["location"] = _status->mseedSettings.location;
-        range["network"] = _status->mseedSettings.network;
-        range["station"] = _status->mseedSettings.station;
-        range["samplesInRecord"] = _status->mseedSettings.samplesInRecord;
+        mseedSettings["fileName"] = _status->mseedSettings.fileName;
+        mseedSettings["location"] = _status->mseedSettings.location;
+        mseedSettings["network"] = _status->mseedSettings.network;
+        mseedSettings["station"] = _status->mseedSettings.station;
+        mseedSettings["samplesInRecord"] = _status->mseedSettings.samplesInRecord;
         json["mseedSettings"] = mseedSettings;
 
         json["commandQueueSize"] = _status->commandQueueSize;
