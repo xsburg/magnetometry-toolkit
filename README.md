@@ -1,6 +1,10 @@
-The following actions should be made to rebuild Qt MYSQL plugin.
+How to install the web site
 
-1. cd qt\5.3\Src\qtbase\src\plugins\sqldrivers\mysql
-2. qmake INCLUDEPATH+='C:\MySQL\MySQLConnectorC6.1\include' LIBS+="C:\MySQL\MySQLConnectorC6.1\lib\libmysql.lib" mysql.pro
-# paths must not contain whitespaces
-3. nmake (in dev console)
+1. Install nodejs package (yum install nodejs, yum install npm)
+2. Set proxy if you have to (npm config set https-proxy http://squid.adm:3128)
+3. Install grunt-cli (npm install -g grunt-cli)
+4. Install node modules (cd web, npm install)
+5. Install ruby (yum install ruby)
+6. Install sass (gem install sass)
+7. Run grunt tasks (grunt development)
+8. Run web site (node bin/www)
