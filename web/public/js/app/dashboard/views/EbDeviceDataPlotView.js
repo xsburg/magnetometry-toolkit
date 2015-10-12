@@ -65,7 +65,12 @@ define([
         },
 
         __updateData: function (data) {
-            this.line.setData(data.samples, true);
+            if (data.samples.length === 0) {
+                this.ui.dataPlot.hide();
+            } else {
+                this.ui.dataPlot.show();
+                this.line.setData(data.samples, true);
+            }
         },
 
         setDataUpdating: function (isUpdating) {
