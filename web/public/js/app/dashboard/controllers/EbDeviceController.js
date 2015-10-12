@@ -195,7 +195,7 @@ define([
 
         __updateMSeedSettings: function (settings) {
             return this.__sendCommand(_.extend({
-                command: 'update-mseed-settings'
+                command: 'apply-mseed-settings'
             }, settings));
         },
 
