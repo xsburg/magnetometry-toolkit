@@ -10,16 +10,12 @@
         var cssnano = require('cssnano');
 
         grunt.loadNpmTasks('grunt-bower-task');
-        grunt.loadNpmTasks('grunt-contrib-sass');
+        grunt.loadNpmTasks('grunt-sass');
         grunt.loadNpmTasks('grunt-contrib-watch');
         grunt.loadNpmTasks('grunt-contrib-requirejs');
         grunt.loadNpmTasks('grunt-contrib-cssmin');
         grunt.loadNpmTasks('grunt-shell');
         grunt.loadNpmTasks('grunt-postcss');
-
-        // SASS requirements:
-        // http://dl.bintray.com/oneclick/rubyinstaller/rubyinstaller-2.2.2.exe
-        // gem install sass
 
         //noinspection JSUnresolvedFunction
         grunt.initConfig({
