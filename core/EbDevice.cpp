@@ -4,10 +4,14 @@
 #include "common/InvalidOperationException.h"
 #include "common/NotSupportedException.h"
 
+core::EbDeviceException::EbDeviceException(const QString& message): Common::Exception(message)
+{
+}
+
 core::EbDevice::EbDevice(BufferedLogger::SharedPtr_t logger) :
-    _logger(logger),
     _bitConverter(Common::BitConverter::EByteOrder::MostSignificantByte),
-    _mode(Binary)
+    _mode(Binary),
+    _logger(logger)
 {
 }
 
@@ -207,7 +211,7 @@ bool core::EbDevice::readStandBy()
     {
         return false;
     }
-    throw Common::Exception(QString("EbDevice command response: StandBy returned '%1'.").arg(standByString));
+    throw EbDeviceException(QString("EbDevice command response: StandBy returned '%1'.").arg(standByString));
 }
 
 core::EbDevice::Mode core::EbDevice::readGetMode()
@@ -221,7 +225,7 @@ core::EbDevice::Mode core::EbDevice::readGetMode()
     {
         return Mode::Binary;
     }
-    throw Common::Exception(QString("EbDevice command response: GetMode returned '%1'.").arg(modeString));
+    throw EbDeviceException(QString("EbDevice command response: GetMode returned '%1'.").arg(modeString));
 }
 
 core::EbDevice::Mode core::EbDevice::readSetMode()
@@ -235,12 +239,12 @@ core::EbDevice::Mode core::EbDevice::readSetMode()
     {
         return Mode::Binary;
     }
-    throw Common::Exception(QString("EbDevice command response: SetMode returned '%1'.").arg(modeString));
+    throw EbDeviceException(QString("EbDevice command response: SetMode returned '%1'.").arg(modeString));
 }
 
 QDateTime core::EbDevice::readGetTime()
 {
-    auto data = readResponse();
+    auto data = readLastResponseMessage();
     uint32_t unixtime = _bitConverter.GetUInt32(data);
     return QDateTime::fromTime_t(unixtime, Qt::UTC);
 }
@@ -252,7 +256,7 @@ void core::EbDevice::readSetTime()
     {
         return;
     }
-    throw Common::Exception(QString("EbDevice command response: SetTime returned '%1'.").arg(setTimeString));
+    throw EbDeviceException(QString("EbDevice command response: SetTime returned '%1'.").arg(setTimeString));
 }
 
 QDateTime core::EbDevice::readGetDate()
@@ -272,7 +276,7 @@ core::EbDevice::RangeData core::EbDevice::readGetRange()
         throw Common::NotSupportedException();
     }
     RangeData data;
-    auto response = readResponse();
+    auto response = readLastResponseMessage();
     data.minField = _bitConverter.GetInt32(response);
     data.maxField = _bitConverter.GetInt32(response.data() + 4);
     return data;
@@ -286,7 +290,7 @@ core::EbDevice::RangeData core::EbDevice::readSetRange()
 core::EbDevice::Sample core::EbDevice::readSample(int readTimeout)
 {
     Sample data;
-    auto response = readResponse(256, readTimeout);
+    auto response = readLastResponseMessage(readTimeout);
     auto responsePtr = response.data();
     data.field = _bitConverter.GetInt32(responsePtr);
     data.qmc = _bitConverter.GetUInt16(responsePtr + 4);
@@ -430,49 +434,71 @@ void core::EbDevice::sendCommand(QByteArray command, int delayMilliseconds, bool
     int written = _serialPort.write(command);
     if (command.size() != written)
     {
-        throw Common::Exception(QString("EbDevice command execution error: written size < command size. Error string: %1.").arg(_serialPort.errorString()));
+        throw EbDeviceException(QString("EbDevice command execution error: `written size < command size`. Error string: `%1`.").arg(_serialPort.errorString()));
     }
     if (!_serialPort.waitForBytesWritten(1000))
     {
-        throw Common::Exception(QString("EbDevice command execution error: waitForBytesWritten timeout exceeded. Error string: %1.").arg(_serialPort.errorString()));
+        throw EbDeviceException(QString("EbDevice command execution error: `waitForBytesWritten timeout exceeded`. Error string: `%1`.").arg(_serialPort.errorString()));
     }
     QThread::msleep(delayMilliseconds);
 }
 
-QByteArray core::EbDevice::readResponse(qint64 maxlen, int readTimeout)
+QByteArray core::EbDevice::readLastResponseMessage(int readTimeout)
 {
-    if (!_serialPort.waitForReadyRead(readTimeout))
+    auto messages = readAllResponseMessages(readTimeout);
+    if (messages.size() == 0)
     {
-        throw Common::Exception(QString("EbDevice read data error: waitForReadyRead timeout exceeded. Error string: %1.").arg(_serialPort.errorString()));
+        throw EbDeviceException(QString("EbDevice read data error: `no messages in input stream`."));
     }
-    auto data = _serialPort.read(maxlen);
-
-    auto responses = data.split('\0');
-    if (responses.size() > 1)
+    if (messages.size() > 1)
     {
-        if (responses.last().size() == 0)
-        {
-            responses.pop_back();
-        }
-        if (responses.size() > 1)
-        {
-            logDebug(QString("EbDevice read notice: skipping %1 responses.").arg(responses.size() - 1));
-        }
+        logDebug(QString("EbDevice read notice: skipping %1 response messages.").arg(messages.size() - 1));
     }
-
-    QByteArray responseData = responses.last();
-    responseData += '\0';
-    auto rawSize = responseData.size();
-    responseData = unescapeData(responseData);
-    logDebug(QString("EbDevice got response, raw size = %1, decoded size = %2...").arg(rawSize).arg(responseData.size()));
-    return responseData;
+    return messages.last();
 }
 
-QString core::EbDevice::readResponseString(qint64 maxlen, int readTimeout)
+QList<QByteArray> core::EbDevice::readAllResponseMessages(int readTimeout)
 {
-    auto response = readResponse(maxlen, readTimeout);
+    logDebug(QString("EbDevice is reading pending response messages..."));
+    QList<QByteArray> result;
+    if (!_serialPort.waitForReadyRead(readTimeout))
+    {
+        logDebug(QString("EbDevice read data suspicious behavior: `waitForReadyRead timeout exceeded`. Error string: %1.").arg(_serialPort.errorString()));
+        return result;
+    }
+    auto data = _serialPort.read(SerialPortReadBufferSize);
+
+    auto responseMessages = data.split('\0');
+    if (responseMessages.size() == 0)
+    {
+        return result;
+    }
+
+    for (auto& encodedMsg : responseMessages)
+    {
+        if (encodedMsg.size() == 0)
+        {
+            continue;
+        }
+        if (encodedMsg.size() > MessageMaxSize)
+        {
+            throw EbDeviceException(QString("EbDevice got a response message with invalid size (>%2 bytes). Actual size: %1.").arg(encodedMsg.size()).arg(MessageMaxSize));
+        }
+        encodedMsg += '\0';
+        QByteArray responseMsg = unescapeData(encodedMsg);
+        logDebug(QString("EbDevice got response message, raw size = %1, decoded size = %2...").arg(encodedMsg.size()).arg(responseMsg.size()));
+        result.push_back(responseMsg);
+    }
+
+    logDebug(QString("EbDevice response messages: %1 messages read in total.").arg(result.size()));
+    return result;
+}
+
+QString core::EbDevice::readResponseString(int readTimeout)
+{
+    auto response = readLastResponseMessage(readTimeout);
     auto responseString = QString(response);
-    logDebug(QString("EbDevice got text response: '%1'").arg(responseString));
+    logDebug(QString("EbDevice got text response message: '%1'").arg(responseString));
     return responseString;
 }
 
@@ -525,7 +551,7 @@ void core::EbDevice::assertTrue(bool condition, QString failureComment)
     {
         auto message = QString("EbDevice diagnostics failure: %1").arg(failureComment);
         logError(message);
-        throw Common::Exception(message);
+        throw EbDeviceException(message);
     }
 }
 

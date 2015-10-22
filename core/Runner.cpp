@@ -69,14 +69,29 @@ void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, Runner
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Preparing command STOP..."));
     status->isRunning = false;
     status->updated = QDateTime::currentDateTimeUtc();
     logInfo(QString("Executing command STOP..."));
     device->sendEnq();
-    device->readEnq();
+    // We wait for the moment when there are no incoming messages. That means that the incoming data stream has stopped.
+    int counter = 0;
+    while (true)
+    {
+        auto messages = device->readAllResponseMessages();
+        if (messages.size() == 0)
+        {
+            break;
+        }
+        counter++;
+        if (counter > 10)
+        {
+            // We can't wait forever: restart runner if we stuck
+            throw Common::Exception
+        }
+    }
     logInfo(QString("Executed."));
 }
 
@@ -190,12 +205,13 @@ core::IntegerMSeedRecord::SharedPtr_t core::Runner::createIntegerRecord(QString 
     return record;
 }
 
-void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MSeedWriter::SharedPtr_t writer, int samplingIntervalMs)
+void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MSeedWriter::SharedPtr_t writer, int samplingIntervalMs, bool* isFlushing)
 {
     if (samplesCache.empty())
     {
         return;
     }
+    *isFlushing = true;
     logDebug(QString("Flushing samples cache (%1 samples)...").arg(samplesCache.size()));
     double samplingRateHz = 1000.0 / samplingIntervalMs;
 
@@ -217,6 +233,7 @@ void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MS
     writer->flush();
     samplesCache.clear();
     logDebug(QString("Done flushing."));
+    *isFlushing = false;
 }
 
 void core::Runner::run()
@@ -247,7 +264,6 @@ void core::Runner::run()
 
     // We always do status update on start
     bool isRunning;
-    bool isStopping = false;
     bool isFlushing = false;
     int samplingIntervalMs;
     {
@@ -274,38 +290,23 @@ void core::Runner::run()
         {
             if (isRunning)
             {
-                if (!isStopping)
-                {
-                    // receive data sample and write it into mini-seed stream
-                    const int acceptableDelay = 1000;
-                    auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
-                    auto isValid = device->validateSample(sample);
-                    sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
-                        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
-                        .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+                // receive data sample and write it into mini-seed stream
+                const int acceptableDelay = 1000;
+                auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
+                auto isValid = device->validateSample(sample);
+                sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                    .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+                    .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
 
-                    samplesCache.push_back(sample);
-                    {
-                        QMutexLocker lock(_actionHandler->dataMutex());
-                        _actionHandler->addToDataBuffer(sample);
-                    }
-
-                    if (samplesCache.size() >= _config.samplesCacheMaxSize)
-                    {
-                        isFlushing = true;
-                        QMutexLocker lock(_actionHandler->dataMutex());
-                        flushSamplesCache(samplesCache, writer, samplingIntervalMs);
-                        isFlushing = false;
-                    }
-                }
-                else
+                samplesCache.push_back(sample);
                 {
-                    isFlushing = true;
                     QMutexLocker lock(_actionHandler->dataMutex());
-                    flushSamplesCache(samplesCache, writer, samplingIntervalMs);
-                    isFlushing = false;
-                    isStopping = false;
-                    isRunning = false;
+                    _actionHandler->addToDataBuffer(sample);
+                }
+
+                if (samplesCache.size() >= _config.samplesCacheMaxSize)
+                {
+                    flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
                 }
             }
             else
@@ -319,6 +320,14 @@ void core::Runner::run()
             while (!_actionHandler->commands().empty())
             {
                 sLogger.debug("Found a command...");
+
+                if (isRunning)
+                {
+                    flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
+                    executeStopCommand(device, _actionHandler->status());
+                    isRunning = false;
+                }
+
                 auto cmd = _actionHandler->commands().dequeue();
                 switch (cmd->type())
                 {
@@ -328,11 +337,7 @@ void core::Runner::run()
                     samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
                     break;
                 case Stop:
-                    if (isRunning)
-                    {
-                        executeStopCommand(device, cmd, _actionHandler->status());
-                        isStopping = true;
-                    }
+                    // Any command make a stop first
                     break;
                 case UpdateStatus:
                     executeUpdateStatus(device, cmd, _actionHandler->status());
@@ -370,7 +375,7 @@ void core::Runner::run()
         if (!isFlushing)
         {
             sLogger.debug("Trying to flush samples cache...");
-            flushSamplesCache(samplesCache, writer, samplingIntervalMs);
+            flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
         }
         throw;
     }

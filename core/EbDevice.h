@@ -18,6 +18,12 @@
 
 namespace core
 {
+    class EbDeviceException : Common::Exception
+    {
+    public:
+        EbDeviceException(const QString& message);
+    };
+
     class EbDevice
     {
     public:
@@ -95,14 +101,19 @@ namespace core
         void runDiagnosticSequence();
         void runTestAutoSequence();
 
+        QList<QByteArray> readAllResponseMessages(int readTimeout = 1000);
+
     private:
         Common::BitConverter _bitConverter;
         QSerialPort _serialPort;
         Mode _mode;
         BufferedLogger::SharedPtr_t _logger;
+        static const int SerialPortReadBufferSize = 125000;
+        static const int MessageMaxSize = 125000;
         void sendCommand(QByteArray command, int delayMilliseconds = 500, bool escape = true);
-        QByteArray readResponse(qint64 maxlen = 256, int readTimeout = 1000);
-        QString readResponseString(qint64 maxlen = 256, int readTimeout = 1000);
+        QByteArray readLastResponseMessage(int readTimeout = 1000);
+        QString readResponseString(int readTimeout = 1000);
+
         QByteArray escapeData(QByteArray data);
         QByteArray unescapeData(QByteArray data);
         void assertTrue(bool condition, QString failureComment);
