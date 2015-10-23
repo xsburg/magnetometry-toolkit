@@ -18,7 +18,7 @@
 
 namespace core
 {
-    class EbDeviceException : Common::Exception
+    class EbDeviceException : public Common::Exception
     {
     public:
         EbDeviceException(const QString& message);

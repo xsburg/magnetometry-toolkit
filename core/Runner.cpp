@@ -89,7 +89,7 @@ void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, Runne
         if (counter > 10)
         {
             // We can't wait forever: restart runner if we stuck
-            throw Common::Exception
+            throw Common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
         }
     }
     logInfo(QString("Executed."));
@@ -242,142 +242,163 @@ void core::Runner::run()
     sLogger.info(QString("Starting web server on port %1...").arg(_config.webServerPort));
     _webServer->runAsync();
 
-    // Creating a device
-    sLogger.info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
-    auto device = std::make_shared<EbDevice>(_logger);
-    device->connect(_config.devicePortName);
-    if (!_config.skipDiagnostics)
+    // Error-restart loop
+    while (true)
     {
-        sLogger.info(QString("Running device diagnostics..."));
-        device->runDiagnosticSequence();
-        device->runTestAutoSequence();
-        sLogger.info(QString("Diagnostics done."));
-    }
-    else
-    {
-        sLogger.info(QString("Skipping device diagnostics..."));
-    }
-
-    // Creating an mseed writer
-    auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);
-    auto writer = std::make_shared<MSeedWriter>(stream);
-
-    // We always do status update on start
-    bool isRunning;
-    bool isFlushing = false;
-    int samplingIntervalMs;
-    {
-        sLogger.info(QString("Gathering device start-up config..."));
-        QMutexLocker lock(_actionHandler->dataMutex());
-        RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
-        executeUpdateStatus(device, updateCmd, _actionHandler->status());
-        isRunning = _actionHandler->status()->isRunning;
-        samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
-        _actionHandler->status()->mseedSettings.fileName = _config.msFileName;
-        _actionHandler->status()->mseedSettings.network = _config.msRecordNetwork;
-        _actionHandler->status()->mseedSettings.station = _config.msRecordStation;
-        _actionHandler->status()->mseedSettings.location = _config.msRecordLocation;
-        _actionHandler->status()->mseedSettings.samplesInRecord = _config.samplesCacheMaxSize;
-        sLogger.info(QString("Done gathering."));
-    }
-
-    QVector<EbDevice::Sample> samplesCache;
-    // Main worker loop
-    try
-    {
-        sLogger.info(QString("Starting main logging loop..."));
-        while (true)
+        // Creating a device
+        sLogger.info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
+        auto device = std::make_shared<EbDevice>(_logger);
+        device->connect(_config.devicePortName);
+        if (!_config.skipDiagnostics)
         {
-            if (isRunning)
-            {
-                // receive data sample and write it into mini-seed stream
-                const int acceptableDelay = 1000;
-                auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
-                auto isValid = device->validateSample(sample);
-                sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
-                    .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
-                    .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+            sLogger.info(QString("Running device diagnostics..."));
+            device->runDiagnosticSequence();
+            device->runTestAutoSequence();
+            sLogger.info(QString("Diagnostics done."));
+        }
+        else
+        {
+            sLogger.info(QString("Skipping device diagnostics..."));
+        }
 
-                samplesCache.push_back(sample);
-                {
-                    QMutexLocker lock(_actionHandler->dataMutex());
-                    _actionHandler->addToDataBuffer(sample);
-                }
+        // Creating an mseed writer
+        auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);
+        auto writer = std::make_shared<MSeedWriter>(stream);
 
-                if (samplesCache.size() >= _config.samplesCacheMaxSize)
-                {
-                    flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
-                }
-            }
-            else
-            {
-                // sleep 1 second as a fallback for data logging
-                QThread::sleep(1);
-            }
-
-            // run commands
+        // We always do status update on start
+        bool isRunning;
+        bool isFlushing = false;
+        int samplingIntervalMs;
+        {
+            sLogger.info(QString("Gathering device start-up config..."));
             QMutexLocker lock(_actionHandler->dataMutex());
-            while (!_actionHandler->commands().empty())
-            {
-                sLogger.debug("Found a command...");
+            RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
+            executeUpdateStatus(device, updateCmd, _actionHandler->status());
+            isRunning = _actionHandler->status()->isRunning;
+            samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+            _actionHandler->status()->mseedSettings.fileName = _config.msFileName;
+            _actionHandler->status()->mseedSettings.network = _config.msRecordNetwork;
+            _actionHandler->status()->mseedSettings.station = _config.msRecordStation;
+            _actionHandler->status()->mseedSettings.location = _config.msRecordLocation;
+            _actionHandler->status()->mseedSettings.samplesInRecord = _config.samplesCacheMaxSize;
+            sLogger.info(QString("Done gathering."));
+        }
 
+        // Main worker loop
+        QVector<EbDevice::Sample> samplesCache;
+        try
+        {
+            sLogger.info(QString("Starting main logging loop..."));
+            while (true)
+            {
                 if (isRunning)
                 {
-                    flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
-                    executeStopCommand(device, _actionHandler->status());
-                    isRunning = false;
+                    // receive data sample and write it into mini-seed stream
+                    const int acceptableDelay = 1000;
+                    auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
+                    auto isValid = device->validateSample(sample);
+                    sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+                        .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+
+                    samplesCache.push_back(sample);
+                    {
+                        QMutexLocker lock(_actionHandler->dataMutex());
+                        _actionHandler->addToDataBuffer(sample);
+                    }
+
+                    if (samplesCache.size() >= _config.samplesCacheMaxSize)
+                    {
+                        flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
+                    }
+                }
+                else
+                {
+                    // sleep 1 second as a fallback for data logging
+                    QThread::sleep(1);
                 }
 
-                auto cmd = _actionHandler->commands().dequeue();
-                switch (cmd->type())
+                // run commands
+                QMutexLocker lock(_actionHandler->dataMutex());
+                while (!_actionHandler->commands().empty())
                 {
-                case Run:
-                    executeRunCommand(device, cmd, _actionHandler->status());
-                    isRunning = _actionHandler->status()->isRunning;
-                    samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
-                    break;
-                case Stop:
-                    // Any command make a stop first
-                    break;
-                case UpdateStatus:
-                    executeUpdateStatus(device, cmd, _actionHandler->status());
-                    break;
-                case SetTime:
-                    executeSetTime(device, cmd, _actionHandler->status());
-                    break;
-                case SetRange:
-                    executeSetRange(device, cmd, _actionHandler->status());
-                    break;
-                case SetStandBy:
-                    executeSetStandBy(device, cmd, _actionHandler->status());
-                    break;
-                case RunDiagnostics:
-                    executeDiagnostics(device, cmd, _actionHandler->status());
-                    executeUpdateStatus(device, cmd, _actionHandler->status());
-                    break;
-                case RunModeAutoTest:
-                    executeAutoTest(device, cmd, _actionHandler->status());
-                    break;
-                case ApplyMSeedSettings:
-                    executeApplyMSeedSettings(device, cmd, _actionHandler->status());
-                    break;
-                default:
-                    throw Common::NotImplementedException();
+                    sLogger.debug("Found a command...");
+
+                    if (isRunning)
+                    {
+                        flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
+                        executeStopCommand(device, _actionHandler->status());
+                        isRunning = false;
+                    }
+
+                    auto cmd = _actionHandler->commands().dequeue();
+                    switch (cmd->type())
+                    {
+                    case Run:
+                        executeRunCommand(device, cmd, _actionHandler->status());
+                        isRunning = _actionHandler->status()->isRunning;
+                        samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+                        break;
+                    case Stop:
+                        // Any command make a stop first
+                        break;
+                    case UpdateStatus:
+                        executeUpdateStatus(device, cmd, _actionHandler->status());
+                        break;
+                    case SetTime:
+                        executeSetTime(device, cmd, _actionHandler->status());
+                        break;
+                    case SetRange:
+                        executeSetRange(device, cmd, _actionHandler->status());
+                        break;
+                    case SetStandBy:
+                        executeSetStandBy(device, cmd, _actionHandler->status());
+                        break;
+                    case RunDiagnostics:
+                        executeDiagnostics(device, cmd, _actionHandler->status());
+                        executeUpdateStatus(device, cmd, _actionHandler->status());
+                        break;
+                    case RunModeAutoTest:
+                        executeAutoTest(device, cmd, _actionHandler->status());
+                        break;
+                    case ApplyMSeedSettings:
+                        executeApplyMSeedSettings(device, cmd, _actionHandler->status());
+                        break;
+                    default:
+                        throw Common::NotImplementedException();
+                    }
+                    _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
+                    sLogger.debug("Done reading command.");
                 }
-                _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
-                sLogger.debug("Done reading command.");
             }
         }
-    }
-    catch (...)
-    {
-        sLogger.debug("Main runner loop has been broken by exception...");
-        if (!isFlushing)
+        catch (EbDeviceException& ex)
         {
-            sLogger.debug("Trying to flush samples cache...");
+            sLogger.error("Main runner loop has been broken by EbDeviceException.");
+            sLogger.error(QString("The what() message: %1.").arg(ex.what()));
             flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
         }
-        throw;
+        catch (Common::Exception& ex)
+        {
+            sLogger.error("Main runner loop has been broken by Common::Exception.");
+            sLogger.error(QString("The what() message: %1.").arg(ex.what()));
+            if (!isFlushing)
+            {
+                sLogger.error("Trying to flush samples cache...");
+                flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
+            }
+        }
+        catch (std::exception& ex)
+        {
+            sLogger.error("Main runner loop has been broken by std::exception.");
+            sLogger.error(QString("The what() message: %1.").arg(ex.what()));
+            sLogger.error(QString("The samples cache won't be flushed because we don't know the exact reason of the failure."));
+        }
+        catch (...)
+        {
+            sLogger.error("Main runner loop has been broken by unknown exception.");
+            sLogger.error(QString("The samples cache won't be flushed because we don't know the exact reason of the failure."));
+        }
     }
 }
 
