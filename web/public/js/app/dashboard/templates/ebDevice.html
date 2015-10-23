@@ -30,7 +30,8 @@
                 <div class="js-cond-running">
                     Stopped
                     <div class="form-group eb-device__start-logging-container">
-                        <select class="form-control js-status-sampling-interval-input">
+                        <label for="samplingIntervalSelect" class="form-label">Sampling interval</label>
+                        <select id="samplingIntervalSelect" class="form-control js-status-sampling-interval-input">
                             {{#each samplingIntervalOptions}}
                                 <optgroup label="{{groupName}}">
                                     {{#each options}}
@@ -83,7 +84,9 @@
         </tr>
         <tr>
             <td>Device Time</td>
-            <td><span class="js-status-device-time"></span> <button type="button" class="btn btn-primary btn-xs js-fix-device-time-button">Fix</button></td>
+            <td>
+                <span class="js-status-device-time"></span> <button type="button" class="btn btn-primary btn-xs js-fix-device-time-button">Fix</button>
+            </td>
         </tr>
         <tr>
             <td>Range (pT)</td>
