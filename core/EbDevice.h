@@ -94,8 +94,9 @@ namespace core
         void readSetDate();
         RangeData readGetRange();
         RangeData readSetRange();
-        Sample readSample(int readTimeout = 1000);
-
+        QList<Sample> readAllSamples(int readTimeout = 1000);
+        Sample parseSample(char* respPtr);
+        Sample readOneSample();
         bool validateSample(const Sample& sample);
         
         void runDiagnosticSequence();

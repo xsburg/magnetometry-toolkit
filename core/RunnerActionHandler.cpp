@@ -32,7 +32,8 @@ void core::RunnerActionHandler::addToDataBuffer(const EbDevice::Sample& sample)
 void core::RunnerActionHandler::addRunCommand(QJsonObject json)
 {
     auto intervalMilliseconds = json.value("intervalMilliseconds").toInt();
-    _commands.enqueue(std::make_shared<RunRunnerCommand>(intervalMilliseconds));
+    auto timeFixIntervalSeconds = json.value("timeFixIntervalSeconds").toInt();
+    _commands.enqueue(std::make_shared<RunRunnerCommand>(intervalMilliseconds, timeFixIntervalSeconds));
 }
 
 void core::RunnerActionHandler::addStopCommand(QJsonObject json)
@@ -101,6 +102,7 @@ void core::RunnerActionHandler::execute()
         json["standBy"] = _status->standBy;
         json["isRunning"] = _status->isRunning;
         json["samplingIntervalMs"] = _status->samplingIntervalMs;
+        json["timeFixIntervalSeconds"] = _status->timeFixIntervalSeconds;
         
         QJsonObject range;
         range["minField"] = _status->range.minField;

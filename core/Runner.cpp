@@ -6,22 +6,21 @@
 #include "FileBinaryStream.h"
 #include "MSeedWriter.h"
 
-core::Runner::Runner(RunnerConfig config) : _config(config)
+core::Runner::Runner(RunnerConfig config)
+: _config(config), _isRunning(false), _isFlushing(false), _samplingIntervalMs(0), _timeFixIntervalSeconds(0)
 {
     _actionHandler = std::make_shared<RunnerActionHandler>();
-    _logger = _actionHandler->logger();
+    _webLogger = _actionHandler->logger();
     _webServer = std::make_shared<WebServer>();
     _webServer->port(config.webServerPort);
     _webServer->addActionHandler(_actionHandler);
 }
 
-void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Preparing command RUN..."));
-    auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
     status->isRunning = true;
     status->updated = QDateTime::currentDateTimeUtc();
-    int samplingIntervalMs = runCmd->intervalMilliseconds();
     int actualSamplingIntervalMs;
     int32_t actualIntervalVal;
     if (samplingIntervalMs > 1000)
@@ -63,10 +62,14 @@ void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, Runner
         }
     }
     status->samplingIntervalMs = actualSamplingIntervalMs;
+    status->timeFixIntervalSeconds = timeFixIntervalSeconds;
     logInfo(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
         .arg(samplingIntervalMs).arg(actualIntervalVal));
     device->sendAuto(actualIntervalVal);
     logInfo(QString("Executed."));
+    _isRunning = _actionHandler->status()->isRunning;
+    _samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+    _timeFixIntervalSeconds = timeFixIntervalSeconds;
 }
 
 void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
@@ -95,7 +98,7 @@ void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, Runne
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command UPDATE-STATUS..."));
 
@@ -121,11 +124,8 @@ void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, Runn
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeSetTime(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeSetTime(core::EbDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status)
 {
-    logInfo(QString("Preparing command SET-TIME..."));
-    auto timeCmd = std::static_pointer_cast<SetTimeRunnerCommand>(cmd);
-    auto time = timeCmd->time();
     logInfo(QString("Executing command SET-TIME..."));
     device->sendSetTime(time);
     device->readSetTime();
@@ -136,11 +136,8 @@ void core::Runner::executeSetTime(core::EbDevice::SharedPtr_t& device, RunnerCom
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeSetRange(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeSetRange(core::EbDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status)
 {
-    logInfo(QString("Preparing command SET-RANGE..."));
-    auto rangeCmd = std::static_pointer_cast<SetRangeRunnerCommand>(cmd);
-    auto center = rangeCmd->center();
     logInfo(QString("Executing command SET-RANGE..."));
     device->sendSetRange(center);
     status->range = device->readSetRange();
@@ -148,11 +145,8 @@ void core::Runner::executeSetRange(core::EbDevice::SharedPtr_t& device, RunnerCo
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status)
 {
-    logInfo(QString("Preparing command SET-STAND-BY..."));
-    auto standByCmd = std::static_pointer_cast<SetStandByRunnerCommand>(cmd);
-    auto standBy = standByCmd->standBy();
     logInfo(QString("Executing command SET-STAND-BY..."));
     device->sendStandBy(standBy);
     status->standBy = device->readStandBy();
@@ -160,25 +154,23 @@ void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, Runner
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeDiagnostics(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeDiagnostics(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command RUN-DIAGNOSTICS..."));
     device->runDiagnosticSequence();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command AUTO-TEST..."));
     device->runTestAutoSequence();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, RunnerCommand::SharedPtr_t& cmd, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command APPLY-MSEED-SETTINGS..."));
-    auto applyMSeedSettingsCmd = std::static_pointer_cast<ApplyMSeedSettingsRunnerCommand>(cmd);
-    auto newSettings = applyMSeedSettingsCmd->settings();
     logInfo(QString("Arguments: { fileName: '%1', network: '%2', station: '%3', location: '%4', samplesInRecord: %5 }")
         .arg(newSettings.fileName)
         .arg(newSettings.network)
@@ -205,35 +197,134 @@ core::IntegerMSeedRecord::SharedPtr_t core::Runner::createIntegerRecord(QString 
     return record;
 }
 
-void core::Runner::flushSamplesCache(QVector<EbDevice::Sample>& samplesCache, MSeedWriter::SharedPtr_t writer, int samplingIntervalMs, bool* isFlushing)
+void core::Runner::flushSamplesCache()
 {
-    if (samplesCache.empty())
+    if (_samplesCache.empty())
     {
         return;
     }
-    *isFlushing = true;
-    logDebug(QString("Flushing samples cache (%1 samples)...").arg(samplesCache.size()));
-    double samplingRateHz = 1000.0 / samplingIntervalMs;
+    _isFlushing = true;
+    logDebug(QString("Flushing samples cache (%1 samples)...").arg(_samplesCache.size()));
+    double samplingRateHz = 1000.0 / _samplingIntervalMs;
 
-    for (auto& sample : samplesCache)
+    for (auto& sample : _samplesCache)
     {
         auto fieldRecord = createIntegerRecord("FLD", samplingRateHz, sample.time);
         fieldRecord->data().push_back(sample.field);
-        writer->write(fieldRecord);
+        _writer->write(fieldRecord);
 
         auto qualityRecord = createIntegerRecord("QMC", samplingRateHz, sample.time);
         qualityRecord->data().push_back(sample.qmc);
-        writer->write(qualityRecord);
+        _writer->write(qualityRecord);
 
         auto stateRecord = createIntegerRecord("STT", samplingRateHz, sample.time);
         stateRecord->data().push_back(sample.state);
-        writer->write(stateRecord);
+        _writer->write(stateRecord);
     }
 
-    writer->flush();
-    samplesCache.clear();
+    _writer->flush();
+    _samplesCache.clear();
     logDebug(QString("Done flushing."));
-    *isFlushing = false;
+    _isFlushing = false;
+}
+
+void core::Runner::handlePendingWebServerCommands()
+{
+    QMutexLocker lock(_actionHandler->dataMutex());
+    while (!_actionHandler->commands().empty())
+    {
+        sLogger.debug("Found a command...");
+
+        if (_isRunning)
+        {
+            flushSamplesCache();
+            executeStopCommand(_device, _actionHandler->status());
+            _isRunning = false;
+        }
+
+        auto cmd = _actionHandler->commands().dequeue();
+        switch (cmd->type())
+        {
+        case Run:
+            {
+                auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
+                int samplingIntervalMs = runCmd->intervalMilliseconds();
+                int timeFixIntervalSeconds = runCmd->timeFixIntervalSeconds();
+                executeRunCommand(_device, samplingIntervalMs, timeFixIntervalSeconds, _actionHandler->status());
+            }
+            break;
+        case Stop:
+            // Any command make a stop first
+            break;
+        case UpdateStatus:
+            executeUpdateStatus(_device, _actionHandler->status());
+            break;
+        case SetTime:
+            {
+                auto timeCmd = std::static_pointer_cast<SetTimeRunnerCommand>(cmd);
+                QDateTime time = timeCmd->time();
+                executeSetTime(_device, time, _actionHandler->status());
+            }
+            break;
+        case SetRange:
+            {
+                auto rangeCmd = std::static_pointer_cast<SetRangeRunnerCommand>(cmd);
+                uint32_t center = rangeCmd->center();
+                executeSetRange(_device, center, _actionHandler->status());
+            }
+            break;
+        case SetStandBy:
+            {
+                auto standByCmd = std::static_pointer_cast<SetStandByRunnerCommand>(cmd);
+                bool standBy = standByCmd->standBy();
+                executeSetStandBy(_device, standBy, _actionHandler->status());
+            }
+            break;
+        case RunDiagnostics:
+            executeDiagnostics(_device, _actionHandler->status());
+            executeUpdateStatus(_device, _actionHandler->status());
+            break;
+        case RunModeAutoTest:
+            executeAutoTest(_device, _actionHandler->status());
+            break;
+        case ApplyMSeedSettings:
+            {
+                auto applyMSeedSettingsCmd = std::static_pointer_cast<ApplyMSeedSettingsRunnerCommand>(cmd);
+                auto newSettings = applyMSeedSettingsCmd->settings();
+                executeApplyMSeedSettings(_device, newSettings, _actionHandler->status());
+            }
+            break;
+        default:
+            throw Common::NotImplementedException();
+        }
+        _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
+        sLogger.debug("Done reading command.");
+    }
+}
+
+void core::Runner::handleNewDataSamples()
+{
+    // receive data sample and write it into mini-seed stream
+    const int acceptableDelay = 1000;
+    auto samples = _device->readAllSamples(_samplingIntervalMs + acceptableDelay);
+    for (auto& sample : samples)
+    {
+        auto isValid = _device->validateSample(sample);
+        sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+            .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+            .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
+
+        _samplesCache.push_back(sample);
+        {
+            QMutexLocker lock(_actionHandler->dataMutex());
+            _actionHandler->addToDataBuffer(sample);
+        }
+
+        if (_samplesCache.size() >= _config.samplesCacheMaxSize)
+        {
+            flushSamplesCache();
+        }
+    }
 }
 
 void core::Runner::run()
@@ -247,13 +338,13 @@ void core::Runner::run()
     {
         // Creating a device
         sLogger.info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
-        auto device = std::make_shared<EbDevice>(_logger);
-        device->connect(_config.devicePortName);
+        _device = std::make_shared<EbDevice>(_webLogger);
+        _device->connect(_config.devicePortName);
         if (!_config.skipDiagnostics)
         {
             sLogger.info(QString("Running device diagnostics..."));
-            device->runDiagnosticSequence();
-            device->runTestAutoSequence();
+            _device->runDiagnosticSequence();
+            _device->runTestAutoSequence();
             sLogger.info(QString("Diagnostics done."));
         }
         else
@@ -263,19 +354,22 @@ void core::Runner::run()
 
         // Creating an mseed writer
         auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);
-        auto writer = std::make_shared<MSeedWriter>(stream);
+        _writer = std::make_shared<MSeedWriter>(stream);
+        _writer->verbose(MSeedPackVerbose::None);
 
         // We always do status update on start
-        bool isRunning;
-        bool isFlushing = false;
-        int samplingIntervalMs;
+        _isRunning = false;
+        _isFlushing = false;
+        _samplingIntervalMs = 0;
+        _timeFixIntervalSeconds = 0;
         {
             sLogger.info(QString("Gathering device start-up config..."));
             QMutexLocker lock(_actionHandler->dataMutex());
             RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
-            executeUpdateStatus(device, updateCmd, _actionHandler->status());
-            isRunning = _actionHandler->status()->isRunning;
-            samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+            executeUpdateStatus(_device, _actionHandler->status());
+            _isRunning = _actionHandler->status()->isRunning;
+            _samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+            _timeFixIntervalSeconds = _actionHandler->status()->timeFixIntervalSeconds;
             _actionHandler->status()->mseedSettings.fileName = _config.msFileName;
             _actionHandler->status()->mseedSettings.network = _config.msRecordNetwork;
             _actionHandler->status()->mseedSettings.station = _config.msRecordStation;
@@ -285,32 +379,26 @@ void core::Runner::run()
         }
 
         // Main worker loop
-        QVector<EbDevice::Sample> samplesCache;
+        _samplesCache = QVector<EbDevice::Sample>();
+        qint64 lastTimeFixEpoch = QDateTime::currentMSecsSinceEpoch();
         try
         {
             sLogger.info(QString("Starting main logging loop..."));
             while (true)
             {
-                if (isRunning)
+                if (_isRunning)
                 {
-                    // receive data sample and write it into mini-seed stream
-                    const int acceptableDelay = 1000;
-                    auto sample = device->readSample(samplingIntervalMs + acceptableDelay);
-                    auto isValid = device->validateSample(sample);
-                    sLogger.info(QString("Received another sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
-                        .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
-                        .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
-
-                    samplesCache.push_back(sample);
+                    // Performing device time fix if required
+                    qint64 nowEpoch = QDateTime::currentMSecsSinceEpoch();
+                    if (_timeFixIntervalSeconds > 0 && (nowEpoch - lastTimeFixEpoch) * 1000 > _timeFixIntervalSeconds)
                     {
-                        QMutexLocker lock(_actionHandler->dataMutex());
-                        _actionHandler->addToDataBuffer(sample);
+                        executeStopCommand(_device, _actionHandler->status());
+                        executeSetTime(_device, QDateTime::currentDateTimeUtc(), _actionHandler->status());
+                        executeRunCommand(_device, _samplingIntervalMs, _timeFixIntervalSeconds, _actionHandler->status());
+                        lastTimeFixEpoch = QDateTime::currentMSecsSinceEpoch();
                     }
 
-                    if (samplesCache.size() >= _config.samplesCacheMaxSize)
-                    {
-                        flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
-                    }
+                    handleNewDataSamples();
                 }
                 else
                 {
@@ -318,74 +406,23 @@ void core::Runner::run()
                     QThread::sleep(1);
                 }
 
-                // run commands
-                QMutexLocker lock(_actionHandler->dataMutex());
-                while (!_actionHandler->commands().empty())
-                {
-                    sLogger.debug("Found a command...");
-
-                    if (isRunning)
-                    {
-                        flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
-                        executeStopCommand(device, _actionHandler->status());
-                        isRunning = false;
-                    }
-
-                    auto cmd = _actionHandler->commands().dequeue();
-                    switch (cmd->type())
-                    {
-                    case Run:
-                        executeRunCommand(device, cmd, _actionHandler->status());
-                        isRunning = _actionHandler->status()->isRunning;
-                        samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
-                        break;
-                    case Stop:
-                        // Any command make a stop first
-                        break;
-                    case UpdateStatus:
-                        executeUpdateStatus(device, cmd, _actionHandler->status());
-                        break;
-                    case SetTime:
-                        executeSetTime(device, cmd, _actionHandler->status());
-                        break;
-                    case SetRange:
-                        executeSetRange(device, cmd, _actionHandler->status());
-                        break;
-                    case SetStandBy:
-                        executeSetStandBy(device, cmd, _actionHandler->status());
-                        break;
-                    case RunDiagnostics:
-                        executeDiagnostics(device, cmd, _actionHandler->status());
-                        executeUpdateStatus(device, cmd, _actionHandler->status());
-                        break;
-                    case RunModeAutoTest:
-                        executeAutoTest(device, cmd, _actionHandler->status());
-                        break;
-                    case ApplyMSeedSettings:
-                        executeApplyMSeedSettings(device, cmd, _actionHandler->status());
-                        break;
-                    default:
-                        throw Common::NotImplementedException();
-                    }
-                    _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
-                    sLogger.debug("Done reading command.");
-                }
+                handlePendingWebServerCommands();
             }
         }
         catch (EbDeviceException& ex)
         {
             sLogger.error("Main runner loop has been broken by EbDeviceException.");
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
-            flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
+            flushSamplesCache();
         }
         catch (Common::Exception& ex)
         {
             sLogger.error("Main runner loop has been broken by Common::Exception.");
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
-            if (!isFlushing)
+            if (!_isFlushing)
             {
                 sLogger.error("Trying to flush samples cache...");
-                flushSamplesCache(samplesCache, writer, samplingIntervalMs, &isFlushing);
+                flushSamplesCache();
             }
         }
         catch (std::exception& ex)
@@ -404,9 +441,9 @@ void core::Runner::run()
 
 void core::Runner::log(Common::LogLevel level, const QString& message)
 {
-    if (_logger.get())
+    if (_webLogger.get())
     {
-        _logger->write(level, message);
+        _webLogger->write(level, message);
     }
     sLogger.write(level, message);
 }

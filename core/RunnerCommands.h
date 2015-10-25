@@ -49,20 +49,27 @@ namespace core
     class RunRunnerCommand : public RunnerCommand
     {
         int _intervalMilliseconds;
+        int _timeFixIntervalSeconds;
     public:
         RunnerCommandType type() const override
         {
             return RunnerCommandType::Run;
         }
 
-        explicit RunRunnerCommand(int intervalMilliseconds)
-            : _intervalMilliseconds(intervalMilliseconds)
+        explicit RunRunnerCommand(int intervalMilliseconds, int timeFixIntervalSeconds)
+            : _intervalMilliseconds(intervalMilliseconds),
+              _timeFixIntervalSeconds(timeFixIntervalSeconds)
         {
         }
 
         int intervalMilliseconds() const
         {
             return _intervalMilliseconds;
+        }
+
+        int timeFixIntervalSeconds() const
+        {
+            return _timeFixIntervalSeconds;
         }
     };
 

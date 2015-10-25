@@ -55,7 +55,7 @@ namespace core
         msr->datasamples = sampleRange->data().data();
         msr->numsamples = sampleRange->data().size();
 
-        flag verbose = 3;
+        flag verbose = _verbose;
         _packedSamples = 0;
         _packedRecords = msr_pack(msr, &binaryStreamRecorder, _binaryStream.get(), &_packedSamples, 1, verbose);
         if (_packedRecords == -1)

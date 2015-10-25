@@ -287,20 +287,37 @@ core::EbDevice::RangeData core::EbDevice::readSetRange()
     return readGetRange();
 }
 
-core::EbDevice::Sample core::EbDevice::readSample(int readTimeout)
+QList<core::EbDevice::Sample> core::EbDevice::readAllSamples(int readTimeout)
+{
+    auto responses = readAllResponseMessages(readTimeout);
+    QList<Sample> result;
+    for (auto& resp : responses)
+    {
+        auto respPtr = resp.data();
+        result.push_back(parseSample(respPtr));
+    }
+    return result;
+}
+
+core::EbDevice::Sample core::EbDevice::parseSample(char* dataPtr)
 {
     Sample data;
-    auto response = readLastResponseMessage(readTimeout);
-    auto responsePtr = response.data();
-    data.field = _bitConverter.GetInt32(responsePtr);
-    data.qmc = _bitConverter.GetUInt16(responsePtr + 4);
-    data.state = static_cast<SampleState>(_bitConverter.GetUInt8(responsePtr + 6));
-    auto time = _bitConverter.GetInt32(responsePtr + 7);
-    auto pph = _bitConverter.GetUInt8(responsePtr + 11);
+    data.field = _bitConverter.GetInt32(dataPtr);
+    data.qmc = _bitConverter.GetUInt16(dataPtr + 4);
+    data.state = static_cast<SampleState>(_bitConverter.GetUInt8(dataPtr + 6));
+    auto time = _bitConverter.GetInt32(dataPtr + 7);
+    auto pph = _bitConverter.GetUInt8(dataPtr + 11);
     auto dateTime = QDateTime::fromTime_t(time, Qt::UTC);
     dateTime = dateTime.addMSecs(pph * 10);
     data.time = dateTime;
     return data;
+}
+
+core::EbDevice::Sample core::EbDevice::readOneSample()
+{
+    auto resp = readLastResponseMessage();
+    auto respPtr = resp.data();
+    return parseSample(respPtr);
 }
 
 bool core::EbDevice::validateSample(const Sample& sample)
@@ -392,7 +409,7 @@ void core::EbDevice::runDiagnosticSequence()
 
     logInfo("Testing run...");
     sendRun();
-    auto sample = readSample();
+    auto sample = readOneSample();
     auto isValid = validateSample(sample);
     logInfo(QString("Got sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
         .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
@@ -406,21 +423,40 @@ void core::EbDevice::runDiagnosticSequence()
 
 void core::EbDevice::runTestAutoSequence()
 {
+    // sending AUTO command
     int intervalBetweenSamples = 1;
     logInfo(QString("Testing auto mode, every %1 seconds...").arg(intervalBetweenSamples));
     sendAuto(intervalBetweenSamples);
+    // receiving data (at least 10 samples)
     for (int i = 0; i < 10; i++)
     {
-        auto sample = readSample((intervalBetweenSamples + 1) * 1000);
-        auto isValid = validateSample(sample);
-        logInfo(QString("Got sample #%7: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
-            .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
-            .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
-        assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
+        auto samples = readAllSamples();
+        for (auto& sample : samples)
+        {
+            auto isValid = validateSample(sample);
+            logInfo(QString("Got sample #%7: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
+                .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
+                .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
+            assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
+        }
     }
+    // stopping the madness
     sendEnq();
-    auto responseString = readEnq();
-    assertTrue(responseString.size() > 0, "ENQ data is empty.");
+    int counter = 0;
+    while (true)
+    {
+        auto messages = readAllResponseMessages();
+        if (messages.size() == 0)
+        {
+            break;
+        }
+        counter++;
+        if (counter > 10)
+        {
+            // We can't wait forever: something went wrong and we can't cope with it
+            throw Common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
+        }
+    }
     logInfo("Done.");
 }
 

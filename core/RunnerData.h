@@ -43,6 +43,7 @@ namespace core
             isRunning = false;
             samplingIntervalMs = 0;
             commandQueueSize = 0;
+            timeFixIntervalSeconds = 0;
         }
 
         QDateTime timeUpdated;
@@ -52,6 +53,7 @@ namespace core
         int samplingIntervalMs;
         int commandQueueSize;
         MSeedSettings mseedSettings;
+        int timeFixIntervalSeconds;
     };
 
     struct RunnerConfig
