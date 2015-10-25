@@ -28,7 +28,7 @@ void core::EbDevice::connect(QString portName)
     _serialPort.setBreakEnabled(false);
     sLogger.debug("Connected, sending ENQ to interrupt auto mode that might be running...");
     sendEnq();
-    readEnq();
+    waitForInputSilence();
     sLogger.debug("Sending setMode : binary...");
     sendSetMode(Mode::Binary);
     _mode = readSetMode();
@@ -442,21 +442,7 @@ void core::EbDevice::runTestAutoSequence()
     }
     // stopping the madness
     sendEnq();
-    int counter = 0;
-    while (true)
-    {
-        auto messages = readAllResponseMessages();
-        if (messages.size() == 0)
-        {
-            break;
-        }
-        counter++;
-        if (counter > 10)
-        {
-            // We can't wait forever: something went wrong and we can't cope with it
-            throw common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
-        }
-    }
+    waitForInputSilence();
     logInfo("Done.");
 }
 
@@ -528,6 +514,25 @@ QList<QByteArray> core::EbDevice::readAllResponseMessages(int readTimeout)
 
     logDebug(QString("EbDevice response messages: %1 messages read in total.").arg(result.size()));
     return result;
+}
+
+void core::EbDevice::waitForInputSilence(int maxWaitCicles, int readTimeout)
+{
+    int counter = 0;
+    while (true)
+    {
+        auto messages = readAllResponseMessages();
+        if (messages.size() == 0)
+        {
+            break;
+        }
+        counter++;
+        if (counter > 10)
+        {
+            // We can't wait forever: something went wrong and we can't cope with it
+            throw common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
+        }
+    }
 }
 
 QString core::EbDevice::readResponseString(int readTimeout)

@@ -102,7 +102,7 @@ namespace core
         void runDiagnosticSequence();
         void runTestAutoSequence();
 
-        QList<QByteArray> readAllResponseMessages(int readTimeout = 1000);
+        void waitForInputSilence(int maxWaitCicles = 10, int readTimeout = 1000);
 
     private:
         common::BitConverter _bitConverter;
@@ -114,6 +114,7 @@ namespace core
         void sendCommand(QByteArray command, int delayMilliseconds = 500, bool escape = true);
         QByteArray readLastResponseMessage(int readTimeout = 1000);
         QString readResponseString(int readTimeout = 1000);
+        QList<QByteArray> readAllResponseMessages(int readTimeout = 1000);
 
         QByteArray escapeData(QByteArray data);
         QByteArray unescapeData(QByteArray data);

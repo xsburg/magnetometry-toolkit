@@ -80,21 +80,7 @@ void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, Runne
     logInfo(QString("Executing command STOP..."));
     device->sendEnq();
     // We wait for the moment when there are no incoming messages. That means that the incoming data stream has stopped.
-    int counter = 0;
-    while (true)
-    {
-        auto messages = device->readAllResponseMessages();
-        if (messages.size() == 0)
-        {
-            break;
-        }
-        counter++;
-        if (counter > 10)
-        {
-            // We can't wait forever: restart runner if we stuck
-            throw common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
-        }
-    }
+    device->waitForInputSilence();
     logInfo(QString("Executed."));
 }
 
