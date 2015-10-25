@@ -1,7 +1,7 @@
 #include "Path.h"
 #include <QtCore/QtCore>
 
-namespace Common
+namespace common
 {
     QString Path::ApplicationDirPath()
     {

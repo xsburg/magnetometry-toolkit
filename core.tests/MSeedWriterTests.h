@@ -6,7 +6,7 @@
 #include <core/FileBinaryStream.h>
 #include <core/MSeedReader.h>
 
-using namespace Common;
+using namespace common;
 
 namespace core
 {

@@ -9,7 +9,7 @@
 #include "InvalidOperationException.h"
 #include "SmartPtr.h"
 
-namespace Common 
+namespace common 
 {
     class DataBatchInserter : boost::noncopyable
     {

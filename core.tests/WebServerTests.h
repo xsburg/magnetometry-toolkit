@@ -6,7 +6,7 @@
 #include <Helpers.h>
 #include <mongoose/mongoose.h>
 
-using namespace Common;
+using namespace common;
 
 namespace core
 {

@@ -1,7 +1,7 @@
 #include "Connection.h"
 #include "SmartPtr.h"
 
-namespace Common
+namespace common
 {
     void Connection::Connect()
     {

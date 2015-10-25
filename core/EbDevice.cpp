@@ -4,12 +4,12 @@
 #include "common/InvalidOperationException.h"
 #include "common/NotSupportedException.h"
 
-core::EbDeviceException::EbDeviceException(const QString& message): Common::Exception(message)
+core::EbDeviceException::EbDeviceException(const QString& message): common::Exception(message)
 {
 }
 
 core::EbDevice::EbDevice(BufferedLogger::SharedPtr_t logger) :
-    _bitConverter(Common::BitConverter::EByteOrder::MostSignificantByte),
+    _bitConverter(common::BitConverter::EByteOrder::MostSignificantByte),
     _mode(Binary),
     _logger(logger)
 {
@@ -80,7 +80,7 @@ void core::EbDevice::sendSetMode(Mode mode)
         sendCommand("mode binary");
         break;
     default:
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
 }
 
@@ -108,7 +108,7 @@ void core::EbDevice::sendSetTime(QDateTime dateTime)
         break;
     }
     default:
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
 }
 
@@ -129,10 +129,10 @@ void core::EbDevice::sendSetDate(QDateTime dateTime)
     }
     case Binary:
     {
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
     default:
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
 }
 
@@ -159,7 +159,7 @@ void core::EbDevice::sendSetRange(uint32_t center)
         break;
     }
     default:
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
 }
 
@@ -186,7 +186,7 @@ void core::EbDevice::sendAuto(int32_t freq)
         break;
     }
     default:
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
 }
 
@@ -261,19 +261,19 @@ void core::EbDevice::readSetTime()
 
 QDateTime core::EbDevice::readGetDate()
 {
-    throw Common::NotSupportedException();
+    throw common::NotSupportedException();
 }
 
 void core::EbDevice::readSetDate()
 {
-    throw Common::NotSupportedException();
+    throw common::NotSupportedException();
 }
 
 core::EbDevice::RangeData core::EbDevice::readGetRange()
 {
     if (_mode != Mode::Binary)
     {
-        throw Common::NotSupportedException();
+        throw common::NotSupportedException();
     }
     RangeData data;
     auto response = readLastResponseMessage();
@@ -454,7 +454,7 @@ void core::EbDevice::runTestAutoSequence()
         if (counter > 10)
         {
             // We can't wait forever: something went wrong and we can't cope with it
-            throw Common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
+            throw common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
         }
     }
     logInfo("Done.");
@@ -591,7 +591,7 @@ void core::EbDevice::assertTrue(bool condition, QString failureComment)
     }
 }
 
-void core::EbDevice::log(Common::LogLevel level, const QString& message)
+void core::EbDevice::log(common::LogLevel level, const QString& message)
 {
     if (_logger.get())
     {
@@ -602,15 +602,15 @@ void core::EbDevice::log(Common::LogLevel level, const QString& message)
 
 void core::EbDevice::logInfo(const QString& message)
 {
-    log(Common::Info, message);
+    log(common::Info, message);
 }
 
 void core::EbDevice::logDebug(const QString& message)
 {
-    log(Common::Debug, message);
+    log(common::Debug, message);
 }
 
 void core::EbDevice::logError(const QString& message)
 {
-    log(Common::Error, message);
+    log(common::Error, message);
 }

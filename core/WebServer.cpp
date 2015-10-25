@@ -36,9 +36,9 @@ int ev_handler(mg_connection *connection, enum mg_event event) {
                 {
                     handler->execute();
                 }
-                catch (Common::Exception& ex)
+                catch (common::Exception& ex)
                 {
-                    sLogger.error(QString("Handler error (Common::Exception): %1").arg(ex.what()));
+                    sLogger.error(QString("Handler error (common::Exception): %1").arg(ex.what()));
                 }
                 catch (std::exception& ex)
                 {

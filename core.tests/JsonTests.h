@@ -14,7 +14,7 @@
 #include <WebServer.h>
 #include <Helpers.h>
 
-using namespace Common;
+using namespace common;
 
 namespace core
 {

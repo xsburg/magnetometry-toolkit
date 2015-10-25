@@ -101,6 +101,8 @@ define([
             condSamplingIntervalRow: '.js-cond-sampling-interval-row',
             statusSamplingIntervalInput: '.js-status-sampling-interval-input',
             statusSamplingInterval: '.js-status-sampling-interval',
+            timeFixIntervalInput: '.js-time-fix-interval-input',
+            statusTimeFixInterval: '.js-status-time-fix-interval',
             statusStandBy: '.js-status-stand-by',
             statusStandByButton: '.js-status-stand-by-button',
             statusDeviceTime: '.js-status-device-time',
@@ -145,6 +147,8 @@ define([
             this.ui.dataTable.hide();
             this.ui.statusSamplingIntervalInput.val(1000);
             this.ui.statusSamplingIntervalInput.selectpicker();
+            this.ui.timeFixIntervalInput.val(0);
+            this.ui.timeFixIntervalInput.selectpicker();
             this.ui.mseedSettingsPanel.hide();
         },
 
@@ -168,7 +172,15 @@ define([
             this.ui.statusSamplingInterval.text(data.samplingIntervalMs);
             if (!this.ui.statusSamplingIntervalInput.val()) {
                 //noinspection JSUnresolvedVariable
-                this.ui.statusSamplingIntervalInput.text(data.samplingIntervalMs);
+                this.ui.statusSamplingIntervalInput.val(data.samplingIntervalMs);
+            }
+            //noinspection JSUnresolvedVariable
+            this.ui.statusTimeFixInterval.text(core.utils.dateTimeHelpers.durationToReadableString(moment.duration({
+                seconds: data.timeFixIntervalSeconds
+            })));
+            if (!this.ui.timeFixIntervalInput.val()) {
+                //noinspection JSUnresolvedVariable
+                this.ui.timeFixIntervalInput.val(data.timeFixIntervalSeconds);
             }
             if (data.standBy) {
                 this.ui.statusStandBy.text('On');
@@ -250,6 +262,7 @@ define([
             this.ui.forceUpdateButton[0].disabled = !enabled;
             this.ui.statusCenterRangeInput[0].disabled = !enabled;
             this.ui.statusSamplingIntervalInput[0].disabled = !enabled;
+            this.ui.timeFixIntervalInput[0].disabled = !enabled;
             this.ui.runDiagnosticsButton[0].disabled = !enabled;
             this.ui.runAutoTestButton[0].disabled = !enabled;
             // mseed settings
@@ -277,7 +290,8 @@ define([
 
         __onStartLogging: function () {
             var samplingIntervalMs = Number(this.ui.statusSamplingIntervalInput.val());
-            this.reqres.request('logging:start', samplingIntervalMs);
+            var timeFixIntervalSeconds = Number(this.ui.timeFixIntervalInput.val());
+            this.reqres.request('logging:start', samplingIntervalMs, timeFixIntervalSeconds);
         },
 
         __onStopLogging: function () {

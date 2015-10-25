@@ -7,7 +7,7 @@
 #include <boost/utility.hpp>
 #include "Singleton.h"
 
-namespace Common
+namespace common
 {
     class IniSettings : boost::noncopyable
     {
@@ -28,6 +28,6 @@ namespace Common
     };
 }
 
-#define sIniSettings SINGLETON_INSTANCE(::Common::IniSettings)
+#define sIniSettings SINGLETON_INSTANCE(::common::IniSettings)
 
 #endif // IniSettings_h__

@@ -18,7 +18,7 @@
 
 namespace core
 {
-    class EbDeviceException : public Common::Exception
+    class EbDeviceException : public common::Exception
     {
     public:
         EbDeviceException(const QString& message);
@@ -105,7 +105,7 @@ namespace core
         QList<QByteArray> readAllResponseMessages(int readTimeout = 1000);
 
     private:
-        Common::BitConverter _bitConverter;
+        common::BitConverter _bitConverter;
         QSerialPort _serialPort;
         Mode _mode;
         BufferedLogger::SharedPtr_t _logger;
@@ -118,7 +118,7 @@ namespace core
         QByteArray escapeData(QByteArray data);
         QByteArray unescapeData(QByteArray data);
         void assertTrue(bool condition, QString failureComment);
-        void log(Common::LogLevel level, const QString& message);
+        void log(common::LogLevel level, const QString& message);
         void logInfo(const QString& message);
         void logDebug(const QString& message);
         void logError(const QString& message);

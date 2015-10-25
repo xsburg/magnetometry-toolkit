@@ -8,7 +8,7 @@
 #include "common/SmartPtr.h"
 #include "common/Connection.h"
 
-using namespace Common;
+using namespace common;
 
 namespace core
 {

@@ -12,9 +12,10 @@ define([
     'module/core/services/AjaxService',
     'module/core/utils/helpers',
     'module/core/utils/htmlHelpers',
+    'module/core/utils/dateTimeHelpers',
     'module/core/utils/handlebarsHelpers',
     'module/core/utils/keyCode'
-], function (lib, AjaxService, helpers, htmlHelpers, handlebarsHelpers, keyCode) {
+], function (lib, AjaxService, helpers, htmlHelpers, dateTimeHelpers, handlebarsHelpers, keyCode) {
     'use strict';
 
     return {
@@ -24,6 +25,7 @@ define([
         utils: {
             helpers: helpers,
             htmlHelpers: htmlHelpers,
+            dateTimeHelpers: dateTimeHelpers,
             keyCode: keyCode
         }
     };

@@ -141,10 +141,11 @@ define([
             return Promise.resolve(this.model.fetch());
         },
 
-        __startLogging: function (samplingIntervalMs) {
+        __startLogging: function (samplingIntervalMs, timeFixIntervalSeconds) {
             return this.__sendCommand({
                 command: 'run',
-                intervalMilliseconds: samplingIntervalMs
+                intervalMilliseconds: samplingIntervalMs,
+                timeFixIntervalSeconds: timeFixIntervalSeconds
             });
         },
 

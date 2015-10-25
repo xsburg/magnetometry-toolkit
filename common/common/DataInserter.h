@@ -8,7 +8,7 @@
 #include "Connection.h"
 #include "DatabaseHelper.h"
 
-namespace Common 
+namespace common 
 {
     class DataInserter : boost::noncopyable
     {

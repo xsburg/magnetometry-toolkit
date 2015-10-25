@@ -6,7 +6,7 @@
 #include <boost/utility.hpp>
 #include "SmartPtr.h"
 
-namespace Common 
+namespace common 
 {
     class DatabaseHelper : boost::noncopyable
     {

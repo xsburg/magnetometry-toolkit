@@ -15,7 +15,7 @@ namespace core
         class BaseTest : public ::testing::Test
         {
         private:
-            std::shared_ptr<Common::Connection> _connection;
+            std::shared_ptr<common::Connection> _connection;
         protected:
             BaseTest();
 
@@ -25,7 +25,7 @@ namespace core
 
             virtual void TearDown();
 
-            const std::shared_ptr<Common::Connection>& Connection() const;
+            const std::shared_ptr<common::Connection>& Connection() const;
 
             QString ResolvePath(const QString& fileName) const;
 

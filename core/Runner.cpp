@@ -92,7 +92,7 @@ void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, Runne
         if (counter > 10)
         {
             // We can't wait forever: restart runner if we stuck
-            throw Common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
+            throw common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
         }
     }
     logInfo(QString("Executed."));
@@ -295,7 +295,7 @@ void core::Runner::handlePendingWebServerCommands()
             }
             break;
         default:
-            throw Common::NotImplementedException();
+            throw common::NotImplementedException();
         }
         _actionHandler->status()->commandQueueSize = _actionHandler->commands().size();
         sLogger.debug("Done reading command.");
@@ -415,9 +415,9 @@ void core::Runner::run()
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
             flushSamplesCache();
         }
-        catch (Common::Exception& ex)
+        catch (common::Exception& ex)
         {
-            sLogger.error("Main runner loop has been broken by Common::Exception.");
+            sLogger.error("Main runner loop has been broken by common::Exception.");
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
             if (!_isFlushing)
             {
@@ -439,7 +439,7 @@ void core::Runner::run()
     }
 }
 
-void core::Runner::log(Common::LogLevel level, const QString& message)
+void core::Runner::log(common::LogLevel level, const QString& message)
 {
     if (_webLogger.get())
     {
@@ -450,15 +450,15 @@ void core::Runner::log(Common::LogLevel level, const QString& message)
 
 void core::Runner::logInfo(const QString& message)
 {
-    log(Common::Info, message);
+    log(common::Info, message);
 }
 
 void core::Runner::logDebug(const QString& message)
 {
-    log(Common::Debug, message);
+    log(common::Debug, message);
 }
 
 void core::Runner::logError(const QString& message)
 {
-    log(Common::Error, message);
+    log(common::Error, message);
 }

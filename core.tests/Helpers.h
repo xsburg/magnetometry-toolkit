@@ -7,7 +7,7 @@
 #include "common/Connection.h"
 #include <QtNetwork/QNetworkReply>
 
-using namespace Common;
+using namespace common;
 
 namespace core
 {

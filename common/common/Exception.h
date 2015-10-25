@@ -3,7 +3,7 @@
 
 #include <QtCore/QtCore>
 
-namespace Common
+namespace common
 {
     class Exception
     {

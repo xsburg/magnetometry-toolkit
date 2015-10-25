@@ -1,7 +1,7 @@
 #include "DataBatchInserter.h"
 #include "Logger.h"
 
-namespace Common
+namespace common
 {
     DataBatchInserter::DataBatchInserter(const QString& insertQuery, int boundColumnsCount, Connection* connection, 
                                          const QString& tableName, int batchSize)

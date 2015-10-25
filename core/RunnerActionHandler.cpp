@@ -1,6 +1,7 @@
 ﻿#include "RunnerActionHandler.h"
 #include <mongoose.h>
 #include <common/InvalidOperationException.h>
+#include <common/Helpers.h>
 #include "RunnerCommands.h"
 
 core::RunnerActionHandler::RunnerActionHandler() : _status(new RunnerStatus()), _logger(new BufferedLogger())
@@ -96,9 +97,9 @@ void core::RunnerActionHandler::execute()
         QJsonObject json;
         json["about"] = _status->about;
         json["enq"] = _status->enq;
-        json["time"] = _status->time.toString(Qt::ISODate);
-        json["timeUpdated"] = _status->timeUpdated.toString(Qt::ISODate);
-        json["updated"] = _status->updated.toString(Qt::ISODate);
+        json["time"] = common::Helpers::toISODateWithMilliseconds(_status->time);
+        json["timeUpdated"] = common::Helpers::toISODateWithMilliseconds(_status->timeUpdated);
+        json["updated"] = common::Helpers::toISODateWithMilliseconds(_status->updated);
         json["standBy"] = _status->standBy;
         json["isRunning"] = _status->isRunning;
         json["samplingIntervalMs"] = _status->samplingIntervalMs;
@@ -169,7 +170,7 @@ void core::RunnerActionHandler::execute()
         }
         else
         {
-            throw Common::InvalidOperationException(QString("Command `%1` is not supported.").arg(command));
+            throw common::InvalidOperationException(QString("Command `%1` is not supported.").arg(command));
         }
 
         _status->commandQueueSize++;
@@ -185,7 +186,7 @@ void core::RunnerActionHandler::execute()
         for (auto& msg : _logger->buffer())
         {
             QJsonObject messageObject;
-            messageObject["time"] = msg.time.toString(Qt::ISODate);
+            messageObject["time"] = common::Helpers::toISODateWithMilliseconds(msg.time);
             messageObject["id"] = qint64(msg.id);
             messageObject["logLevel"] = msg.logLevel;
             messageObject["message"] = msg.message;
@@ -208,7 +209,7 @@ void core::RunnerActionHandler::execute()
         for (auto& sample : dataSamples)
         {
             QJsonObject messageObject;
-            messageObject["time"] = sample.time.toString(Qt::ISODate);
+            messageObject["time"] = common::Helpers::toISODateWithMilliseconds(sample.time);
             messageObject["field"] = sample.field;
             messageObject["qmc"] = sample.qmc;
             messageObject["state"] = sample.state;
@@ -223,7 +224,7 @@ void core::RunnerActionHandler::execute()
     }
     else
     {
-        throw Common::InvalidOperationException();
+        throw common::InvalidOperationException();
     }
 }
 

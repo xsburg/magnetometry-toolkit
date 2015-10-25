@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace Common
+namespace common
 {
     void Logger::initialize(LogLevel logLevel)
     {

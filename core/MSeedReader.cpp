@@ -27,7 +27,7 @@ namespace core
                 }
                 break;
             default:
-                throw Common::Exception("Sample type is not supported.");
+                throw common::Exception("Sample type is not supported.");
             }
 
             record->channelName(msr->channel);

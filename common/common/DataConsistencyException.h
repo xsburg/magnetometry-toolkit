@@ -3,7 +3,7 @@
 
 #include "Exception.h"
 
-namespace Common 
+namespace common 
 {
     class DataConsistencyException : public Exception
     {

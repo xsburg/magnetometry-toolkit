@@ -3,7 +3,7 @@
 
 #include <QtCore/QString>
 
-namespace Common
+namespace common
 {
     class Path
     {

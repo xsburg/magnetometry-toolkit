@@ -31,15 +31,29 @@
                     Stopped
                     <div class="form-group eb-device__start-logging-container">
                         <label for="samplingIntervalSelect" class="form-label">Sampling interval</label>
-                        <select id="samplingIntervalSelect" class="form-control js-status-sampling-interval-input">
-                            {{#each samplingIntervalOptions}}
-                                <optgroup label="{{groupName}}">
-                                    {{#each options}}
-                                        <option value="{{value}}">{{name}}</option>
-                                    {{/each}}
-                                </optgroup>
-                            {{/each}}
-                        </select>
+                        <div>
+                            <select id="samplingIntervalSelect" class="form-control js-status-sampling-interval-input">
+                                {{#each samplingIntervalOptions}}
+                                    <optgroup label="{{groupName}}">
+                                        {{#each options}}
+                                            <option value="{{value}}">{{name}}</option>
+                                        {{/each}}
+                                    </optgroup>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <label for="deviceTimeCorrectionSelect" class="form-label">Device time correction</label>
+                        <div>
+                            <select id="deviceTimeCorrectionSelect" class="form-control js-time-fix-interval-input">
+                                <option value="0">Never</option>
+                                <option value="10">10 Seconds</option>
+                                <option value="600">10 Minutes</option>
+                                <option value="3600">1 Hour</option>
+                                <option value="21600">6 Hours</option>
+                                <option value="86400">24 Hours</option>
+                                <option value="604800">1 Week</option>
+                            </select>
+                        </div>
                         <button type="button" class="btn btn-success btn-sm eb-device__start-logging-btn js-start-logging-button">Start</button>
                     </div>
                 </div>
@@ -48,6 +62,10 @@
         <tr class="js-cond-sampling-interval-row">
             <td>Sampling Interval (ms)</td>
             <td class="js-status-sampling-interval"></td>
+        </tr>
+        <tr class="js-cond-sampling-interval-row">
+            <td>Device time correction interval</td>
+            <td class="js-status-time-fix-interval"></td>
         </tr>
         <tr>
             <td>Diagnostics</td>

@@ -1,6 +1,6 @@
 #include "BitConverter.h"
 
-namespace Common
+namespace common
 {
     BitConverter::BitConverter(EByteOrder byteOrder /*= LeastSignificantByte*/)
     {

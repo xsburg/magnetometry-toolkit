@@ -1,7 +1,7 @@
 #include "DatabaseHelper.h"
 #include "DatabaseException.h"
 
-namespace Common
+namespace common
 {
     void DatabaseHelper::ThrowIfError( const QSqlQuery& query )
     {

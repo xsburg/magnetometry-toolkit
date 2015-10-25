@@ -42,7 +42,7 @@ namespace core
         void warn(const QString& message);
         void error(const QString& message);
         void fatal(const QString& message);
-        void write(Common::LogLevel logLevel, const QString& message);
+        void write(common::LogLevel logLevel, const QString& message);
 
         const QList<BufferMessage>& buffer() const
         {

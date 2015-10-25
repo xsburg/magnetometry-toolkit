@@ -8,7 +8,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QTextCodec>
 
-namespace Common
+namespace common
 {
     IniSettings::IniSettings()
     {

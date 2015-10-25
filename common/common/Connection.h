@@ -8,7 +8,7 @@
 #include "IniSettings.h"
 #include "Logger.h"
 
-namespace Common 
+namespace common 
 {
     class Connection
     {

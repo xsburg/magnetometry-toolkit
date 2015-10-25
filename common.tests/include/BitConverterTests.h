@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "common/BitConverter.h"
 
-using namespace Common;
+using namespace common;
 
 namespace
 {

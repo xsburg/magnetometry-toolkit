@@ -7,7 +7,7 @@
 //#include <log4cxx/log4cxx.h>
 #include <QtCore/QString>
 
-namespace Common
+namespace common
 {
     enum LogLevel
     {
@@ -44,6 +44,6 @@ namespace Common
     };
 }
 
-#define sLogger SINGLETON_INSTANCE(::Common::Logger)
+#define sLogger SINGLETON_INSTANCE(::common::Logger)
 
 #endif // Logger_h__

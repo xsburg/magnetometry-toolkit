@@ -8,7 +8,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <Runner.h>
 
-using namespace Common;
+using namespace common;
 
 int main(int argc, char** argv)
 {

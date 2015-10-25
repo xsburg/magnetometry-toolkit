@@ -1,7 +1,7 @@
 #include "File.h"
 #include "FileException.h"
 
-namespace Common
+namespace common
 {
     QFilePtr File::OpenReadBinary(QString filename)
     {

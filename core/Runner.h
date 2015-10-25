@@ -34,7 +34,7 @@ namespace core
         void executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
         void executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status);
 
-        void log(Common::LogLevel level, const QString& message);
+        void log(common::LogLevel level, const QString& message);
         void logInfo(const QString& message);
         void logDebug(const QString& message);
         void logError(const QString& message);

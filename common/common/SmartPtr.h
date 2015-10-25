@@ -14,7 +14,7 @@
     const t::SharedPtr_t t::sharedNullPtr = t::SharedPtr_t(); \
     const t::UniquePtr_t t::uniqueNullPtr = t::UniquePtr_t();
 
-namespace Common
+namespace common
 {
     /* 
     // uncomment when variadic templates will be implemented.

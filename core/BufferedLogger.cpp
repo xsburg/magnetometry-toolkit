@@ -2,55 +2,55 @@
 
 void core::BufferedLogger::debug(const QString& message)
 {
-    write(Common::Debug, message);
+    write(common::Debug, message);
 }
 
 void core::BufferedLogger::trace(const QString& message)
 {
-    write(Common::Trace, message);
+    write(common::Trace, message);
 }
 
 void core::BufferedLogger::info(const QString& message)
 {
-    write(Common::Info, message);
+    write(common::Info, message);
 }
 
 void core::BufferedLogger::warn(const QString& message)
 {
-    write(Common::Warn, message);
+    write(common::Warn, message);
 }
 
 void core::BufferedLogger::error(const QString& message)
 {
-    write(Common::Error, message);
+    write(common::Error, message);
 }
 
 void core::BufferedLogger::fatal(const QString& message)
 {
-    write(Common::Fatal, message);
+    write(common::Fatal, message);
 }
 
-void core::BufferedLogger::write(Common::LogLevel logLevel, const QString& message)
+void core::BufferedLogger::write(common::LogLevel logLevel, const QString& message)
 {
     QString levelMsg;
     switch (logLevel)
     {
-    case Common::Debug:
+    case common::Debug:
         levelMsg = "DEBUG";
         break;
-    case Common::Trace:
+    case common::Trace:
         levelMsg = "TRACE";
         break;
-    case Common::Info:
+    case common::Info:
         levelMsg = "INFO";
         break;
-    case Common::Warn:
+    case common::Warn:
         levelMsg = "WARN";
         break;
-    case Common::Error:
+    case common::Error:
         levelMsg = "ERROR";
         break;
-    case Common::Fatal:
+    case common::Fatal:
         levelMsg = "FATAL";
         break;
     default:

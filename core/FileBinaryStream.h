@@ -8,7 +8,7 @@ namespace core
     class FileBinaryStream : public IBinaryStream
     {
     private:
-        Common::QFilePtr _file;
+        common::QFilePtr _file;
     public:
         SMART_PTR_T(FileBinaryStream);
 
@@ -16,11 +16,11 @@ namespace core
         {
             if (create)
             {
-                _file = Common::File::CreateBinary(filename);
+                _file = common::File::CreateBinary(filename);
             }
             else
             {
-                _file = Common::File::OpenReadBinary(filename);
+                _file = common::File::OpenReadBinary(filename);
             }
         }
 

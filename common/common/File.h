@@ -5,7 +5,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QString>
 
-namespace Common
+namespace common
 {
     typedef std::shared_ptr<QFile> QFilePtr;
 

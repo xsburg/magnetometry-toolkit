@@ -8,7 +8,7 @@
 #endif
 #include "SmartPtr.h"
 
-namespace Common
+namespace common
 {
     template<class T>
     class Singleton : boost::noncopyable
@@ -35,11 +35,11 @@ namespace Common
 
 #define SINGLETON_BLOCK(ClassName)\
 protected:\
-    friend class ::Common::Singleton<ClassName>;\
+    friend class ::common::Singleton<ClassName>;\
     ClassName(ClassName const&) {}\
     ClassName inline& operator=(ClassName const&) { return *this; }\
 private:
 
-#define SINGLETON_INSTANCE(ClassName) ::Common::Singleton<ClassName>::Instance()
+#define SINGLETON_INSTANCE(ClassName) ::common::Singleton<ClassName>::Instance()
 
 #endif // SINGLETON_H

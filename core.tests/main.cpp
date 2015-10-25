@@ -7,7 +7,7 @@
 
 #include "tests.h"
 
-using namespace Common;
+using namespace common;
 
 int main(int argc, char **argv)
 {

@@ -4,7 +4,7 @@
 #include "BaseTest.h"
 #include "EbDevice.h"
 
-using namespace Common;
+using namespace common;
 
 namespace core
 {

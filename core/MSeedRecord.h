@@ -38,7 +38,7 @@ namespace core
         {
             if (channelName.size() > 10)
             {
-                throw Common::InvalidOperationException("Channel name should not be longer than 10 characters.");
+                throw common::InvalidOperationException("Channel name should not be longer than 10 characters.");
             }
             _channelName = channelName;
         }
@@ -48,7 +48,7 @@ namespace core
         {
             if (network.size() > 10)
             {
-                throw Common::InvalidOperationException("Network name should not be longer than 10 characters.");
+                throw common::InvalidOperationException("Network name should not be longer than 10 characters.");
             }
             _network = network;
         }
@@ -58,7 +58,7 @@ namespace core
         {
             if (station.size() > 10)
             {
-                throw Common::InvalidOperationException("Station name should not be longer than 10 characters.");
+                throw common::InvalidOperationException("Station name should not be longer than 10 characters.");
             }
             _station = station;
         }
@@ -68,7 +68,7 @@ namespace core
         {
             if (location.size() > 10)
             {
-                throw Common::InvalidOperationException("Location name should not be longer than 10 characters.");
+                throw common::InvalidOperationException("Location name should not be longer than 10 characters.");
             }
             _location = location;
         }

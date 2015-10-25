@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace Common
+namespace common
 {
     class BitConverter
     {
