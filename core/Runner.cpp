@@ -76,15 +76,14 @@ void core::Runner::executeRunCommand(QMutexLocker& dataLock, core::EbDevice::Sha
 
 void core::Runner::executeStopCommand(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
-    logInfo(QString("Preparing command STOP..."));
-    status->isRunning = false;
-    status->updated = QDateTime::currentDateTimeUtc();
     logInfo(QString("Executing command STOP..."));
     dataLock.unlock();
     device->sendEnq();
     // We wait for the moment when there are no incoming messages. That means that the incoming data stream has stopped.
     device->waitForInputSilence();
     dataLock.relock();
+    status->isRunning = false;
+    status->updated = QDateTime::currentDateTimeUtc();
     logInfo(QString("Executed."));
 }
 
@@ -418,6 +417,7 @@ void core::Runner::run()
                         sLogger.info("Performing device time correction...");
                         QMutexLocker lock(_actionHandler->dataMutex());
                         executeStopCommand(lock, _device, _actionHandler->status());
+                        _actionHandler->status()->isRunning = true; // simulating that we are still running
                         executeSetTime(lock, _device, QDateTime::currentDateTimeUtc(), _actionHandler->status());
                         executeRunCommand(lock, _device, _samplingIntervalMs, _timeFixIntervalSeconds, _actionHandler->status());
                         lastTimeFixEpoch = QDateTime::currentMSecsSinceEpoch();
