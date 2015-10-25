@@ -185,7 +185,7 @@ core::IntegerMSeedRecord::SharedPtr_t core::Runner::createIntegerRecord(QString 
 
 void core::Runner::flushSamplesCache()
 {
-    if (_samplesCache.empty())
+    if (_samplesCache.empty() || _isFlushing)
     {
         return;
     }
@@ -193,20 +193,29 @@ void core::Runner::flushSamplesCache()
     logDebug(QString("Flushing samples cache (%1 samples)...").arg(_samplesCache.size()));
     double samplingRateHz = 1000.0 / _samplingIntervalMs;
 
+    auto recordTime = _samplesCache.first().time;
+
+    // field
+    auto fieldRecord = createIntegerRecord("FLD", samplingRateHz, recordTime);
     for (auto& sample : _samplesCache)
     {
-        auto fieldRecord = createIntegerRecord("FLD", samplingRateHz, sample.time);
         fieldRecord->data().push_back(sample.field);
-        _writer->write(fieldRecord);
-
-        auto qualityRecord = createIntegerRecord("QMC", samplingRateHz, sample.time);
-        qualityRecord->data().push_back(sample.qmc);
-        _writer->write(qualityRecord);
-
-        auto stateRecord = createIntegerRecord("STT", samplingRateHz, sample.time);
-        stateRecord->data().push_back(sample.state);
-        _writer->write(stateRecord);
     }
+    _writer->write(fieldRecord);
+    // qmc
+    auto qualityRecord = createIntegerRecord("QMC", samplingRateHz, recordTime);
+    for (auto& sample : _samplesCache)
+    {
+        qualityRecord->data().push_back(sample.qmc);
+    }
+    _writer->write(qualityRecord);
+    // state
+    auto stateRecord = createIntegerRecord("STT", samplingRateHz, recordTime);
+    for (auto& sample : _samplesCache)
+    {
+        stateRecord->data().push_back(sample.state);
+    }
+    _writer->write(stateRecord);
 
     _writer->flush();
     _samplesCache.clear();
@@ -405,11 +414,7 @@ void core::Runner::run()
         {
             sLogger.error("Main runner loop has been broken by common::Exception.");
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
-            if (!_isFlushing)
-            {
-                sLogger.error("Trying to flush samples cache...");
-                flushSamplesCache();
-            }
+            flushSamplesCache();
         }
         catch (std::exception& ex)
         {
