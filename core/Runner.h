@@ -24,15 +24,15 @@ namespace core
         Runner(RunnerConfig config);
         void run();
     private:
-        void executeRunCommand(core::EbDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status);
-        void executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeSetTime(core::EbDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status);
-        void executeSetRange(core::EbDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status);
-        void executeSetStandBy(core::EbDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status);
-        void executeDiagnostics(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status);
+        void executeRunCommand(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status);
+        void executeStopCommand(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
+        void executeUpdateStatus(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
+        void executeSetTime(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status);
+        void executeSetRange(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status);
+        void executeSetStandBy(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status);
+        void executeDiagnostics(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
+        void executeAutoTest(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
+        void executeApplyMSeedSettings(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status);
 
         void log(common::LogLevel level, const QString& message);
         void logInfo(const QString& message);

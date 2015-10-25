@@ -15,7 +15,7 @@ define([
 
     return {
         durationToReadableString: function (duration) {
-            var result;
+            var result = '';
             var days = duration.days();
             if (days) {
                 result += days + ' days ';

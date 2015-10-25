@@ -16,7 +16,7 @@ core::Runner::Runner(RunnerConfig config)
     _webServer->addActionHandler(_actionHandler);
 }
 
-void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeRunCommand(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Preparing command RUN..."));
     status->isRunning = true;
@@ -65,41 +65,53 @@ void core::Runner::executeRunCommand(core::EbDevice::SharedPtr_t& device, int sa
     status->timeFixIntervalSeconds = timeFixIntervalSeconds;
     logInfo(QString("Executing command RUN with { intervalMilliseconds: %1 (converted to %2) }...")
         .arg(samplingIntervalMs).arg(actualIntervalVal));
+    dataLock.unlock();
     device->sendAuto(actualIntervalVal);
+    dataLock.relock();
     logInfo(QString("Executed."));
     _isRunning = _actionHandler->status()->isRunning;
     _samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
     _timeFixIntervalSeconds = timeFixIntervalSeconds;
 }
 
-void core::Runner::executeStopCommand(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeStopCommand(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Preparing command STOP..."));
     status->isRunning = false;
     status->updated = QDateTime::currentDateTimeUtc();
     logInfo(QString("Executing command STOP..."));
+    dataLock.unlock();
     device->sendEnq();
     // We wait for the moment when there are no incoming messages. That means that the incoming data stream has stopped.
     device->waitForInputSilence();
+    dataLock.relock();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeUpdateStatus(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command UPDATE-STATUS..."));
 
+    dataLock.unlock();
     // enq
     device->sendEnq();
-    status->enq = device->readEnq();
+    auto newEnq = device->readEnq();
     // about
     device->sendAbout();
-    status->about = device->readAbout();
+    auto newAbout = device->readAbout();
     // range
     device->sendGetRange();
-    status->range = device->readGetRange();
+    auto newRange = device->readGetRange();
     // time
     device->sendGetTime();
-    status->time = device->readGetTime();
+    auto newTime = device->readGetTime();
+    dataLock.relock();
+
+    status->enq = newEnq;
+    status->about = newAbout;
+    status->range = newRange;
+    status->time = newTime;
+
     // timeUpdated
     status->timeUpdated = QDateTime::currentDateTimeUtc();
     // updated
@@ -110,51 +122,64 @@ void core::Runner::executeUpdateStatus(core::EbDevice::SharedPtr_t& device, Runn
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeSetTime(core::EbDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeSetTime(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command SET-TIME..."));
+    dataLock.unlock();
     device->sendSetTime(time);
     device->readSetTime();
     device->sendGetTime();
-    status->time = device->readGetTime();
+    auto newTime = device->readGetTime();
+    dataLock.relock();
+    status->time = newTime;
     status->timeUpdated = QDateTime::currentDateTimeUtc();
     status->updated = status->timeUpdated;
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeSetRange(core::EbDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeSetRange(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command SET-RANGE..."));
+    dataLock.unlock();
     device->sendSetRange(center);
-    status->range = device->readSetRange();
+    auto newRange = device->readSetRange();
+    dataLock.relock();
+    status->range = newRange;
     status->updated = QDateTime::currentDateTimeUtc();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeSetStandBy(core::EbDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeSetStandBy(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command SET-STAND-BY..."));
+    dataLock.unlock();
     device->sendStandBy(standBy);
-    status->standBy = device->readStandBy();
+    auto newStandBy = device->readStandBy();
+    dataLock.relock();
+    status->standBy = newStandBy;
     status->updated = QDateTime::currentDateTimeUtc();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeDiagnostics(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeDiagnostics(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command RUN-DIAGNOSTICS..."));
+    dataLock.unlock();
     device->runDiagnosticSequence();
+    dataLock.relock();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeAutoTest(core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeAutoTest(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command AUTO-TEST..."));
+    dataLock.unlock();
     device->runTestAutoSequence();
+    dataLock.relock();
     logInfo(QString("Executed."));
 }
 
-void core::Runner::executeApplyMSeedSettings(core::EbDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status)
+void core::Runner::executeApplyMSeedSettings(QMutexLocker& dataLock, core::EbDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command APPLY-MSEED-SETTINGS..."));
     logInfo(QString("Arguments: { fileName: '%1', network: '%2', station: '%3', location: '%4', samplesInRecord: %5 }")
@@ -233,7 +258,7 @@ void core::Runner::handlePendingWebServerCommands()
         if (_isRunning)
         {
             flushSamplesCache();
-            executeStopCommand(_device, _actionHandler->status());
+            executeStopCommand(lock, _device, _actionHandler->status());
             _isRunning = false;
         }
 
@@ -242,51 +267,54 @@ void core::Runner::handlePendingWebServerCommands()
         {
         case Run:
             {
-                auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
-                int samplingIntervalMs = runCmd->intervalMilliseconds();
-                int timeFixIntervalSeconds = runCmd->timeFixIntervalSeconds();
-                executeRunCommand(_device, samplingIntervalMs, timeFixIntervalSeconds, _actionHandler->status());
+                if (!_isRunning)
+                {
+                    auto runCmd = std::static_pointer_cast<RunRunnerCommand>(cmd);
+                    int samplingIntervalMs = runCmd->intervalMilliseconds();
+                    int timeFixIntervalSeconds = runCmd->timeFixIntervalSeconds();
+                    executeRunCommand(lock, _device, samplingIntervalMs, timeFixIntervalSeconds, _actionHandler->status());
+                }
             }
             break;
         case Stop:
             // Any command make a stop first
             break;
         case UpdateStatus:
-            executeUpdateStatus(_device, _actionHandler->status());
+            executeUpdateStatus(lock, _device, _actionHandler->status());
             break;
         case SetTime:
             {
                 auto timeCmd = std::static_pointer_cast<SetTimeRunnerCommand>(cmd);
                 QDateTime time = timeCmd->time();
-                executeSetTime(_device, time, _actionHandler->status());
+                executeSetTime(lock, _device, time, _actionHandler->status());
             }
             break;
         case SetRange:
             {
                 auto rangeCmd = std::static_pointer_cast<SetRangeRunnerCommand>(cmd);
                 uint32_t center = rangeCmd->center();
-                executeSetRange(_device, center, _actionHandler->status());
+                executeSetRange(lock, _device, center, _actionHandler->status());
             }
             break;
         case SetStandBy:
             {
                 auto standByCmd = std::static_pointer_cast<SetStandByRunnerCommand>(cmd);
                 bool standBy = standByCmd->standBy();
-                executeSetStandBy(_device, standBy, _actionHandler->status());
+                executeSetStandBy(lock, _device, standBy, _actionHandler->status());
             }
             break;
         case RunDiagnostics:
-            executeDiagnostics(_device, _actionHandler->status());
-            executeUpdateStatus(_device, _actionHandler->status());
+            executeDiagnostics(lock, _device, _actionHandler->status());
+            executeUpdateStatus(lock, _device, _actionHandler->status());
             break;
         case RunModeAutoTest:
-            executeAutoTest(_device, _actionHandler->status());
+            executeAutoTest(lock, _device, _actionHandler->status());
             break;
         case ApplyMSeedSettings:
             {
                 auto applyMSeedSettingsCmd = std::static_pointer_cast<ApplyMSeedSettingsRunnerCommand>(cmd);
                 auto newSettings = applyMSeedSettingsCmd->settings();
-                executeApplyMSeedSettings(_device, newSettings, _actionHandler->status());
+                executeApplyMSeedSettings(lock, _device, newSettings, _actionHandler->status());
             }
             break;
         default:
@@ -361,7 +389,7 @@ void core::Runner::run()
             sLogger.info(QString("Gathering device start-up config..."));
             QMutexLocker lock(_actionHandler->dataMutex());
             RunnerCommand::SharedPtr_t updateCmd = std::make_shared<UpdateStatusRunnerCommand>();
-            executeUpdateStatus(_device, _actionHandler->status());
+            executeUpdateStatus(lock, _device, _actionHandler->status());
             _isRunning = _actionHandler->status()->isRunning;
             _samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
             _timeFixIntervalSeconds = _actionHandler->status()->timeFixIntervalSeconds;
@@ -388,9 +416,10 @@ void core::Runner::run()
                     if (_timeFixIntervalSeconds > 0 && nowEpoch - lastTimeFixEpoch > _timeFixIntervalSeconds * 1000)
                     {
                         sLogger.info("Performing device time correction...");
-                        executeStopCommand(_device, _actionHandler->status());
-                        executeSetTime(_device, QDateTime::currentDateTimeUtc(), _actionHandler->status());
-                        executeRunCommand(_device, _samplingIntervalMs, _timeFixIntervalSeconds, _actionHandler->status());
+                        QMutexLocker lock(_actionHandler->dataMutex());
+                        executeStopCommand(lock, _device, _actionHandler->status());
+                        executeSetTime(lock, _device, QDateTime::currentDateTimeUtc(), _actionHandler->status());
+                        executeRunCommand(lock, _device, _samplingIntervalMs, _timeFixIntervalSeconds, _actionHandler->status());
                         lastTimeFixEpoch = QDateTime::currentMSecsSinceEpoch();
                     }
 
