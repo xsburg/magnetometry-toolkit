@@ -385,8 +385,9 @@ void core::Runner::run()
                 {
                     // Performing device time fix if required
                     qint64 nowEpoch = QDateTime::currentMSecsSinceEpoch();
-                    if (_timeFixIntervalSeconds > 0 && (nowEpoch - lastTimeFixEpoch) * 1000 > _timeFixIntervalSeconds)
+                    if (_timeFixIntervalSeconds > 0 && nowEpoch - lastTimeFixEpoch > _timeFixIntervalSeconds * 1000)
                     {
+                        sLogger.info("Performing device time correction...");
                         executeStopCommand(_device, _actionHandler->status());
                         executeSetTime(_device, QDateTime::currentDateTimeUtc(), _actionHandler->status());
                         executeRunCommand(_device, _samplingIntervalMs, _timeFixIntervalSeconds, _actionHandler->status());
