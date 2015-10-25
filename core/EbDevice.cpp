@@ -532,6 +532,7 @@ void core::EbDevice::waitForInputSilence(int maxWaitCicles, int readTimeout)
             // We can't wait forever: something went wrong and we can't cope with it
             throw common::Exception("Failed to stop data acquisition. The device possibly stuck and must be rebooted via power cord.");
         }
+        QThread::msleep(100);
     }
 }
 
