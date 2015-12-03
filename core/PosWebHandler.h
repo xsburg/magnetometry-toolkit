@@ -10,7 +10,7 @@
 #pragma once
 
 #include "WebServer.h"
-#include "RunnerData.h"
+#include "Common.h"
 #include "PosWebCommands.h"
 #include "PosDevice.h"
 

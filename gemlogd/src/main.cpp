@@ -2,7 +2,7 @@
 #include "common/Logger.h"
 #include "common/Path.h"
 #include "common/Connection.h"
-#include <PosController.h>
+#include <Runner.h>
 
 using namespace common;
 
@@ -35,14 +35,14 @@ int main(int argc, char** argv)
         core::RunnerConfig config;
         config.webServerPort = sIniSettings.value("webServer/port", 8000).toInt();
         config.devicePortName = sIniSettings.value("device/portName").toString();
-        config.msRecordLocation = sIniSettings.value("mseed/location").toString();
-        config.msRecordNetwork = sIniSettings.value("mseed/network").toString();
-        config.msRecordStation = sIniSettings.value("mseed/station").toString();
-        config.msFileName = sIniSettings.value("mseed/fileName").toString();
-        config.samplesCacheMaxSize = sIniSettings.value("runner/samplesCacheMaxSize", 100).toInt();
+        config.msSettings.location = sIniSettings.value("mseed/location").toString();
+        config.msSettings.network = sIniSettings.value("mseed/network").toString();
+        config.msSettings.station = sIniSettings.value("mseed/station").toString();
+        config.msSettings.fileName = sIniSettings.value("mseed/fileName").toString();
+        config.msSettings.samplesInRecord = sIniSettings.value("runner/samplesCacheMaxSize", 100).toInt();
 
-        auto runner = std::make_shared<core::PosController>(config);
-        runner->run();
+        auto runner = std::make_shared<core::Runner>();
+        runner->run(config);
 
         return 0;
     }

@@ -5,13 +5,11 @@
 #include "FileBinaryStream.h"
 #include "MSeedWriter.h"
 
-core::PosController::PosController(RunnerConfig config)
-: _config(config), _isRunning(false), _isFlushing(false), _samplingIntervalMs(0), _timeFixIntervalSeconds(0)
+core::PosController::PosController(WebServer::SharedPtr_t webServer, QString devicePortName)
+    : _devicePortName(devicePortName), _isRunning(false), _isFlushing(false), _samplingIntervalMs(0), _timeFixIntervalSeconds(0)
 {
     _actionHandler = std::make_shared<PosWebHandler>();
     _webLogger = _actionHandler->logger();
-    _webServer = std::make_shared<WebServer>();
-    _webServer->port(config.webServerPort);
     _webServer->addActionHandler(_actionHandler);
 }
 
@@ -350,17 +348,13 @@ void core::PosController::handleNewDataSamples()
 
 void core::PosController::run()
 {
-    // Running commands aggregator in background thread
-    sLogger.info(QString("Starting web server on port %1...").arg(_config.webServerPort));
-    _webServer->runAsync();
-
     // Error-restart loop
     while (true)
     {
         // Creating a device
-        sLogger.info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
+        sLogger.info(QString("Connecting to device on port %1...").arg(_devicePortName));
         _device = std::make_shared<PosDevice>(_webLogger);
-        _device->connect(_config.devicePortName);
+        _device->connect(_devicePortName);
         sLogger.info(QString("Connected."));
 
         // Creating an mseed writer

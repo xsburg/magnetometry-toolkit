@@ -11,9 +11,9 @@
 
 #include "WebServer.h"
 #include "PosWebHandler.h"
-#include "RunnerData.h"
 #include "MSeedRecord.h"
 #include "MSeedWriter.h"
+#include "Common.h"
 
 namespace core
 {
@@ -21,7 +21,7 @@ namespace core
     {
     public:
         SMART_PTR_T(PosController);
-        PosController(RunnerConfig config);
+        PosController(WebServer::SharedPtr_t webServer, QString devicePortName);
         void run();
     private:
         void executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, PosStatus::SharedPtr_t status);
@@ -46,7 +46,6 @@ namespace core
 
         WebServer::SharedPtr_t _webServer;
         PosWebHandler::SharedPtr_t _actionHandler;
-        RunnerConfig _config;
         BufferedLogger::SharedPtr_t _webLogger;
 
         // Runner loop components and data
@@ -57,5 +56,7 @@ namespace core
         bool _isFlushing;
         int _samplingIntervalMs;
         int _timeFixIntervalSeconds;
+
+        QString _devicePortName;
     };
 }
