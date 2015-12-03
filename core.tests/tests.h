@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "EbDeviceTests.h"
 #include "EnvironmentTests.h"
 #include "JsonTests.h"
 #include "MSeedWriterTests.h"
+#include "PosDeviceTests.h"
 #include "WebServerTests.h"

@@ -10,15 +10,15 @@
 
 #pragma once
 
-#include "EbDevice.h"
+#include "PosDevice.h"
 
 namespace core
 {
-    struct EbDeviceStatus
+    struct PosDeviceStatus
     {
-        SMART_PTR_T(EbDeviceStatus);
+        SMART_PTR_T(PosDeviceStatus);
 
-        EbDevice::RangeData range;
+        PosDevice::RangeData range;
         QString enq;
         QString about;
         QDateTime time;
@@ -33,7 +33,7 @@ namespace core
         int samplesInRecord;
     };
 
-    struct RunnerStatus : EbDeviceStatus
+    struct RunnerStatus : PosDeviceStatus
     {
         SMART_PTR_T(RunnerStatus);
 

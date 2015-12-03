@@ -4,9 +4,9 @@
 #include "common/Path.h"
 #include "common/Connection.h"
 #include <boost/system/system_error.hpp>
-#include <EbDevice.h>
+#include <PosDevice.h>
 #include <boost/exception/diagnostic_information.hpp>
-#include <Runner.h>
+#include <PosController.h>
 
 using namespace common;
 
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
         config.samplesCacheMaxSize = sIniSettings.value("runner/samplesCacheMaxSize", 100).toInt();
         config.skipDiagnostics = sIniSettings.value("runner/skipDiagnostics", false).toBool();
 
-        auto runner = std::make_shared<core::Runner>(config);
+        auto runner = std::make_shared<core::PosController>(config);
         runner->run();
 
         return 0;
