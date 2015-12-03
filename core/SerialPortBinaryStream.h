@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef BOOST_SERIAL_PORT
+
 #include <boost/asio.hpp>
 #include <vector>
 #include <iostream>
@@ -169,3 +171,5 @@ namespace core
         }
     };
 }
+
+#endif

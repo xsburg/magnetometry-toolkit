@@ -16,6 +16,36 @@
 
 namespace core
 {
+    struct PosStatus
+    {
+        SMART_PTR_T(PosStatus);
+
+        PosStatus()
+        {
+            standBy = false;
+            isRunning = false;
+            samplingIntervalMs = 0;
+            commandQueueSize = 0;
+            timeFixIntervalSeconds = 0;
+        }
+
+        // Actually read from device
+        PosDevice::RangeData range;
+        QString enq;
+        QString about;
+        QDateTime time;
+
+        // Other data
+        QDateTime timeUpdated;
+        QDateTime updated;
+        bool standBy;
+        bool isRunning;
+        int samplingIntervalMs;
+        int commandQueueSize;
+        MSeedSettings mseedSettings;
+        int timeFixIntervalSeconds;
+    };
+
     class PosWebHandler : public core::WebServerActionHandler
     {
     public:
@@ -32,7 +62,7 @@ namespace core
         void execute() override;
         QMutex* dataMutex();
 
-        RunnerStatus::SharedPtr_t& status()
+        PosStatus::SharedPtr_t& status()
         {
             return _status;
         }
@@ -42,7 +72,7 @@ namespace core
             return _logger;
         }
 
-        void setStatus(RunnerStatus::SharedPtr_t runnerStatus)
+        void setStatus(PosStatus::SharedPtr_t runnerStatus)
         {
             _status = runnerStatus;
         }
@@ -65,7 +95,7 @@ namespace core
 
         QList<PosDevice::Sample> dataSamples;
         QQueue<PosWebCommand::SharedPtr_t> _commands;
-        RunnerStatus::SharedPtr_t _status;
+        PosStatus::SharedPtr_t _status;
         BufferedLogger::SharedPtr_t _logger;
         QMutex _dataMutex;
     };

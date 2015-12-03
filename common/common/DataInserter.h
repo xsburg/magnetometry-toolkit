@@ -2,7 +2,6 @@
 #define DataInserter_h__
 
 #include <QtCore/QtCore>
-#include <boost/utility.hpp>
 #include "Exception.h"
 #include "Logger.h"
 #include "Connection.h"
@@ -10,8 +9,10 @@
 
 namespace common 
 {
-    class DataInserter : boost::noncopyable
+    class DataInserter
     {
+        Q_DISABLE_COPY(DataInserter);
+
         QString _resultInsertQuery;
         QString _insertTemplate;
         int _rowsAdded;

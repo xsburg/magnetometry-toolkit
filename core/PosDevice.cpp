@@ -322,7 +322,7 @@ core::PosDevice::Sample core::PosDevice::readOneSample()
 
 bool core::PosDevice::validateSample(const Sample& sample)
 {
-    return sample.state == SampleState::Valid;
+    return sample.state == SampleState::VALID;
 }
 
 void core::PosDevice::runDiagnosticSequence()

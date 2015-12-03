@@ -4,7 +4,7 @@
 #include <common/Helpers.h>
 #include "PosWebCommands.h"
 
-core::PosWebHandler::PosWebHandler() : _status(new RunnerStatus()), _logger(new BufferedLogger())
+core::PosWebHandler::PosWebHandler() : _status(new PosStatus()), _logger(new BufferedLogger())
 {
 }
 

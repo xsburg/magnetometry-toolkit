@@ -10,20 +10,8 @@
 
 #pragma once
 
-#include "PosDevice.h"
-
 namespace core
 {
-    struct PosDeviceStatus
-    {
-        SMART_PTR_T(PosDeviceStatus);
-
-        PosDevice::RangeData range;
-        QString enq;
-        QString about;
-        QDateTime time;
-    };
-
     struct MSeedSettings
     {
         QString location;
@@ -33,38 +21,17 @@ namespace core
         int samplesInRecord;
     };
 
-    struct RunnerStatus : PosDeviceStatus
-    {
-        SMART_PTR_T(RunnerStatus);
-
-        RunnerStatus()
-        {
-            standBy = false;
-            isRunning = false;
-            samplingIntervalMs = 0;
-            commandQueueSize = 0;
-            timeFixIntervalSeconds = 0;
-        }
-
-        QDateTime timeUpdated;
-        QDateTime updated;
-        bool standBy;
-        bool isRunning;
-        int samplingIntervalMs;
-        int commandQueueSize;
-        MSeedSettings mseedSettings;
-        int timeFixIntervalSeconds;
-    };
-
     struct RunnerConfig
     {
         int webServerPort;
+        
         QString devicePortName;
+
+        // mseed settings
         QString msRecordLocation;
         QString msRecordNetwork;
         QString msRecordStation;
         QString msFileName;
         int samplesCacheMaxSize;
-        bool skipDiagnostics;
     };
 }

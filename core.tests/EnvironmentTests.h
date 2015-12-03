@@ -3,7 +3,6 @@
 #include <vector>
 #include <cmath>
 #include <gtest/gtest.h>
-#include <boost/thread.hpp>
 #include "BaseTest.h"
 #include "common/SmartPtr.h"
 #include "common/Connection.h"

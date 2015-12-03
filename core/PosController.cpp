@@ -15,7 +15,7 @@ core::PosController::PosController(RunnerConfig config)
     _webServer->addActionHandler(_actionHandler);
 }
 
-void core::PosController::executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Preparing command RUN..."));
     status->isRunning = true;
@@ -73,7 +73,7 @@ void core::PosController::executeRunCommand(QMutexLocker& dataLock, core::PosDev
     _timeFixIntervalSeconds = timeFixIntervalSeconds;
 }
 
-void core::PosController::executeStopCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeStopCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command STOP..."));
     dataLock.unlock();
@@ -86,7 +86,7 @@ void core::PosController::executeStopCommand(QMutexLocker& dataLock, core::PosDe
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeUpdateStatus(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeUpdateStatus(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command UPDATE-STATUS..."));
 
@@ -120,7 +120,7 @@ void core::PosController::executeUpdateStatus(QMutexLocker& dataLock, core::PosD
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeSetTime(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeSetTime(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, QDateTime time, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command SET-TIME..."));
     dataLock.unlock();
@@ -135,7 +135,7 @@ void core::PosController::executeSetTime(QMutexLocker& dataLock, core::PosDevice
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeSetRange(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeSetRange(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, uint32_t center, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command SET-RANGE..."));
     dataLock.unlock();
@@ -147,7 +147,7 @@ void core::PosController::executeSetRange(QMutexLocker& dataLock, core::PosDevic
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeSetStandBy(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeSetStandBy(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, bool standBy, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command SET-STAND-BY..."));
     dataLock.unlock();
@@ -159,7 +159,7 @@ void core::PosController::executeSetStandBy(QMutexLocker& dataLock, core::PosDev
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeDiagnostics(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeDiagnostics(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command RUN-DIAGNOSTICS..."));
     dataLock.unlock();
@@ -168,7 +168,7 @@ void core::PosController::executeDiagnostics(QMutexLocker& dataLock, core::PosDe
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeAutoTest(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeAutoTest(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command AUTO-TEST..."));
     dataLock.unlock();
@@ -177,7 +177,7 @@ void core::PosController::executeAutoTest(QMutexLocker& dataLock, core::PosDevic
     logInfo(QString("Executed."));
 }
 
-void core::PosController::executeApplyMSeedSettings(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status)
+void core::PosController::executeApplyMSeedSettings(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, core::MSeedSettings newSettings, PosStatus::SharedPtr_t status)
 {
     logInfo(QString("Executing command APPLY-MSEED-SETTINGS..."));
     logInfo(QString("Arguments: { fileName: '%1', network: '%2', station: '%3', location: '%4', samplesInRecord: %5 }")
@@ -361,17 +361,7 @@ void core::PosController::run()
         sLogger.info(QString("Connecting to device on port %1...").arg(_config.devicePortName));
         _device = std::make_shared<PosDevice>(_webLogger);
         _device->connect(_config.devicePortName);
-        if (!_config.skipDiagnostics)
-        {
-            sLogger.info(QString("Running device diagnostics..."));
-            _device->runDiagnosticSequence();
-            _device->runTestAutoSequence();
-            sLogger.info(QString("Diagnostics done."));
-        }
-        else
-        {
-            sLogger.info(QString("Skipping device diagnostics..."));
-        }
+        sLogger.info(QString("Connected."));
 
         // Creating an mseed writer
         auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);

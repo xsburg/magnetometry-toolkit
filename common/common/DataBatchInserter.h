@@ -2,7 +2,6 @@
 #define DataBatchInserter_h__
 
 #include <QtCore/QtCore>
-#include <boost/utility.hpp>
 #include "Exception.h"
 #include "Connection.h"
 #include "DatabaseHelper.h"
@@ -11,11 +10,13 @@
 
 namespace common 
 {
-    class DataBatchInserter : boost::noncopyable
+    class DataBatchInserter
     {
     public:
         SMART_PTR_T(DataBatchInserter);
     private:
+        Q_DISABLE_COPY(DataBatchInserter);
+
         QString _insertQuery;
         QString _tableName;
         int _rowsAdded;
@@ -25,6 +26,7 @@ namespace common
         QVector<QVariantList> _boundValues;
         QList<DataBatchInserter::SharedPtr_t> _children;
     public:
+
         // insertQuery: "INSERT INTO <table name>(<column name>[, <column name>]) VALUES (?, ?, ?)"
         // connection: pointer to connection class
         DataBatchInserter(const QString& insertQuery, int boundColumnsCount, Connection* connection, 

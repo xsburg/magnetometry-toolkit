@@ -24,15 +24,15 @@ namespace core
         PosController(RunnerConfig config);
         void run();
     private:
-        void executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, RunnerStatus::SharedPtr_t status);
-        void executeStopCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeUpdateStatus(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeSetTime(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, QDateTime time, RunnerStatus::SharedPtr_t status);
-        void executeSetRange(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, uint32_t center, RunnerStatus::SharedPtr_t status);
-        void executeSetStandBy(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, bool standBy, RunnerStatus::SharedPtr_t status);
-        void executeDiagnostics(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeAutoTest(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, RunnerStatus::SharedPtr_t status);
-        void executeApplyMSeedSettings(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, core::MSeedSettings newSettings, RunnerStatus::SharedPtr_t status);
+        void executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, PosStatus::SharedPtr_t status);
+        void executeStopCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
+        void executeUpdateStatus(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
+        void executeSetTime(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, QDateTime time, PosStatus::SharedPtr_t status);
+        void executeSetRange(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, uint32_t center, PosStatus::SharedPtr_t status);
+        void executeSetStandBy(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, bool standBy, PosStatus::SharedPtr_t status);
+        void executeDiagnostics(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
+        void executeAutoTest(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
+        void executeApplyMSeedSettings(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, core::MSeedSettings newSettings, PosStatus::SharedPtr_t status);
 
         void log(common::LogLevel level, const QString& message);
         void logInfo(const QString& message);

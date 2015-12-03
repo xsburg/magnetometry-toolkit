@@ -2,24 +2,16 @@
 #define SINGLETON_H
 
 #include <memory>
-#include <boost/utility.hpp>
-#ifdef USE_THREADSAFE_SINGLETON
-#include <boost/thread/thread.hpp>
-#endif
 #include "SmartPtr.h"
 
 namespace common
 {
     template<class T>
-    class Singleton : boost::noncopyable
+    class Singleton
     {
     public:
         static T& Instance()
         {
-#ifdef USE_THREADSAFE_SINGLETON
-            static boost::mutex _mutex;
-            boost::mutex::scoped_lock scoped_lock(_mutex);
-#endif
             static std::unique_ptr<T> _impl;
             if (!_impl.get())
             {

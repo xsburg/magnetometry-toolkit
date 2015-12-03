@@ -3,15 +3,15 @@
 
 #include <QtCore/QtCore>
 #include <QtSql/QtSql>
-#include <boost/utility.hpp>
 #include "SmartPtr.h"
 
 namespace common 
 {
-    class DatabaseHelper : boost::noncopyable
+    class DatabaseHelper
     {
-    private:
         QSqlDatabase _db;
+
+        Q_DISABLE_COPY(DatabaseHelper);
     public:
         SMART_PTR_T(DatabaseHelper);
 

@@ -2,7 +2,6 @@
 
 #include <QtCore/QtCore>
 #include <QtSql/QtSql>
-#include <boost/utility.hpp>
 #include "DatabaseException.h"
 #include "DatabaseHelper.h"
 #include "IniSettings.h"

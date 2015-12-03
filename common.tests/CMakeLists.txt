@@ -40,7 +40,7 @@ SET_TARGET_PROPERTIES(${PROJECT} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(
     ${PROJECT}
     ${DEPENDS_ON_PROJECTS}
-    ${Boost_LIBRARIES}
+#   ${Boost_LIBRARIES}
     Qt5::Core
     Qt5::Sql
     debug ${GTEST_DEBUG_LIBS}

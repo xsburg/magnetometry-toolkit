@@ -15,6 +15,7 @@
 #include <common/BitConverter.h>
 #include <QtSerialPort/QSerialPort>
 #include "BufferedLogger.h"
+#include "common/Exception.h"
 
 namespace core
 {
@@ -50,8 +51,8 @@ namespace core
             OUTERR = 0x10, // бит 4, результат не попадает в пределы 20000-100000 нTл
             FAILED = 0x20, // бит 5, нет сигнала (измерение не проводилось)
             PWERR = 0x40, // бит 6, низкое напряжение питания (измерение не проводилось)
-            Valid = 0x80, // бит 7, значение магнитного поля можно выводить на дисплей
-            FatalError = 0x7F // 0x7F = Fatal Error
+            VALID = 0x80, // бит 7, значение магнитного поля можно выводить на дисплей
+            FATAL_ERROR = 0x7F // 0x7F = Fatal Error
         };
 
         struct Sample
