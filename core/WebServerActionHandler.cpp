@@ -1,6 +1,6 @@
 ﻿#include "WebServerActionHandler.h"
 
-#include <mongoose.h>
+#include <mongoose/mongoose.h>
 
 bool core::WebServerActionHandler::methodMatch(const QString& requestMethod)
 {

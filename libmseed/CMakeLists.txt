@@ -23,10 +23,6 @@ PROJECT(${PROJECT} C)
 
 # includes
 
-foreach(DEPENDENCY ${DEPENDS_ON_PROJECTS})
-	include_directories("../${DEPENDENCY}")
-endforeach()
-
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")

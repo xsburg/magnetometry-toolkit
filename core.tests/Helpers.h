@@ -2,10 +2,6 @@
 
 #include <QtCore/QtCore>
 #include "common/Singleton.h"
-#include "common/SmartPtr.h"
-#include "common/Exception.h"
-#include "common/Connection.h"
-#include <QtNetwork/QNetworkReply>
 
 using namespace common;
 

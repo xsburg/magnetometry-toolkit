@@ -2,6 +2,9 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include "common/File.h"
+#include <common/Logger.h>
+#include <common/Exception.h>
+#include <QtNetwork/QNetworkReply>
 
 namespace core
 {

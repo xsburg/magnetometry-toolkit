@@ -1,7 +1,7 @@
 ﻿#include "WebServer.h"
 #include "common/Logger.h"
 
-#include <mongoose.h>
+#include <mongoose/mongoose.h>
 #include <common/Exception.h>
 
 void *serve(void *param) {

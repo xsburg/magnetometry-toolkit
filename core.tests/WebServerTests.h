@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include "BaseTest.h"
-#include <WebServer.h>
+#include <core/WebServer.h>
 #include <Helpers.h>
 #include <mongoose/mongoose.h>
 

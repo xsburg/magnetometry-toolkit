@@ -26,12 +26,8 @@ PROJECT(${PROJECT} CXX)
 
 # includes
 
-foreach(DEPENDENCY ${DEPENDS_ON_PROJECTS})
-	include_directories("../${DEPENDENCY}")
-endforeach()
-
 include_directories("../libmseed/src")
-
+include_directories("..")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT}")

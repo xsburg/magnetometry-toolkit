@@ -4,9 +4,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET(PROJECT common)
 
-FILE(GLOB_RECURSE HEADERS "${PROJECT}/*.h")
+FILE(GLOB_RECURSE HEADERS "*.h")
 
-FILE(GLOB_RECURSE SOURCES "src/*.cpp")
+FILE(GLOB_RECURSE SOURCES "*.cpp")
 
 FILE(GLOB_RECURSE MOC_SOURCES "*_automoc.cpp")
 
@@ -22,10 +22,7 @@ PROJECT(${PROJECT} CXX)
 
 # includes
 
-foreach(DEPENDENCY ${DEPENDS_ON_PROJECTS})
-	include_directories("../${DEPENDENCY}")
-endforeach()
-
+include_directories("..")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT}")
 
