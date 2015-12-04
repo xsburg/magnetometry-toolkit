@@ -1,15 +1,15 @@
 ﻿#include "PosController.h"
-#include <common/NotImplementedException.h>
-#include <common/Logger.h>
+#include "common/NotImplementedException.h"
+#include "common/Logger.h"
 #include "MSeedRecord.h"
-#include "FileBinaryStream.h"
-#include "MSeedWriter.h"
+#include "common/Thread.h"
 
-core::PosController::PosController(WebServer::SharedPtr_t webServer, QString devicePortName)
-    : _devicePortName(devicePortName), _isRunning(false), _isFlushing(false), _samplingIntervalMs(0), _timeFixIntervalSeconds(0)
+core::PosController::PosController(WebServer::SharedPtr_t webServer, MSeedSink::SharedPtr_t msSink, QString devicePortName, MSeedSettings msSettings)
+    : _webServer(webServer), _msSink(msSink), _devicePortName(devicePortName), _msSettingsCache(msSettings), _samplingIntervalMsCache(0), _isRunning(false), _isFlushing(false), _timeFixIntervalSeconds(0)
 {
     _actionHandler = std::make_shared<PosWebHandler>();
     _webLogger = _actionHandler->logger();
+    _actionHandler->status()->mseedSettings = msSettings;
     _webServer->addActionHandler(_actionHandler);
 }
 
@@ -67,7 +67,7 @@ void core::PosController::executeRunCommand(QMutexLocker& dataLock, core::PosDev
     dataLock.relock();
     logInfo(QString("Executed."));
     _isRunning = _actionHandler->status()->isRunning;
-    _samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+    _samplingIntervalMsCache = _actionHandler->status()->samplingIntervalMs;
     _timeFixIntervalSeconds = timeFixIntervalSeconds;
 }
 
@@ -184,11 +184,8 @@ void core::PosController::executeApplyMSeedSettings(QMutexLocker& dataLock, core
         .arg(newSettings.station)
         .arg(newSettings.location)
         .arg(newSettings.samplesInRecord));
-    _actionHandler->status()->mseedSettings.fileName = newSettings.fileName;
-    _actionHandler->status()->mseedSettings.network = newSettings.network;
-    _actionHandler->status()->mseedSettings.station = newSettings.station;
-    _actionHandler->status()->mseedSettings.location = newSettings.location;
-    _actionHandler->status()->mseedSettings.samplesInRecord = newSettings.samplesInRecord;
+    _actionHandler->status()->mseedSettings = newSettings;
+    _msSettingsCache = newSettings;
     logInfo(QString("Executed."));
 }
 
@@ -196,34 +193,34 @@ core::IntegerMSeedRecord::SharedPtr_t core::PosController::createIntegerRecord(Q
 {
     auto record = std::make_shared<IntegerMSeedRecord>();
     record->channelName(channelName);
-    record->location(_config.msRecordLocation);
-    record->network(_config.msRecordNetwork);
-    record->station(_config.msRecordStation);
+    record->location(_msSettingsCache.location);
+    record->network(_msSettingsCache.network);
+    record->station(_msSettingsCache.station);
     record->samplingRateHz(samplingRateHz);
     record->startTime(time);
     return record;
 }
 
-void core::PosController::flushSamplesCache()
+void core::PosController::flushGatheredSamples()
 {
-    if (_samplesCache.empty() || _isFlushing)
+    if (_gatheredSamples.empty() || _isFlushing)
     {
         return;
     }
     _isFlushing = true;
-    logDebug(QString("Flushing samples cache (%1 samples)...").arg(_samplesCache.size()));
-    double samplingRateHz = 1000.0 / _samplingIntervalMs;
+    logDebug(QString("Flushing samples cache (%1 samples)...").arg(_gatheredSamples.size()));
+    double samplingRateHz = 1000.0 / _samplingIntervalMsCache;
 
-    auto recordTime = _samplesCache.first().time;
+    auto recordTime = _gatheredSamples.first().time;
 
     // field
     auto fieldRecord = createIntegerRecord("FLD", samplingRateHz, recordTime);
-    for (auto& sample : _samplesCache)
+    for (auto& sample : _gatheredSamples)
     {
         fieldRecord->data().push_back(sample.field);
     }
-    _writer->write(fieldRecord);
-    // qmc
+    _msSink->write(fieldRecord);
+    /*// qmc
     auto qualityRecord = createIntegerRecord("QMC", samplingRateHz, recordTime);
     for (auto& sample : _samplesCache)
     {
@@ -236,10 +233,10 @@ void core::PosController::flushSamplesCache()
     {
         stateRecord->data().push_back(sample.state);
     }
-    _writer->write(stateRecord);
+    _writer->write(stateRecord);*/
 
-    _writer->flush();
-    _samplesCache.clear();
+    _msSink->flush();
+    _gatheredSamples.clear();
     logDebug(QString("Done flushing."));
     _isFlushing = false;
 }
@@ -253,7 +250,7 @@ void core::PosController::handlePendingWebServerCommands()
 
         if (_isRunning)
         {
-            flushSamplesCache();
+            flushGatheredSamples();
             executeStopCommand(lock, _device, _actionHandler->status());
             _isRunning = false;
         }
@@ -325,7 +322,7 @@ void core::PosController::handleNewDataSamples()
 {
     // receive data sample and write it into mini-seed stream
     const int acceptableDelay = 1000;
-    auto samples = _device->readAllSamples(_samplingIntervalMs + acceptableDelay);
+    auto samples = _device->readAllSamples(_samplingIntervalMsCache + acceptableDelay);
     for (auto& sample : samples)
     {
         auto isValid = _device->validateSample(sample);
@@ -333,15 +330,15 @@ void core::PosController::handleNewDataSamples()
             .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
             .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
 
-        _samplesCache.push_back(sample);
+        _gatheredSamples.push_back(sample);
         {
             QMutexLocker lock(_actionHandler->dataMutex());
             _actionHandler->addToDataBuffer(sample);
         }
 
-        if (_samplesCache.size() >= _config.samplesCacheMaxSize)
+        if (_gatheredSamples.size() >= _msSettingsCache.samplesInRecord)
         {
-            flushSamplesCache();
+            flushGatheredSamples();
         }
     }
 }
@@ -357,15 +354,10 @@ void core::PosController::run()
         _device->connect(_devicePortName);
         sLogger.info(QString("Connected."));
 
-        // Creating an mseed writer
-        auto stream = std::make_shared<FileBinaryStream>(_config.msFileName, true);
-        _writer = std::make_shared<MSeedWriter>(stream);
-        _writer->verbose(MSeedPackVerbose::None);
-
         // We always do status update on start
         _isRunning = false;
         _isFlushing = false;
-        _samplingIntervalMs = 0;
+        _samplingIntervalMsCache = 0;
         _timeFixIntervalSeconds = 0;
         {
             sLogger.info(QString("Gathering device start-up config..."));
@@ -373,18 +365,13 @@ void core::PosController::run()
             PosWebCommand::SharedPtr_t updateCmd = std::make_shared<PosUpdateStatusWebCommand>();
             executeUpdateStatus(lock, _device, _actionHandler->status());
             _isRunning = _actionHandler->status()->isRunning;
-            _samplingIntervalMs = _actionHandler->status()->samplingIntervalMs;
+            _samplingIntervalMsCache = _actionHandler->status()->samplingIntervalMs;
             _timeFixIntervalSeconds = _actionHandler->status()->timeFixIntervalSeconds;
-            _actionHandler->status()->mseedSettings.fileName = _config.msFileName;
-            _actionHandler->status()->mseedSettings.network = _config.msRecordNetwork;
-            _actionHandler->status()->mseedSettings.station = _config.msRecordStation;
-            _actionHandler->status()->mseedSettings.location = _config.msRecordLocation;
-            _actionHandler->status()->mseedSettings.samplesInRecord = _config.samplesCacheMaxSize;
             sLogger.info(QString("Done gathering."));
         }
 
         // Main worker loop
-        _samplesCache = QVector<PosDevice::Sample>();
+        _gatheredSamples = QVector<PosDevice::Sample>();
         qint64 lastTimeFixEpoch = QDateTime::currentMSecsSinceEpoch();
         try
         {
@@ -402,7 +389,7 @@ void core::PosController::run()
                         executeStopCommand(lock, _device, _actionHandler->status());
                         _actionHandler->status()->isRunning = true; // simulating that we are still running
                         executeSetTime(lock, _device, QDateTime::currentDateTimeUtc(), _actionHandler->status());
-                        executeRunCommand(lock, _device, _samplingIntervalMs, _timeFixIntervalSeconds, _actionHandler->status());
+                        executeRunCommand(lock, _device, _samplingIntervalMsCache, _timeFixIntervalSeconds, _actionHandler->status());
                         lastTimeFixEpoch = QDateTime::currentMSecsSinceEpoch();
                     }
 
@@ -421,13 +408,13 @@ void core::PosController::run()
         {
             sLogger.error("Main runner loop has been broken by PosDeviceException.");
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
-            flushSamplesCache();
+            flushGatheredSamples();
         }
         catch (common::Exception& ex)
         {
             sLogger.error("Main runner loop has been broken by common::Exception.");
             sLogger.error(QString("The what() message: %1.").arg(ex.what()));
-            flushSamplesCache();
+            flushGatheredSamples();
         }
         catch (std::exception& ex)
         {
@@ -441,6 +428,19 @@ void core::PosController::run()
             sLogger.error(QString("The samples cache won't be flushed because we don't know the exact reason of the failure."));
         }
     }
+}
+
+void core::PosController::runAsync()
+{
+    if (_activeThread.get())
+    {
+        throw common::InvalidOperationException("The controller is already running.");
+    }
+    _activeThread = std::make_shared<common::Thread>([this]()
+    {
+        this->run();
+    });
+    _activeThread->start();
 }
 
 void core::PosController::log(common::LogLevel level, const QString& message)

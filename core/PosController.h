@@ -12,8 +12,9 @@
 #include "WebServer.h"
 #include "PosWebHandler.h"
 #include "MSeedRecord.h"
-#include "MSeedWriter.h"
 #include "Common.h"
+#include "MSeedSink.h"
+#include <common/Thread.h>
 
 namespace core
 {
@@ -21,8 +22,9 @@ namespace core
     {
     public:
         SMART_PTR_T(PosController);
-        PosController(WebServer::SharedPtr_t webServer, QString devicePortName);
+        PosController(WebServer::SharedPtr_t webServer, MSeedSink::SharedPtr_t msSink, QString devicePortName, MSeedSettings msSettings);
         void run();
+        void runAsync();
     private:
         void executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, PosStatus::SharedPtr_t status);
         void executeStopCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
@@ -40,23 +42,26 @@ namespace core
         void logError(const QString& message);
 
         IntegerMSeedRecord::SharedPtr_t createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time);
-        void flushSamplesCache();
+        void flushGatheredSamples();
         void handlePendingWebServerCommands();
         void handleNewDataSamples();
 
         WebServer::SharedPtr_t _webServer;
+        MSeedSink::SharedPtr_t _msSink;
         PosWebHandler::SharedPtr_t _actionHandler;
         BufferedLogger::SharedPtr_t _webLogger;
 
-        // Runner loop components and data
+        QString _devicePortName;
+
+        MSeedSettings _msSettingsCache;
+        int _samplingIntervalMsCache;
+
+        // Runner loop components and data (erased on every loop cicle)
         PosDevice::SharedPtr_t _device;
-        MSeedWriter::SharedPtr_t _writer;
-        QVector<PosDevice::Sample> _samplesCache;
+        QVector<PosDevice::Sample> _gatheredSamples;
         bool _isRunning;
         bool _isFlushing;
-        int _samplingIntervalMs;
         int _timeFixIntervalSeconds;
-
-        QString _devicePortName;
+        common::Thread::SharedPtr_t _activeThread;
     };
 }

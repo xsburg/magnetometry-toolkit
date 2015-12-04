@@ -59,7 +59,8 @@ endif()
 ## Qt
 
 # (Make sure that CMAKE_PREFIX_PATH env var is set)
-#set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC ON)
+
 FIND_PACKAGE(Qt5Core)
 FIND_PACKAGE(Qt5Sql)
 FIND_PACKAGE(Qt5Network)

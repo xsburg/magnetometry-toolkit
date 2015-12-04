@@ -414,7 +414,7 @@ void core::PosDevice::runDiagnosticSequence()
     logInfo(QString("Got sample: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
         .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
         .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid));
-    assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
+    assertTrue(sample.state != FATAL_ERROR, "Errors if any are not fatal.");
     logInfo("Done.");
 
     //sendNak();
@@ -437,7 +437,7 @@ void core::PosDevice::runTestAutoSequence()
             logInfo(QString("Got sample #%7: field: %1, time: %2.%3, state: 0x%4, qmc: %5, isValid: %6")
                 .arg(sample.field).arg(sample.time.toString(Qt::ISODate)).arg(sample.time.toMSecsSinceEpoch() % 1000)
                 .arg(sample.state, 2, 16).arg(sample.qmc).arg(isValid).arg(i + 1));
-            assertTrue(sample.state != FatalError, "Errors if any are not fatal.");
+            assertTrue(sample.state != FATAL_ERROR, "Errors if any are not fatal.");
         }
     }
     // stopping the madness
