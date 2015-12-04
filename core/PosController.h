@@ -11,20 +11,18 @@
 
 #include "WebServer.h"
 #include "PosWebHandler.h"
-#include "MSeedRecord.h"
 #include "Common.h"
 #include "MSeedSink.h"
-#include <common/Thread.h>
+#include "BaseDeviceController.h"
 
 namespace core
 {
-    class PosController
+    class PosController : public BaseDeviceController
     {
     public:
         SMART_PTR_T(PosController);
         PosController(WebServer::SharedPtr_t webServer, MSeedSink::SharedPtr_t msSink, QString devicePortName, MSeedSettings msSettings);
-        void run();
-        void runAsync();
+        void run() override;
     private:
         void executeRunCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, int samplingIntervalMs, int timeFixIntervalSeconds, PosStatus::SharedPtr_t status);
         void executeStopCommand(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
@@ -35,13 +33,7 @@ namespace core
         void executeDiagnostics(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
         void executeAutoTest(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, PosStatus::SharedPtr_t status);
         void executeApplyMSeedSettings(QMutexLocker& dataLock, core::PosDevice::SharedPtr_t& device, core::MSeedSettings newSettings, PosStatus::SharedPtr_t status);
-
-        void log(common::LogLevel level, const QString& message);
-        void logInfo(const QString& message);
-        void logDebug(const QString& message);
-        void logError(const QString& message);
-
-        IntegerMSeedRecord::SharedPtr_t createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time);
+        
         void flushGatheredSamples();
         void handlePendingWebServerCommands();
         void handleNewDataSamples();
@@ -49,11 +41,9 @@ namespace core
         WebServer::SharedPtr_t _webServer;
         MSeedSink::SharedPtr_t _msSink;
         PosWebHandler::SharedPtr_t _actionHandler;
-        BufferedLogger::SharedPtr_t _webLogger;
 
         QString _devicePortName;
 
-        MSeedSettings _msSettingsCache;
         int _samplingIntervalMsCache;
 
         // Runner loop components and data (erased on every loop cicle)
@@ -62,6 +52,5 @@ namespace core
         bool _isRunning;
         bool _isFlushing;
         int _timeFixIntervalSeconds;
-        common::Thread::SharedPtr_t _activeThread;
     };
 }

@@ -2,14 +2,15 @@
 #include "common/NotImplementedException.h"
 #include "common/Logger.h"
 #include "MSeedRecord.h"
-#include "common/Thread.h"
 
 core::PosController::PosController(WebServer::SharedPtr_t webServer, MSeedSink::SharedPtr_t msSink, QString devicePortName, MSeedSettings msSettings)
-    : _webServer(webServer), _msSink(msSink), _devicePortName(devicePortName), _msSettingsCache(msSettings), _samplingIntervalMsCache(0), _isRunning(false), _isFlushing(false), _timeFixIntervalSeconds(0)
+    : _webServer(webServer), _msSink(msSink), _devicePortName(devicePortName),
+      _samplingIntervalMsCache(0), _isRunning(false), _isFlushing(false), _timeFixIntervalSeconds(0)
 {
     _actionHandler = std::make_shared<PosWebHandler>();
     _webLogger = _actionHandler->logger();
     _actionHandler->status()->mseedSettings = msSettings;
+    _msSettingsCache = msSettings;
     _webServer->addActionHandler(_actionHandler);
 }
 
@@ -187,18 +188,6 @@ void core::PosController::executeApplyMSeedSettings(QMutexLocker& dataLock, core
     _actionHandler->status()->mseedSettings = newSettings;
     _msSettingsCache = newSettings;
     logInfo(QString("Executed."));
-}
-
-core::IntegerMSeedRecord::SharedPtr_t core::PosController::createIntegerRecord(QString channelName, double samplingRateHz, QDateTime time)
-{
-    auto record = std::make_shared<IntegerMSeedRecord>();
-    record->channelName(channelName);
-    record->location(_msSettingsCache.location);
-    record->network(_msSettingsCache.network);
-    record->station(_msSettingsCache.station);
-    record->samplingRateHz(samplingRateHz);
-    record->startTime(time);
-    return record;
 }
 
 void core::PosController::flushGatheredSamples()
@@ -428,41 +417,4 @@ void core::PosController::run()
             sLogger.error(QString("The samples cache won't be flushed because we don't know the exact reason of the failure."));
         }
     }
-}
-
-void core::PosController::runAsync()
-{
-    if (_activeThread.get())
-    {
-        throw common::InvalidOperationException("The controller is already running.");
-    }
-    _activeThread = std::make_shared<common::Thread>([this]()
-    {
-        this->run();
-    });
-    _activeThread->start();
-}
-
-void core::PosController::log(common::LogLevel level, const QString& message)
-{
-    if (_webLogger.get())
-    {
-        _webLogger->write(level, message);
-    }
-    sLogger.write(level, message);
-}
-
-void core::PosController::logInfo(const QString& message)
-{
-    log(common::Info, message);
-}
-
-void core::PosController::logDebug(const QString& message)
-{
-    log(common::Debug, message);
-}
-
-void core::PosController::logError(const QString& message)
-{
-    log(common::Error, message);
 }
