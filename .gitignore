@@ -83,3 +83,4 @@ web/public/styles/generated.css.map
 web/.idea/
 web/bower_components/
 web/public/js/compiled/Init.js
+web/public/assets/
