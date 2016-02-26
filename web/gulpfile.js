@@ -6,31 +6,42 @@
  * Published under the MIT license
  */
 
-"use strict";
+'use strict';
 
 const gulp = require('gulp');
 const gutil = require('gulp-util');
+const path = require('path');
 const webpack = require('webpack');
 const webpackConfigFactory = require('./webpack.config.js');
 const browserSync = require('browser-sync').create();
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
+const startServer = require('./startServer');
+const del = require('del');
+const mkdirp = require('mkdirp');
 
 //noinspection JSUnresolvedVariable
 const config = {
     hmr: process.env.HMR || process.env.HMR === undefined,
     server: 'http://localhost:3000',
-    proxyPort: 8080
+    serverPath: path.resolve(`${__dirname}/server/bin/www`),
+    proxyPort: 8080,
+    assetsDir: path.resolve(`${__dirname}/client/assets`)
 };
 
-gulp.task("start", function () {
-    var webpackConfig = webpackConfigFactory.build({
+gulp.task('clear', function () {
+    del.sync([`${config.assetsDir}/**`]);
+    mkdirp.sync(config.assetsDir);
+});
+
+gulp.task('start', function () {
+    let webpackConfig = webpackConfigFactory.build({
         env: 'development',
         hmr: config.hmr
     });
-    var compiler = webpack(webpackConfig);
+    let compiler = webpack(webpackConfig);
 
-    let middleware = [];
+    const middleware = [];
     middleware.push(webpackDevMiddleware(compiler, {
         noInfo: true,
         publicPath: webpackConfig.output.publicPath,
@@ -42,16 +53,19 @@ gulp.task("start", function () {
         middleware.push(webpackHotMiddleware(compiler));
     }
 
-    browserSync.init({
-        proxy: {
-            target: config.server,
-            middleware: middleware,
-            port: config.proxyPort
-        }
+    startServer('node', [config.serverPath], function () {
+        browserSync.init({
+            proxy: {
+                target: config.server,
+                middleware: middleware
+            },
+            port: config.proxyPort,
+            open: false
+        });
     });
 });
 
-gulp.task('deploy', function (callback) {
+gulp.task('deploy', ['clear'], function (callback) {
     const webpackConfig = webpackConfigFactory.build({
         env: 'production',
         hmr: false

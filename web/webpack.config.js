@@ -6,21 +6,23 @@
  * Published under the MIT license
  */
 
-"use strict";
+'use strict';
 
-var webpack = require('webpack');
-var path = require('path');
-var autoprefixer = require('autoprefixer');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var _ = require('underscore');
+const webpack = require('webpack');
+const path = require('path');
+const autoprefixer = require('autoprefixer');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const _ = require('underscore');
 
 const pathResolver = {
     client: function () {
-        return path.resolve.apply(path.resolve, [__dirname, 'public/assets'].concat(_.toArray(arguments)));
+        //noinspection Eslint
+        return path.resolve.apply(path.resolve, [__dirname, 'client/assets'].concat(_.toArray(arguments)));
     },
     source: function () {
-        return path.resolve.apply(path.resolve, [__dirname, 'public'].concat(_.toArray(arguments)));
+        //noinspection Eslint
+        return path.resolve.apply(path.resolve, [__dirname, 'client'].concat(_.toArray(arguments)));
     }
 };
 
@@ -31,10 +33,10 @@ module.exports = {
         const TEST = options.env === 'test';
 
         //noinspection JSUnresolvedFunction
-        var webpackConfig = {
+        let webpackConfig = {
             cache: true,
             entry: {
-                app: [ './public/main' ],
+                app: ['./client/main'],
                 vendor: [
                     'react',
                     'react-redux',
@@ -48,8 +50,8 @@ module.exports = {
             output: {
                 path: pathResolver.client(),
                 publicPath: '/',
-                filename: "[name].js",
-                sourceMapFilename: "[file].map"
+                filename: '[name].js',
+                sourceMapFilename: '[file].map'
             },
             module: {
                 loaders: [
@@ -60,8 +62,8 @@ module.exports = {
                         query: {
                             cacheDirectory: true,
                             plugins: [
-                                "transform-es2015-modules-commonjs",
-                                "transform-runtime"
+                                'transform-es2015-modules-commonjs',
+                                'transform-runtime'
                             ]
                         }
                     },
@@ -70,11 +72,11 @@ module.exports = {
                         loader: ExtractTextPlugin.extract('style-loader', [
                             'css-loader',
                             'postcss-loader',
-                            'sass-loader?includePaths[]=' + pathResolver.client()
+                            `sass-loader?includePaths[]=${pathResolver.client()}`
                         ].join('!'))
                     } : {
                         test: /\.scss$/,
-                        loaders: ['style', 'css?sourceMap', 'postcss?sourceMap', 'sass?sourceMap&includePaths[]=' + pathResolver.client()]
+                        loaders: ['style', 'css?sourceMap', 'postcss?sourceMap', `sass?sourceMap&includePaths[]=${pathResolver.client()}`]
                     }),
                     {
                         test: /\.json$/,
@@ -96,7 +98,10 @@ module.exports = {
                         test: /\.ttf(\?.*)?$/,
                         loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream'
                     },
-                    {test: /\.eot(\?.*)?$/, loader: 'file?prefix=fonts/&name=[path][name].[ext]'},
+                    {
+                        test: /\.eot(\?.*)?$/,
+                        loader: 'file?prefix=fonts/&name=[path][name].[ext]'
+                    },
                     {
                         test: /\.svg(\?.*)?$/,
                         loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml'
@@ -118,17 +123,17 @@ module.exports = {
             plugins: [
                 new HtmlWebpackPlugin({
                     template: pathResolver.source('index.html'),
-                    hash: false,
+                    hash: PRODUCTION,
                     favicon: pathResolver.source('favicon.ico'),
                     filename: 'index.html',
                     inject: 'body',
-                    chunks: ['vendor','app'],
+                    chunks: ['vendor', 'app'],
                     minify: {
                         collapseWhitespace: false
                     }
                 }),
                 new webpack.optimize.CommonsChunkPlugin({
-                    name: "vendor",
+                    name: 'vendor',
                     minChunks: Infinity
                 })
             ],
@@ -150,9 +155,8 @@ module.exports = {
             webpackConfig.cache = false;
             webpackConfig.debug = false;
             webpackConfig.devtool = false;
-            webpackConfig.output.filename = "[name].[hash].js";
 
-            var babelLoader = _.findWhere(webpackConfig.module.loaders, { loader: 'babel-loader' });
+            let babelLoader = _.findWhere(webpackConfig.module.loaders, { loader: 'babel-loader' });
             babelLoader.query.plugins.push(
                 'transform-react-remove-prop-types',
                 'transform-react-constant-elements'
@@ -190,7 +194,7 @@ module.exports = {
             v.push('webpack-hot-middleware/client');
         });
         // React transform
-        var babelLoader = _.findWhere(webpackConfig.module.loaders, { loader: 'babel-loader' });
+        let babelLoader = _.findWhere(webpackConfig.module.loaders, { loader: 'babel-loader' });
         babelLoader.query.plugins.push([
             'react-transform', {
                 transforms: [
