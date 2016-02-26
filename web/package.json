@@ -70,6 +70,8 @@
         "redux-thunk": "^1.0.3",
         "request": "^2.64.0",
         "serve-favicon": "~2.3.0",
+        "material-ui": "^0.14.4",
+        "react-tap-event-plugin": "^0.2.2",
         "underscore": "^1.8.3"
     }
 }

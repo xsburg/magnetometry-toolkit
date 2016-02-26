@@ -7,8 +7,12 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import App from './App';
+
 import './styles/main.scss';
-import Foo from './foo';
+
+injectTapEventPlugin();
 
 //import createBrowserHistory from 'history/lib/createBrowserHistory'
 //import { useRouterHistory } from 'react-router'
@@ -37,15 +41,7 @@ const history = syncHistoryWithStore(browserHistory, store, {
 // hooks such as `onEnter`.
 const routes = makeRoutes(store)*/
 
-// Now that redux and react-router have been configured, we can render the
-// React application to the DOM!
-ReactDOM.render(/*
-    <Root history={history} routes={routes} store={store} />,*/
-    (
-        <div>
-            <h1>Hello, world2!</h1>
-            <Foo />
-        </div>
-    ),
-    document.getElementById('root')
+ReactDOM.render(
+    <App />,
+    document.getElementById('app')
 );

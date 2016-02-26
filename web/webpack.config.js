@@ -78,6 +78,16 @@ module.exports = {
                         test: /\.scss$/,
                         loaders: ['style', 'css?sourceMap', 'postcss?sourceMap', `sass?sourceMap&includePaths[]=${pathResolver.client()}`]
                     }),
+                    (PRODUCTION ? {
+                        test: /\.css$/,
+                        loader: ExtractTextPlugin.extract('style-loader', [
+                            'css-loader',
+                            'postcss-loader'
+                        ].join('!'))
+                    } : {
+                        test: /\.css$/,
+                        loaders: ['style', 'css?sourceMap', 'postcss?sourceMap']
+                    }),
                     {
                         test: /\.json$/,
                         loader: 'json'

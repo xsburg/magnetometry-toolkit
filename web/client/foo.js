@@ -1,12 +1,8 @@
 /**
  * Developer: Stepan Burguchev
- * Date: 2/24/2016
- * Copyright: 2009-2016 Comindware®
+ * Date: 7/4/2014
+ * Copyright: 2009-2013 Stepan Burguchev®
  *       All Rights Reserved
- *
- * THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF Comindware
- *       The copyright notice above does not evidence any
- *       actual or intended publication of such source code.
  */
 
 import React from 'react';
@@ -29,7 +25,7 @@ export default React.createClass({
 
     render: function() {
         return (
-            <div className="commentBox loading-panel" onClick={this.onClick}>
+            <div className="commentBox" onClick={this.onClick}>
                 Hello, world! I am a CommentBox.2
             </div>
         );
