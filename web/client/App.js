@@ -9,6 +9,7 @@ import React from 'react';
 import _ from 'underscore';
 import NavBar from './components/NavBar';
 import SideBar from './components/SideBar';
+import PosDashboard from './components/PosDashboard';
 
 import 'morris_css';
 import 'bootstrap_css';
@@ -37,7 +38,9 @@ export default class App extends React.Component {
             <div onClick={this.onClick}>
                 <NavBar />
                 <SideBar />
-                <div className="js-application-content-region app-content"></div>
+                <div className="app-content">
+                    <PosDashboard />
+                </div>
                 {
                     this.state.loaded ? '' : <div className="js-startup-loading app-startup-loading-panel">
                         <div className="app-startup-loading-panel__fill"></div>
