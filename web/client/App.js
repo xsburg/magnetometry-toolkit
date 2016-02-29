@@ -11,7 +11,7 @@ import RaisedButton from 'material-ui/lib/raised-button';
 import MenuItem from 'material-ui/lib/menu/menu-item';
 import LeftNav from 'material-ui/lib/left-nav';
 
-export default class App {
+export default class App extends React.component {
     render() {
         return (
             <div>
