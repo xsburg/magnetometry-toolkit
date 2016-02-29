@@ -9,8 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import App from './App';
-
-import './styles/main.scss';
+import $ from 'jquery';
 
 injectTapEventPlugin();
 
@@ -40,6 +39,8 @@ const history = syncHistoryWithStore(browserHistory, store, {
 // the store to the route definitions so that routes have access to it for
 // hooks such as `onEnter`.
 const routes = makeRoutes(store)*/
+
+$('.js-startup-loading').remove();
 
 ReactDOM.render(
     <App />,

@@ -32,6 +32,9 @@ module.exports = {
         const PRODUCTION = options.env === 'production';
         const TEST = options.env === 'test';
 
+        const FONT_LIMIT = PRODUCTION ? 10000 : 1000000;
+        const GRAPHICS_LIMIT = PRODUCTION ? 10000 : 1000000;
+
         //noinspection JSUnresolvedFunction
         let webpackConfig = {
             cache: true,
@@ -94,19 +97,19 @@ module.exports = {
                     },
                     {
                         test: /\.woff(\?.*)?$/,
-                        loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff'
+                        loader: `url?prefix=fonts/&name=[path][name].[ext]&limit=${FONT_LIMIT}&mimetype=application/font-woff`
                     },
                     {
                         test: /\.woff2(\?.*)?$/,
-                        loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2'
+                        loader: `url?prefix=fonts/&name=[path][name].[ext]&limit=${FONT_LIMIT}&mimetype=application/font-woff2`
                     },
                     {
                         test: /\.otf(\?.*)?$/,
-                        loader: 'file?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=font/opentype'
+                        loader: `file?prefix=fonts/&name=[path][name].[ext]&limit=${FONT_LIMIT}&mimetype=font/opentype`
                     },
                     {
                         test: /\.ttf(\?.*)?$/,
-                        loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream'
+                        loader: `url?prefix=fonts/&name=[path][name].[ext]&limit=${FONT_LIMIT}&mimetype=application/octet-stream`
                     },
                     {
                         test: /\.eot(\?.*)?$/,
@@ -114,11 +117,11 @@ module.exports = {
                     },
                     {
                         test: /\.svg(\?.*)?$/,
-                        loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml'
+                        loader: `url?prefix=fonts/&name=[path][name].[ext]&limit=${GRAPHICS_LIMIT}&mimetype=image/svg+xml`
                     },
                     {
                         test: /\.(png|jpg)$/,
-                        loader: 'url?limit=8192'
+                        loader: `url?limit=${GRAPHICS_LIMIT}`
                     },
                     {
                         test: /bluebird/,
@@ -157,6 +160,11 @@ module.exports = {
                     pathResolver.source()
                 ],
                 alias: {
+                    bootstrap_css: `${__dirname}/node_modules/bootstrap/dist/css/bootstrap.css`,
+                    bootstrap_theme_css: `${__dirname}/node_modules/bootstrap/dist/css/bootstrap-theme.css`,
+                    morris_css: `${__dirname}/node_modules/morris.js/morris.css`,
+                    font_awesome_css: `${__dirname}/node_modules/font-awesome/css/font-awesome.css`,
+                    metismenu_css: `${__dirname}/node_modules/metismenu/dist/metisMenu.css`
                 }
             }
         };

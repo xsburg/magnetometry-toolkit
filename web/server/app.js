@@ -21,16 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-/*app.use(
- require('node-sass').middleware({
- src: __dirname + '/sass', //where the sass files are
- dest: __dirname + '/public/styles', //where css should go
- debug: true // obvious
- })
- );*/
-//app.use(require('less-middleware')(path.join(__dirname, 'public')));
-
-app.use(express.static(path.join(__dirname, 'public/assets')));
+app.use(express.static(path.join(__dirname, '../client/assets')));
 
 app.use('/', routes);
 app.use('/api/dashboard', dashboard);

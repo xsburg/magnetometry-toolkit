@@ -20,23 +20,15 @@
         var App = new Marionette.Application();
 
         App.addRegions({
-            loginRegion: ".js-application-login-region",
             navbarRegion: ".js-application-navbar-region",
             sidebarRegion: ".js-application-sidebar-region",
-            contentRegion: ".js-application-content-region",
-            loadingRegion: ".js-application-loading-region",
-            fadingRegion: ".js-application-fading-region",
-            popupRegion: ".js-application-popup-region"
+            contentRegion: ".js-application-content-region"
         });
 
         App.ui = {
-            loginRegion: $(".js-application-login-region"),
             navbarRegion: $(".js-application-navbar-region"),
             sidebarRegion: $(".js-application-sidebar-region"),
             contentRegion: $(".js-application-content-region"),
-            loadingRegion: $(".js-application-loading-region"),
-            fadingRegion: $(".js-application-fading-region"),
-            popupRegion: $(".js-application-popup-region"),
             fatalErrorModal: $(".js-fatal-error-modal")
         };
 

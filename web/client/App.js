@@ -6,22 +6,62 @@
  */
 
 import React from 'react';
-import AppBar from 'material-ui/lib/app-bar';
-import RaisedButton from 'material-ui/lib/raised-button';
-import MenuItem from 'material-ui/lib/menu/menu-item';
-import LeftNav from 'material-ui/lib/left-nav';
+import _ from 'underscore';
+import NavBar from './components/NavBar';
+import SideBar from './components/SideBar';
 
-export default class App extends React.component {
+import 'morris_css';
+import 'bootstrap_css';
+import 'bootstrap_theme_css';
+import 'font_awesome_css';
+import 'metismenu_css';
+import './styles/index.scss';
+
+export default class App extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            loaded: false
+        };
+        _.bindAll(this, 'onClick');
+    }
+
+    onClick() {
+        this.setState({
+            loaded: true
+        });
+    }
+
     render() {
         return (
-            <div>
-                <AppBar title="My AppBar" />
-                <LeftNav open={false}>
-                    <AppBar title="My AppBar" />
-                    <MenuItem>Menu Item</MenuItem>
-                    <MenuItem>Menu Item 2</MenuItem>
-                </LeftNav>
-                <RaisedButton label="My Button" primary={true} />
+            <div onClick={this.onClick}>
+                <NavBar />
+                <SideBar />
+                <div className="js-application-content-region app-content"></div>
+                {
+                    this.state.loaded ? '' : <div className="js-startup-loading app-startup-loading-panel">
+                        <div className="app-startup-loading-panel__fill"></div>
+                        <div className="app-startup-loading-panel__text">
+                            <div className="fa fa-cog fa-spin fa-2x"></div>
+                        </div>
+                    </div>
+                }
+                {/* bootstrap modal */}
+                <div className="modal fade js-fatal-error-modal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title" id="myModalLabel">Fatal error</h4>
+                            </div>
+                            <div className="modal-body">
+                                Something bad happened. Please reload the page.
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-default btn-primary" data-dismiss="modal">Reload</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
