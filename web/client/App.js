@@ -5,6 +5,7 @@
  *       All Rights Reserved
  */
 
+import 'babel-polyfill';
 import React from 'react';
 import _ from 'underscore';
 import NavBar from './components/NavBar';

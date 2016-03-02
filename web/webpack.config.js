@@ -41,6 +41,7 @@ module.exports = {
             entry: {
                 app: ['./client/main'],
                 vendor: [
+                    'babel-polyfill',
                     'react',
                     'react-redux',
                     'react-router',
@@ -65,7 +66,6 @@ module.exports = {
                         query: {
                             cacheDirectory: true,
                             plugins: [
-                                'transform-es2015-modules-commonjs',
                                 'transform-runtime'
                             ]
                         }

@@ -70,7 +70,7 @@ export default class PosControlPanel extends React.Component {
     };
 
     render () {
-        let intervalOptions = this._getSamplingIntervals().map(group =>
+        let intervalOptions = Object.values(this._getSamplingIntervals()).map(group =>
             <optgroup label={group.groupName}>{group.options.map(option =>
                 <option value={option.value}>{option.name}</option>)}</optgroup>);
 
