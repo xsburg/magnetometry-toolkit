@@ -11,6 +11,27 @@
 import React from 'react';
 import _ from 'underscore';
 
+function createValueLink(component, key) {
+    let keys = key.split('.');
+    let value = component.state;
+    function combineState(obj, keyIndex, newValue) {
+        return {
+            ...obj,
+            [keys[keyIndex]]: keyIndex === keys.length - 1 ? newValue : combineState(obj[keys[keyIndex]], keyIndex + 1, newValue)
+        };
+    }
+    keys.forEach(k => {
+        value = value[k];
+    });
+
+    return {
+        value: value,
+        requestChange: function(newValue) {
+            component.setState(combineState(component.state, 0, newValue));
+        }
+    };
+}
+
 export default class PosControlPanel extends React.Component {
     static defaultProps = {
     };
@@ -21,6 +42,35 @@ export default class PosControlPanel extends React.Component {
 
     constructor (props) {
         super(props);
+        this.state = {
+            initialLoadingComplete: false,
+            enabled: true,
+            isDataUpdating: false,
+            showMseedSettings: false,
+            data: {
+                about: 'MagState version 3.03\nQuantum Magnetometry Laboratory\nUrals State Technical University\nCopyright 2013.',
+                commandQueueSize: 0,
+                enq: 'MagState version 3.03',
+                isRunning: false,
+                mseedSettings: {
+                    fileName: 'data.mseed',
+                    location: 'SK',
+                    network: 'RU',
+                    samplesInRecord: 2,
+                    station: 'IFZ'
+                },
+                range: {
+                    maxField: 50400,
+                    minField: 48100
+                },
+                samplingIntervalMs: 0,
+                standBy: false,
+                time: '1997-02-03T23:40:03.000Z',
+                timeFixIntervalSeconds: 0,
+                timeUpdated: '2016-03-02T14:56:23.325Z',
+                updated: '2016-03-02T14:56:23.325Z'
+            }
+        };
     }
 
     _getSamplingIntervals = () => {
@@ -33,46 +83,60 @@ export default class PosControlPanel extends React.Component {
             };
         };
 
-        return {
-            samplingIntervalOptions: [
-                {
-                    groupName: '< 1 second',
-                    options: [
-                        optionMs(5, 200),
-                        optionMs(4, 250),
-                        optionMs(3, 334),
-                        optionMs(2, 500)
-                    ]
-                },
-                {
-                    groupName: 'Seconds',
-                    options: range60.map(sec => ({
-                        name: `${sec} second(s)`,
-                        value: sec * 1000
-                    }))
-                },
-                {
-                    groupName: 'Minutes',
-                    options: range60.map(min => ({
-                        name: `${min} minute(s)`,
-                        value: min * 60 * 1000
-                    }))
-                },
-                {
-                    groupName: 'Hours',
-                    options: range24.map(hour => ({
-                        name: `${hour} hour(s)`,
-                        value: hour * 60 * 60 * 1000
-                    }))
-                }
-            ]
-        };
+        return [
+            {
+                groupName: '< 1 second',
+                options: [
+                    optionMs(5, 200),
+                    optionMs(4, 250),
+                    optionMs(3, 334),
+                    optionMs(2, 500)
+                ]
+            },
+            {
+                groupName: 'Seconds',
+                options: range60.map(sec => ({
+                    name: `${sec} second(s)`,
+                    value: sec * 1000
+                }))
+            },
+            {
+                groupName: 'Minutes',
+                options: range60.map(min => ({
+                    name: `${min} minute(s)`,
+                    value: min * 60 * 1000
+                }))
+            },
+            {
+                groupName: 'Hours',
+                options: range24.map(hour => ({
+                    name: `${hour} hour(s)`,
+                    value: hour * 60 * 60 * 1000
+                }))
+            }
+        ];
     };
 
+    _showMseedSettings = () => {
+
+    };
+
+    _applyMseedSettings = () => {
+
+    };
+
+    _cancelMseedSettings = () => {
+
+    };
+
+    _setRange = () => {
+
+    }
+
     render () {
-        let intervalOptions = Object.values(this._getSamplingIntervals()).map(group =>
-            <optgroup label={group.groupName}>{group.options.map(option =>
-                <option value={option.value}>{option.name}</option>)}</optgroup>);
+        let intervalOptions = this._getSamplingIntervals().map(group =>
+            <optgroup key={group.groupName} label={group.groupName}>{group.options.map(option =>
+                <option key={option.value} value={option.value}>{option.name}</option>)}</optgroup>);
 
         return (
             <div className="panel panel-default">
@@ -84,7 +148,7 @@ export default class PosControlPanel extends React.Component {
                             <div className="fa fa-cog fa-spin fa-2x"></div>
                         </div>
                     </div>
-                    <table className="table js-data-table">
+                    <table className="table js-data-table" style={{ display: 'none' }}>
                         <caption>The values here are updated in real time <span className="fa fa-circle-o-notch fa-spin js-data-update-spinner eb-device__data-update-spinner"></span></caption>
                         <thead>
                         <tr>
@@ -110,13 +174,13 @@ export default class PosControlPanel extends React.Component {
                                     <div className="form-group eb-device__start-logging-container">
                                         <label htmlFor="samplingIntervalSelect" className="form-label">Sampling interval</label>
                                         <div>
-                                            <select id="samplingIntervalSelect" className="form-control js-status-sampling-interval-input">
+                                            <select id="samplingIntervalSelect" className="form-control js-status-sampling-interval-input" value="1000">
                                                 {intervalOptions}
                                             </select>
                                         </div>
                                         <label htmlFor="deviceTimeCorrectionSelect" className="form-label">Device time correction</label>
                                         <div>
-                                            <select id="deviceTimeCorrectionSelect" className="form-control js-time-fix-interval-input">
+                                            <select id="deviceTimeCorrectionSelect" className="form-control js-time-fix-interval-input" value="0">
                                                 <option value="0">Never</option>
                                                 <option value="10">10 Seconds</option>
                                                 <option value="600">10 Minutes</option>
@@ -149,21 +213,38 @@ export default class PosControlPanel extends React.Component {
                         <tr>
                             <td>MiniSEED settings</td>
                             <td>
-                                <button type="button" className="btn btn-primary btn-xs js-edit-mseed-settings-button">Edit</button>
-                                <div className="js-mseed-settings-panel">
+                                <button type="button" className="btn btn-primary btn-xs"
+                                        style={this.state.showMseedSettings ? null : {display: 'none'}}
+                                        disabled={!this.state.enabled}
+                                        onClick={this._showMseedSettings}>Edit</button>
+                                <div style={this.state.showMseedSettings ? { display: 'none' } : null}>
                                     <label htmlFor="mseedSettingsFileName" className="form-label">File Name</label>
-                                    <input id="mseedSettingsFileName" type="text" className="form-control js-mseed-settings-fileName-input" placeholder="data.mseed" />
+                                    <input id="mseedSettingsFileName" type="text" className="form-control"
+                                           disabled={!this.state.enabled}
+                                           valueLink={createValueLink(this, 'data.mseedSettings.fileName')} placeholder="data.mseed" />
                                     <label htmlFor="mseedSettingsNetwork" className="form-label">Network</label>
-                                    <input id="mseedSettingsNetwork" type="text" className="form-control js-mseed-settings-network-input" placeholder="RU" />
+                                    <input id="mseedSettingsNetwork" type="text" className="form-control"
+                                           disabled={!this.state.enabled}
+                                           valueLink={createValueLink(this, 'data.mseedSettings.network')} placeholder="RU" />
                                     <label htmlFor="mseedSettingsStation" className="form-label">Station</label>
-                                    <input id="mseedSettingsStation" type="text" className="form-control js-mseed-settings-station-input" placeholder="IFZ" />
+                                    <input id="mseedSettingsStation" type="text" className="form-control"
+                                           disabled={!this.state.enabled}
+                                           valueLink={createValueLink(this, 'data.mseedSettings.station')} placeholder="IFZ" />
                                     <label htmlFor="mseedSettingsLocation" className="form-label">location</label>
-                                    <input id="mseedSettingsLocation" type="text" className="form-control js-mseed-settings-location-input" placeholder="SK" />
+                                    <input id="mseedSettingsLocation" type="text" className="form-control"
+                                           disabled={!this.state.enabled}
+                                           valueLink={createValueLink(this, 'data.mseedSettings.location')} placeholder="SK" />
                                     <label htmlFor="mseedSettingsSamplesInRecord" className="form-label">Samples in MiniSEED record</label>
-                                    <input id="mseedSettingsSamplesInRecord" type="number" className="form-control js-mseed-settings-samplesInRecord-input" placeholder="2" />
+                                    <input id="mseedSettingsSamplesInRecord" type="number" className="form-control"
+                                           disabled={!this.state.enabled}
+                                           valueLink={createValueLink(this, 'data.mseedSettings.samplesInRecord')} placeholder="2" />
                                     <div className="eb-device__mseed-settings-buttons">
-                                        <button type="button" className="btn btn-primary btn-sm js-apply-mseed-settings-button">Apply</button>
-                                        <button type="button" className="btn btn-link btn-sm js-cancel-mseed-settings-button">Cancel</button>
+                                        <button type="button" className="btn btn-primary btn-sm"
+                                                disabled={!this.state.enabled}
+                                                onClick={this._applyMseedSettings}>Apply</button>
+                                        <button type="button" className="btn btn-link btn-sm"
+                                                disabled={!this.state.enabled}
+                                                onClick={this._cancelMseedSettings}>Cancel</button>
                                     </div>
                                 </div>
                             </td>
@@ -181,10 +262,15 @@ export default class PosControlPanel extends React.Component {
                         <tr>
                             <td>Range (pT)</td>
                             <td>
-                                [ <span className="js-status-range-min"></span>, <span className="js-status-range-max"></span> ]
+                                [ {this.state.data.range.minField}, {this.state.data.range.maxField} ]
                                 <div className="form-group eb-device__update-range-container">
-                                    <input id="newCenterRange" type="number" min="1" max="10000000" className="form-control js-status-center-range-input" placeholder="Center range (pT)" />
-                                    <button type="button" className="btn btn-primary btn-sm eb-device__update-range-btn js-set-range-button">Apply</button>
+                                    <input id="newCenterRange" type="number" min="1" max="10000000"
+                                           className="form-control js-status-center-range-input"
+                                           disabled={!this.state.enabled}
+                                           placeholder="Center range (pT)" />
+                                    <button type="button" className="btn btn-primary btn-sm eb-device__update-range-btn"
+                                            onClick={this._setRange}
+                                            disabled={!this.state.enabled}>Apply</button>
                                 </div>
                             </td>
                         </tr>
