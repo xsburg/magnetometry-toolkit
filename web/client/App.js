@@ -14,7 +14,6 @@ import PosDashboard from './components/PosDashboard';
 
 import 'morris_css';
 import 'bootstrap_css';
-import 'bootstrap_theme_css';
 import 'font_awesome_css';
 import 'metismenu_css';
 import './styles/index.scss';

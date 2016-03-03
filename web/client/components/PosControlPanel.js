@@ -10,6 +10,8 @@
 
 import React from 'react';
 import _ from 'underscore';
+import moment from 'moment';
+import dateTimeHelpers from '../utils/dateTimeHelpers';
 
 function createValueLink(component, key) {
     let keys = key.split('.');
@@ -43,7 +45,7 @@ export default class PosControlPanel extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            initialLoadingComplete: false,
+            initialLoadingComplete: true,
             enabled: true,
             isDataUpdating: false,
             showMseedSettings: false,
@@ -61,9 +63,10 @@ export default class PosControlPanel extends React.Component {
                 },
                 range: {
                     maxField: 50400,
-                    minField: 48100
+                    minField: 48100,
+                    center: null
                 },
-                samplingIntervalMs: 0,
+                samplingIntervalMs: 1000,
                 standBy: false,
                 time: '1997-02-03T23:40:03.000Z',
                 timeFixIntervalSeconds: 0,
@@ -131,25 +134,66 @@ export default class PosControlPanel extends React.Component {
 
     _setRange = () => {
 
-    }
+    };
+
+    _fixDeviceTime = () => {
+
+    };
+
+    _toggleStandBy = () => {
+
+    };
+
+    _runDiagnostics = () => {
+
+    };
+
+    _runAutoTest = () => {
+
+    };
+
+    _onStartLogging = () => {
+
+    };
+
+    _onStopLogging = () => {
+
+    };
+
+    _forceUpdate= () => {
+
+    };
 
     render () {
         let intervalOptions = this._getSamplingIntervals().map(group =>
             <optgroup key={group.groupName} label={group.groupName}>{group.options.map(option =>
                 <option key={option.value} value={option.value}>{option.name}</option>)}</optgroup>);
 
+        let timeFixInterval = dateTimeHelpers.durationToReadableString(moment.duration({
+            seconds: this.state.data.timeFixIntervalSeconds
+        }));
+
+        let dataUpdatingLoaderClass = this.state.isDataUpdating ? 'eb-device__data-update-spinner_visible' : '';
+
+        let about = this.state.data.about;
+        about = about.split(/[\r\n]+/g).map(line => <span>{line}<br /></span>);
+
         return (
             <div className="panel panel-default">
                 <div className="panel-heading">MagState Control Panel</div>
                 <div className="panel-body eb-device__panel-body">
-                    <div className="eb-device__loading-panel js-loading-panel">
+                    <div className="eb-device__loading-panel"
+                         style={this.state.initialLoadingComplete ? {display: 'none'} : null}>
                         <div className="eb-device__loading-panel__fill"></div>
                         <div className="eb-device__loading-panel__text">
                             <div className="fa fa-cog fa-spin fa-2x"></div>
                         </div>
                     </div>
-                    <table className="table js-data-table" style={{ display: 'none' }}>
-                        <caption>The values here are updated in real time <span className="fa fa-circle-o-notch fa-spin js-data-update-spinner eb-device__data-update-spinner"></span></caption>
+                    <table className="table" style={this.state.initialLoadingComplete ? null : {display: 'none'}}>
+                        <caption>
+                            <span>The values here are updated in real time </span>
+                            <span className={`fa fa-circle-o-notch fa-spin eb-device__data-update-spinner ${dataUpdatingLoaderClass}`} />
+                        </caption>
                         <thead>
                         <tr>
                             <th>Property Name</th>
@@ -159,28 +203,42 @@ export default class PosControlPanel extends React.Component {
                         <tbody>
                         <tr>
                             <td>Device Status Updated</td>
-                            <td><span className="js-status-updated"></span> <button type="button" className="btn btn-primary btn-xs js-force-update-button">Force device update</button></td>
+                            <td>
+                                <span>{moment(this.state.data.updated).format('lll')} </span>
+                                <button type="button" className="btn btn-primary btn-xs"
+                                        disabled={!this.state.enabled}
+                                        onClick={this._forceUpdate}>Force device update</button>
+                            </td>
                         </tr>
                         <tr>
                             <td>Commands in queue</td>
-                            <td><span className="js-status-command-queue"></span></td>
+                            <td>{this.state.data.commandQueueSize}</td>
                         </tr>
                         <tr>
                             <td>Registration Status</td>
                             <td>
-                                <div className="js-cond-stopped">Running <button type="button" className="btn btn-danger btn-xs js-stop-logging-button">Stop</button></div>
-                                <div className="js-cond-running">
+                                <div style={this.state.data.isRunning ? null : {display: 'none'}}>
+                                    <span>Running </span>
+                                    <button type="button" className="btn btn-danger btn-xs"
+                                            disabled={!this.state.enabled}
+                                            onClick={this._onStopLogging}>Stop</button>
+                                </div>
+                                <div style={this.state.data.isRunning ? {display: 'none'} : null}>
                                     Stopped
                                     <div className="form-group eb-device__start-logging-container">
                                         <label htmlFor="samplingIntervalSelect" className="form-label">Sampling interval</label>
                                         <div>
-                                            <select id="samplingIntervalSelect" className="form-control js-status-sampling-interval-input" value="1000">
+                                            <select id="samplingIntervalSelect" className="form-control"
+                                                    disabled={!this.state.enabled}
+                                                    valueLink={createValueLink(this, 'data.samplingIntervalMs')}>
                                                 {intervalOptions}
                                             </select>
                                         </div>
                                         <label htmlFor="deviceTimeCorrectionSelect" className="form-label">Device time correction</label>
                                         <div>
-                                            <select id="deviceTimeCorrectionSelect" className="form-control js-time-fix-interval-input" value="0">
+                                            <select id="deviceTimeCorrectionSelect" className="form-control"
+                                                    disabled={!this.state.enabled}
+                                                    valueLink={createValueLink(this, 'data.timeFixIntervalSeconds')}>
                                                 <option value="0">Never</option>
                                                 <option value="10">10 Seconds</option>
                                                 <option value="600">10 Minutes</option>
@@ -190,24 +248,31 @@ export default class PosControlPanel extends React.Component {
                                                 <option value="604800">1 Week</option>
                                             </select>
                                         </div>
-                                        <button type="button" className="btn btn-success btn-sm eb-device__start-logging-btn js-start-logging-button">Start</button>
+                                        <button type="button" className="btn btn-success btn-sm eb-device__start-logging-btn"
+                                                disabled={!this.state.enabled}
+                                                onClick={this._onStartLogging}>Start</button>
                                     </div>
                                 </div>
                             </td>
                         </tr>
-                        <tr className="js-cond-sampling-interval-row">
+                        <tr style={this.state.data.isRunning ? null : {display: 'none'}}>
                             <td>Sampling Interval (ms)</td>
-                            <td className="js-status-sampling-interval"></td>
+                            <td>{this.state.data.samplingIntervalMs}</td>
                         </tr>
-                        <tr className="js-cond-sampling-interval-row">
+                        <tr style={this.state.data.isRunning ? null : {display: 'none'}}>
                             <td>Device time correction interval</td>
-                            <td className="js-status-time-fix-interval"></td>
+                            <td>{timeFixInterval}</td>
                         </tr>
                         <tr>
                             <td>Diagnostics</td>
                             <td>
-                                <button type="button" className="btn btn-primary btn-xs js-run-diagnostics-button">General</button>
-                                <button type="button" className="btn btn-primary btn-xs js-run-auto-test-button">Sampling test</button>
+                                <button type="button" className="btn btn-primary btn-xs"
+                                        disabled={!this.state.enabled}
+                                        onClick={this._runDiagnostics}>General</button>
+                                <span> </span>
+                                <button type="button" className="btn btn-primary btn-xs"
+                                        disabled={!this.state.enabled}
+                                        onClick={this._runAutoTest}>Sampling test</button>
                             </td>
                         </tr>
                         <tr>
@@ -251,12 +316,20 @@ export default class PosControlPanel extends React.Component {
                         </tr>
                         <tr>
                             <td>Stand By</td>
-                            <td><span className="js-status-stand-by"></span> <button type="button" className="btn btn-primary btn-xs js-status-stand-by-button"></button></td>
+                            <td>
+                                <span>{this.state.data.standBy ? 'On ' : 'Off '}</span>
+                                <button type="button" className="btn btn-primary btn-xs"
+                                        disabled={!this.state.enabled}
+                                        onClick={this._toggleStandBy}>{this.state.data.standBy ? 'Turn off ' : 'Turn on '}</button>
+                            </td>
                         </tr>
                         <tr>
                             <td>Device Time</td>
                             <td>
-                                <span className="js-status-device-time"></span> <button type="button" className="btn btn-primary btn-xs js-fix-device-time-button">Fix</button>
+                                <span>{moment(this.state.data.time).format('lll')} </span>
+                                <button type="button" className="btn btn-primary btn-xs"
+                                        onClick={this._fixDeviceTime}
+                                        disabled={!this.state.enabled}>Fix</button>
                             </td>
                         </tr>
                         <tr>
@@ -265,7 +338,8 @@ export default class PosControlPanel extends React.Component {
                                 [ {this.state.data.range.minField}, {this.state.data.range.maxField} ]
                                 <div className="form-group eb-device__update-range-container">
                                     <input id="newCenterRange" type="number" min="1" max="10000000"
-                                           className="form-control js-status-center-range-input"
+                                           className="form-control"
+                                           valueLink={createValueLink(this, 'data.range.center')}
                                            disabled={!this.state.enabled}
                                            placeholder="Center range (pT)" />
                                     <button type="button" className="btn btn-primary btn-sm eb-device__update-range-btn"
@@ -276,11 +350,11 @@ export default class PosControlPanel extends React.Component {
                         </tr>
                         <tr>
                             <td>ENQ</td>
-                            <td className="js-status-enq"></td>
+                            <td>{this.state.data.enq}</td>
                         </tr>
                         <tr>
                             <td>About</td>
-                            <td className="js-status-about"></td>
+                            <td>{about}</td>
                         </tr>
                         </tbody>
                     </table>
