@@ -11,9 +11,12 @@ import _ from 'underscore';
 import NavBar from './components/NavBar';
 import SideBar from './components/SideBar';
 import PosDashboard from './components/PosDashboard';
+import 'bootstrap';
+import 'bootstrap-select';
 
 import 'morris_css';
 import 'bootstrap_css';
+import 'bootstrap_select_css';
 import 'font_awesome_css';
 import 'metismenu_css';
 import './styles/index.scss';

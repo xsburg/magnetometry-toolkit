@@ -6,6 +6,8 @@
     },
     "rules": {
         "react/jsx-quotes": 0,
+        "react/jsx-no-bind": 0,
+        "no-return-assign": 0,
         "jsx-quotes": [2, "prefer-double"],
         "indent": [2, 4, { "SwitchCase": 1, "VariableDeclarator": 1 }],
         "prefer-arrow-callback": 0,

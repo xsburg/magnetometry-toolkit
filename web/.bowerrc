@@ -1,4 +1,4 @@
 {
-  "directory": "public/components/",
+  "directory": "client/components/",
   "analytics": false
 }

@@ -10,6 +10,7 @@
 
 import React from 'react';
 import _ from 'underscore';
+import $ from 'jquery';
 import moment from 'moment';
 import dateTimeHelpers from '../utils/dateTimeHelpers';
 
@@ -160,9 +161,15 @@ export default class PosControlPanel extends React.Component {
 
     };
 
-    _forceUpdate= () => {
+    _forceUpdate = () => {
 
     };
+
+    _applySelectPicker (el) {
+        if (el) {
+            $(el).selectpicker();
+        }
+    }
 
     render () {
         let intervalOptions = this._getSamplingIntervals().map(group =>
@@ -176,7 +183,7 @@ export default class PosControlPanel extends React.Component {
         let dataUpdatingLoaderClass = this.state.isDataUpdating ? 'eb-device__data-update-spinner_visible' : '';
 
         let about = this.state.data.about;
-        about = about.split(/[\r\n]+/g).map(line => <span>{line}<br /></span>);
+        about = about.split(/[\r\n]+/g).map((line, i) => <span key={i}>{line}<br /></span>);
 
         return (
             <div className="panel panel-default">
@@ -229,6 +236,7 @@ export default class PosControlPanel extends React.Component {
                                         <label htmlFor="samplingIntervalSelect" className="form-label">Sampling interval</label>
                                         <div>
                                             <select id="samplingIntervalSelect" className="form-control"
+                                                    ref={this._applySelectPicker}
                                                     disabled={!this.state.enabled}
                                                     valueLink={createValueLink(this, 'data.samplingIntervalMs')}>
                                                 {intervalOptions}
@@ -237,6 +245,7 @@ export default class PosControlPanel extends React.Component {
                                         <label htmlFor="deviceTimeCorrectionSelect" className="form-label">Device time correction</label>
                                         <div>
                                             <select id="deviceTimeCorrectionSelect" className="form-control"
+                                                    ref={this._applySelectPicker}
                                                     disabled={!this.state.enabled}
                                                     valueLink={createValueLink(this, 'data.timeFixIntervalSeconds')}>
                                                 <option value="0">Never</option>

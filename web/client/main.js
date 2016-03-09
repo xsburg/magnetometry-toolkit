@@ -42,7 +42,18 @@ const routes = makeRoutes(store)*/
 
 $('.js-startup-loading').remove();
 
-ReactDOM.render(
-    <App />,
-    document.getElementById('app')
-);
+function run() {
+    ReactDOM.render(
+        <App />,
+        document.getElementById('app')
+    );
+}
+
+let production = process.env.NODE_ENV === 'production';
+
+if (production) {
+    run();
+} else {
+    // Inline CSS which is extracted into a separate file on production needs some time to load
+    setTimeout(run, 1000);
+}

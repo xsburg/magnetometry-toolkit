@@ -130,10 +130,30 @@ module.exports = {
                     {
                         test: /underscore\.js/,
                         loader: 'expose?_'
+                    },
+                    {
+                        test: /jquery\.js$/,
+                        loader: 'expose?jQuery!expose?$'
+                    },
+                    {
+                        test: /raphael\.js$/,
+                        loader: 'imports?define=>false'
+                    },
+                    {
+                        test: /morris\.js$/,
+                        loader: 'imports?jquery,raphael!exports?Morris'
+                    },
+                    {
+                        test: /bootstrap\/dist\/js\/npm\.js$/,
+                        loader: 'imports?jquery'
                     }
                 ]
             },
             plugins: [
+                new webpack.DefinePlugin({
+                    'process.env.NODE_ENV': PRODUCTION ? '"production"' : '"development"',
+                    __DEV__: DEVELOPMENT
+                }),
                 new HtmlWebpackPlugin({
                     template: pathResolver.source('index.html'),
                     hash: PRODUCTION,
@@ -160,9 +180,11 @@ module.exports = {
                     pathResolver.source()
                 ],
                 alias: {
+                    bootstrap_select_css: `${__dirname}/node_modules/bootstrap-select/dist/css/bootstrap-select.css`,
                     bootstrap_css: `${__dirname}/node_modules/bootstrap/dist/css/bootstrap.css`,
                     bootstrap_theme_css: `${__dirname}/node_modules/bootstrap/dist/css/bootstrap-theme.css`,
                     morris_css: `${__dirname}/node_modules/morris.js/morris.css`,
+                    morris: `${__dirname}/node_modules/morris.js/morris.js`,
                     font_awesome_css: `${__dirname}/node_modules/font-awesome/css/font-awesome.css`,
                     metismenu_css: `${__dirname}/node_modules/metismenu/dist/metisMenu.css`
                 }

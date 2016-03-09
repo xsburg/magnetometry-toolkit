@@ -9,6 +9,7 @@
 'use strict';
 
 import React from 'react';
+import moment from 'moment';
 
 export default class PosDiagnostics extends React.Component {
     constructor (props) {
@@ -60,7 +61,7 @@ export default class PosDiagnostics extends React.Component {
                 }, {
                     id: 9,
                     logLevel: 'DEBUG',
-                    message: 'PosDevice got text response message: 'set binary mode'',
+                    message: 'PosDevice got text response message: "set binary mode"',
                     time: '2016-03-02T14:56:21.324Z'
                 }, {
                     id: 10,
@@ -85,7 +86,7 @@ export default class PosDiagnostics extends React.Component {
                 }, {
                     id: 14,
                     logLevel: 'DEBUG',
-                    message: 'PosDevice got text response message: 'MagState version 3.03'',
+                    message: 'PosDevice got text response message: "MagState version 3.03"',
                     time: '2016-03-02T14:56:21.824Z'
                 }, {
                     id: 15,
@@ -105,7 +106,8 @@ export default class PosDiagnostics extends React.Component {
                 }, {
                     id: 18,
                     logLevel: 'DEBUG',
-                    message: 'PosDevice got text response message: "MagState version 3.03\nQuantum Magnetometry Laboratory\nUrals State Technical University\nCopyright 2013."',
+                    message: 'PosDevice got text response message: "MagState version 3.03\n' +
+                    'Quantum Magnetometry Laboratory\nUrals State Technical University\nCopyright 2013."',
                     time: '2016-03-02T14:56:22.325Z'
                 }, {
                     id: 19,
@@ -142,10 +144,25 @@ export default class PosDiagnostics extends React.Component {
         };
     }
 
+    componentDidMount () {
+        this._scrollToBottom();
+    }
+
+    componentDidUpdate () {
+        this._scrollToBottom();
+    }
+
+    _scrollToBottom () {
+        this._pre.scrollTop = this._pre.scrollHeight - this._pre.clientHeight;
+    }
+
     render () {
         let dataUpdatingLoaderClass = this.state.isDataUpdating ? 'eb-device__data-update-spinner_visible' : '';
 
-        
+        let logEntries = this.state.messages.map(entry => <div key={entry.id}>
+            <span className="eb-device__diagnostics-log-list-item__time" title={moment(entry.time).format('LLL')}>
+                {moment(entry.time).format('LTS')}</span> [{entry.logLevel}] {entry.message}
+        </div>);
 
         return (
             <div className="panel panel-default">
@@ -162,9 +179,9 @@ export default class PosDiagnostics extends React.Component {
                         <span>The service log is updated in real time </span>
                         <span className={`fa fa-circle-o-notch fa-spin eb-device__data-update-spinner ${dataUpdatingLoaderClass}`} />
                     </small></h4>
-                    <div className="js-log-list-region">
-                        COLLECTION HERE
-                    </div>
+                    <pre className="eb-device__diagnostics-log-list" ref={el => this._pre = el}>
+                        {logEntries}
+                    </pre>
                 </div>
             </div>
         );
