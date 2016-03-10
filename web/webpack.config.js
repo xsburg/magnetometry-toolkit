@@ -13,7 +13,7 @@ const path = require('path');
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const _ = require('underscore');
+const _ = require('lodash');
 
 const pathResolver = {
     client: function () {
@@ -39,7 +39,7 @@ module.exports = {
         let webpackConfig = {
             cache: true,
             entry: {
-                app: ['./client/main'],
+                app: ['./client/index'],
                 vendor: [
                     'babel-polyfill',
                     'react',
@@ -128,10 +128,6 @@ module.exports = {
                         loader: 'expose?Promise'
                     },
                     {
-                        test: /underscore\.js/,
-                        loader: 'expose?_'
-                    },
-                    {
                         test: /jquery\.js$/,
                         loader: 'expose?jQuery!expose?$'
                     },
@@ -144,7 +140,7 @@ module.exports = {
                         loader: 'imports?jquery,raphael!exports?Morris'
                     },
                     {
-                        test: /bootstrap\/dist\/js\/npm\.js$/,
+                        test: require.resolve('bootstrap'),
                         loader: 'imports?jquery'
                     }
                 ]
@@ -196,7 +192,7 @@ module.exports = {
             webpackConfig.debug = false;
             webpackConfig.devtool = false;
 
-            let babelLoader = _.findWhere(webpackConfig.module.loaders, { loader: 'babel-loader' });
+            let babelLoader = _.find(webpackConfig.module.loaders, { loader: 'babel-loader' });
             babelLoader.query.plugins.push(
                 'transform-react-remove-prop-types',
                 'transform-react-constant-elements'
@@ -234,7 +230,7 @@ module.exports = {
             v.push('webpack-hot-middleware/client');
         });
         // React transform
-        let babelLoader = _.findWhere(webpackConfig.module.loaders, { loader: 'babel-loader' });
+        let babelLoader = _.find(webpackConfig.module.loaders, { loader: 'babel-loader' });
         babelLoader.query.plugins.push([
             'react-transform', {
                 transforms: [

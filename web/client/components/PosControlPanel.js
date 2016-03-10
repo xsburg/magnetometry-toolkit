@@ -9,7 +9,6 @@
 'use strict';
 
 import React from 'react';
-import _ from 'underscore';
 import $ from 'jquery';
 import moment from 'moment';
 import dateTimeHelpers from '../utils/dateTimeHelpers';

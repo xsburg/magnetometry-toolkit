@@ -5,11 +5,12 @@
  *       All Rights Reserved
  */
 
-var request = require("request");
-var _ = require("underscore");
-var express = require('express');
-var appConfig = require('../../config');
-var router = express.Router();
+'use strict';
+
+let request = require('request');
+let express = require('express');
+let appConfig = require('../../config');
+let router = express.Router();
 
 router.get('/eb-device/status', function(req, res) {
     request.get({

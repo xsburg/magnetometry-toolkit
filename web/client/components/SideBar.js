@@ -9,13 +9,14 @@
 'use strict';
 
 import React from 'react';
+import { Link } from 'react-router';
 
 const SideBar = () => {
     return (
         <div className="app-sidebar sidebar">
             <ul id="side-menu" className="nav">
                 <li>
-                    <a className="active" href="index.html"><i className="fa fa-dashboard fa-fw" /> Dashboard</a>
+                    <Link to="/Pos" className="active"><i className="fa fa-dashboard fa-fw" /> POS-1</Link>
                 </li>
             </ul>
         </div>

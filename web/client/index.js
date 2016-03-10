@@ -5,13 +5,40 @@
  *       All Rights Reserved
  */
 
+import 'babel-polyfill';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-import App from './App';
-import $ from 'jquery';
+import { render } from 'react-dom';
+import ReactRouter, { browserHistory } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
+import Root from './containers/Root';
+import configureStore from './store/configureStore';
 
-injectTapEventPlugin();
+const store = configureStore();
+const history = syncHistoryWithStore(browserHistory, store);
+
+render(
+    <Root store={store} history={history} />,
+    document.getElementById('root')
+);
+
+/*
+
+function run() {
+    render(
+        <Root store={store} history={history} />,
+        document.getElementById('root')
+    );
+}
+
+if (process.env.NODE_ENV === 'production') {
+    run();
+} else {
+    // Inline CSS which is extracted into a separate file on production needs some time to load
+    setTimeout(run, 1000);
+}
+*/
+
+//-----------------------------------------------------
 
 //import createBrowserHistory from 'history/lib/createBrowserHistory'
 //import { useRouterHistory } from 'react-router'
@@ -39,21 +66,3 @@ const history = syncHistoryWithStore(browserHistory, store, {
 // the store to the route definitions so that routes have access to it for
 // hooks such as `onEnter`.
 const routes = makeRoutes(store)*/
-
-$('.js-startup-loading').remove();
-
-function run() {
-    ReactDOM.render(
-        <App />,
-        document.getElementById('app')
-    );
-}
-
-let production = process.env.NODE_ENV === 'production';
-
-if (production) {
-    run();
-} else {
-    // Inline CSS which is extracted into a separate file on production needs some time to load
-    setTimeout(run, 1000);
-}
