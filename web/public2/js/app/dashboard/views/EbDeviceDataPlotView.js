@@ -73,10 +73,6 @@ define([
             }
         },
 
-        setDataUpdating: function (isUpdating) {
-            this.ui.dataUpdateSpinner.toggleClass(classes.DATA_UPDATE_SPINNER_VISIBLE, isUpdating);
-        },
-
         setLoading: function (isLoading) {
             if (isLoading) {
                 this.ui.loadingPanel.show();

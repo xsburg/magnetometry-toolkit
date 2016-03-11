@@ -9,35 +9,29 @@
 'use strict';
 
 import React from 'react';
-import PosDiagnostics from './PosDiagnostics';
-import PosDataPlot from './PosDataPlot';
-import PosControlPanel from './PosControlPanel';
+import PosDiagnostics from '../containers/PosDiagnostics';
+import PosDataPlot from '../containers/PosDataPlot';
+import PosControlPanel from '../containers/PosControlPanel';
 
-export default class PosPage extends React.Component {
-    constructor (props) {
-        super(props);
-    }
-
-    render () {
-        return (
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-lg-12">
-                        <h2 className="page-header">Dashboard</h2>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-6 eb-device__control-panel-block">
-                        <PosControlPanel />
-                    </div>
-                    <div className="col-lg-6 eb-device__diagnostics-block">
-                        <PosDiagnostics />
-                        <PosDataPlot />
-                    </div>
+const PosPage = () => {
+    return (
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-lg-12">
+                    <h2 className="page-header">Dashboard</h2>
                 </div>
             </div>
-        );
-    }
-}
+            <div className="row">
+                <div className="col-lg-6 eb-device__control-panel-block">
+                    <PosControlPanel />
+                </div>
+                <div className="col-lg-6 eb-device__diagnostics-block">
+                    <PosDiagnostics />
+                    <PosDataPlot />
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default PosPage;

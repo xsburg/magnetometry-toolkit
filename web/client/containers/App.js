@@ -26,7 +26,6 @@ class App extends Component {
         // Injected by React Redux
         errorMessage: PropTypes.string,
         resetErrorMessage: PropTypes.func.isRequired,
-        inputValue: PropTypes.string.isRequired,
         // Injected by React Router
         children: PropTypes.node
     };
@@ -59,7 +58,7 @@ class App extends Component {
     }
 
     render() {
-        const { children, inputValue } = this.props;
+        const { children } = this.props;
         return (
             <div onClick={this.onClick}>
                 <NavBar />
@@ -99,8 +98,7 @@ class App extends Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        errorMessage: state.errorMessage,
-        inputValue: ownProps.location.pathname.substring(1)
+        errorMessage: state.errorMessage
     };
 }
 

@@ -6,6 +6,20 @@
  * Published under the MIT license
  */
 
+/* POS ACTIONS */
+
+export const POS_UPDATE_CONFIG_DATA = 'POS_UPDATE_CONFIG_DATA';
+
+export function posUpdateConfigData (patch) {
+    return {
+        type: POS_UPDATE_CONFIG_DATA,
+        patch: patch
+    };
+}
+
+
+/* COMMON ACTIONS */
+
 export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE';
 
 // Resets the currently visible error message.

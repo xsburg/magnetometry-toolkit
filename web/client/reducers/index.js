@@ -2,6 +2,7 @@ import * as ActionTypes from '../actions';
 import merge from 'lodash/merge';
 import { routerReducer as routing } from 'react-router-redux';
 import { combineReducers } from 'redux';
+import pos from './pos';
 
 // Updates an entity cache in response to any action with response.entities.
 function entities (state = {users: {}, repos: {}}, action) {
@@ -26,7 +27,7 @@ function errorMessage (state = null, action) {
 }
 
 const rootReducer = combineReducers({
-    entities,
+    pos,
     errorMessage,
     routing
 });
