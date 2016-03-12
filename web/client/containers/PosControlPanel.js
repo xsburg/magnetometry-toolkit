@@ -18,10 +18,9 @@ import { posUpdateConfigData } from '../actions';
 function createValueLink(component, key) {
     let keys = key.split('.');
     let value = component.props;
-    function combineState(obj, keyIndex, newValue) {
+    function combineState(keyIndex, newValue) {
         return {
-            ...obj,
-            [keys[keyIndex]]: keyIndex === keys.length - 1 ? newValue : combineState(obj[keys[keyIndex]], keyIndex + 1, newValue)
+            [keys[keyIndex]]: keyIndex === keys.length - 1 ? newValue : combineState(keyIndex + 1, newValue)
         };
     }
     keys.forEach(k => {
@@ -58,19 +57,15 @@ class PosControlPanel extends React.Component {
         keys.forEach(k => {
             value = value[k];
         });
+        function combineState(keyIndex, newValue) {
+            return {
+                [keys[keyIndex]]: keyIndex === keys.length - 1 ? newValue : combineState(keyIndex + 1, newValue)
+            };
+        }
         return {
             value: value,
             requestChange: newValue => {
-                let patch = {};
-                let cur = patch;
-                keys.forEach((k, i) => {
-                    if (i === keys.length - 1) {
-                        cur[k] = newValue;
-                    } else {
-                        cur[k] = {};
-                        cur = cur[k];
-                    }
-                });
+                let patch = combineState(0, newValue);
                 this.props.posUpdateConfigData(patch);
             }
         };
@@ -244,7 +239,7 @@ class PosControlPanel extends React.Component {
                                             <select id="samplingIntervalSelect" className="form-control"
                                                     ref={this._applySelectPicker}
                                                     disabled={this.props.readonly}
-                                                    valueLink={createValueLink(this, 'data.samplingIntervalMs')}>
+                                                    valueLink={this._createValueLink('samplingIntervalMs')}>
                                                 {intervalOptions}
                                             </select>
                                         </div>
@@ -253,7 +248,7 @@ class PosControlPanel extends React.Component {
                                             <select id="deviceTimeCorrectionSelect" className="form-control"
                                                     ref={this._applySelectPicker}
                                                     disabled={this.props.readonly}
-                                                    valueLink={createValueLink(this, 'data.timeFixIntervalSeconds')}>
+                                                    valueLink={this._createValueLink('timeFixIntervalSeconds')}>
                                                 <option value="0">Never</option>
                                                 <option value="10">10 Seconds</option>
                                                 <option value="600">10 Minutes</option>
@@ -305,19 +300,19 @@ class PosControlPanel extends React.Component {
                                     <label htmlFor="mseedSettingsNetwork" className="form-label">Network</label>
                                     <input id="mseedSettingsNetwork" type="text" className="form-control"
                                            disabled={this.props.readonly}
-                                           valueLink={createValueLink(this, 'data.mseedSettings.network')} placeholder="RU" />
+                                           valueLink={this._createValueLink('mseedSettings.network')} placeholder="RU" />
                                     <label htmlFor="mseedSettingsStation" className="form-label">Station</label>
                                     <input id="mseedSettingsStation" type="text" className="form-control"
                                            disabled={this.props.readonly}
-                                           valueLink={createValueLink(this, 'data.mseedSettings.station')} placeholder="IFZ" />
+                                           valueLink={this._createValueLink('mseedSettings.station')} placeholder="IFZ" />
                                     <label htmlFor="mseedSettingsLocation" className="form-label">location</label>
                                     <input id="mseedSettingsLocation" type="text" className="form-control"
                                            disabled={this.props.readonly}
-                                           valueLink={createValueLink(this, 'data.mseedSettings.location')} placeholder="SK" />
+                                           valueLink={this._createValueLink('mseedSettings.location')} placeholder="SK" />
                                     <label htmlFor="mseedSettingsSamplesInRecord" className="form-label">Samples in MiniSEED record</label>
                                     <input id="mseedSettingsSamplesInRecord" type="number" className="form-control"
                                            disabled={this.props.readonly}
-                                           valueLink={createValueLink(this, 'data.mseedSettings.samplesInRecord')} placeholder="2" />
+                                           valueLink={this._createValueLink('mseedSettings.samplesInRecord')} placeholder="2" />
                                     <div className="eb-device__mseed-settings-buttons">
                                         <button type="button" className="btn btn-primary btn-sm"
                                                 disabled={this.props.readonly}
@@ -354,7 +349,7 @@ class PosControlPanel extends React.Component {
                                 <div className="form-group eb-device__update-range-container">
                                     <input id="newCenterRange" type="number" min="1" max="10000000"
                                            className="form-control"
-                                           valueLink={createValueLink(this, 'data.range.center')}
+                                           valueLink={this._createValueLink('range.center')}
                                            disabled={this.props.readonly}
                                            placeholder="Center range (pT)" />
                                     <button type="button" className="btn btn-primary btn-sm eb-device__update-range-btn"

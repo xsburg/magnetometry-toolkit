@@ -8,6 +8,7 @@
 
 import { POS_UPDATE_CONFIG_DATA } from '../actions';
 import { combineReducers } from 'redux';
+import _ from 'lodash';
 
 function config (state = {
     initialLoadingComplete: true,
@@ -40,19 +41,10 @@ function config (state = {
 }, action) {
     switch (action.type) {
     case POS_UPDATE_CONFIG_DATA:
-        if (action.patch.mseedSettings) {
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    mseedSettings: {
-                        ...state.data.mseedSettings,
-                        ...action.patch.mseedSettings
-                    }
-                }
-            };
-        }
-        return state;
+        return {
+            ...state,
+            data: _.merge({}, state.data, action.patch)
+        };
     default:
         return state;
     }

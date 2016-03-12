@@ -24,7 +24,7 @@ class PosDiagnostics extends React.Component {
     }
 
     componentDidUpdate () {
-        this._scrollToBottom();
+        //this._scrollToBottom();
     }
 
     _scrollToBottom () {
