@@ -12,24 +12,28 @@ import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import Morris from 'morris';
+import { posLoadData } from '../actions';
 
 class PosDataPlot extends React.Component {
     static propTypes = {
         initialLoadingComplete: React.PropTypes.bool.isRequired,
         isLoading: React.PropTypes.bool.isRequired,
-        samples: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+        samples: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+        posLoadData: React.PropTypes.func.isRequired
     };
 
     componentDidMount () {
-        this._updateData();
+        this._refresh();
     }
 
-    componentDidUpdate () {
-        //this._updateData();
+    componentDidUpdate (prevProps) {
+        if (prevProps.samples !== this.props.samples) {
+            this._updateData();
+        }
     }
 
     _refresh = () => {
-
+        this.props.posLoadData();
     };
 
     _updateData () {
@@ -85,4 +89,6 @@ function mapStateToProps(state) {
     return state.pos.dataPlot;
 }
 
-export default connect(mapStateToProps)(PosDataPlot);
+export default connect(mapStateToProps, {
+    posLoadData
+})(PosDataPlot);

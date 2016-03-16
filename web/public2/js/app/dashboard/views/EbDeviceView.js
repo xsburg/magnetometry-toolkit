@@ -167,7 +167,7 @@ define([
 
         __updateData: function () {
             var data = this.model.toJSON();
-            
+
             //noinspection JSUnresolvedVariable
             this.ui.statusSamplingInterval.text(data.samplingIntervalMs);
             if (!this.ui.statusSamplingIntervalInput.val()) {
@@ -248,7 +248,7 @@ define([
             }*/
             this.__updateData();
         },
-
+/*
         setDataUpdating: function (isUpdating) {
             this.ui.dataUpdateSpinner.toggleClass(classes.DATA_UPDATE_SPINNER_VISIBLE, isUpdating);
         },
@@ -271,9 +271,9 @@ define([
             this.ui.mseedSettingsStationInput[0].disabled = !enabled;
             this.ui.mseedSettingsLocationInput[0].disabled = !enabled;
             this.ui.mseedSettingsSamplesInRecordInput[0].disabled = !enabled;
-        },
+        },*/
 
-        __onToggleStandBy: function () {
+        /*__onToggleStandBy: function () {
             //this.setLoading(true);
             var newValue = !this.model.get('standBy');
             this.reqres.request('standBy', newValue);
@@ -300,9 +300,9 @@ define([
 
         __onForceUpdate: function () {
             this.reqres.request('device:update');
-        },
+        },*/
 
-        __onApplyMSeedSettings: function () {
+        /*__onApplyMSeedSettings: function () {
             this.reqres.request('mseed:updateSettings', {
                 fileName: this.ui.mseedSettingsFileNameInput.val(),
                 station: this.ui.mseedSettingsStationInput.val(),
@@ -326,6 +326,6 @@ define([
         __closeMSeedSettingsPanel: function () {
             this.ui.editMseedSettingsButton.show();
             this.ui.mseedSettingsPanel.slideUp();
-        }
+        }*/
     });
 });

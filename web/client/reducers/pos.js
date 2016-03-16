@@ -6,7 +6,11 @@
  * Published under the MIT license
  */
 
-import { POS_UPDATE_CONFIG_DATA } from '../actions';
+import {
+    POS_UPDATE_CONFIG_DATA,
+    POS_SEND_COMMAND_REQUEST, POS_LOAD_DATA_REQUEST, POS_LOAD_DATA_RESPONSE, POS_LOAD_DATA_FAILURE,
+    POS_LOAD_STATUS_REQUEST, POS_LOAD_STATUS_RESPONSE, POS_LOAD_STATUS_FAILURE
+} from '../actions';
 import { combineReducers } from 'redux';
 import _ from 'lodash';
 
@@ -14,6 +18,7 @@ function config (state = {
     initialLoadingComplete: true,
     isLoading: false,
     readonly: false,
+    hasUnhandledCommands: false,
     data: {
         about: 'MagState version 3.03\nQuantum Magnetometry Laboratory\nUrals State Technical University\nCopyright 2013.',
         commandQueueSize: 0,
@@ -45,6 +50,33 @@ function config (state = {
             ...state,
             data: _.merge({}, state.data, action.patch)
         };
+    case POS_LOAD_STATUS_REQUEST:
+        return {
+            ...state,
+            isLoading: true
+        };
+    case POS_LOAD_STATUS_RESPONSE:
+    case POS_LOAD_STATUS_FAILURE:
+        return {
+            ...state,
+            isLoading: false
+        };
+    case POS_SEND_COMMAND_REQUEST: {
+        let data = state.data;
+        if (action.request.command === 'set-device-stand-by') {
+            let newStandBy = !state.data.standBy;
+            data = {
+                ...state.data,
+                standBy: newStandBy
+            };
+        }
+        return {
+            ...state,
+            data,
+            readonly: true,
+            hasUnhandledCommands: true
+        };
+    }
     default:
         return state;
     }
@@ -181,33 +213,57 @@ function diagnostics (state, action) {
     };
 }
 
-function dataPlot (state, action) {
-    return {
-        initialLoadingComplete: true,
-        isLoading: false,
-        samples: [
-            {
-                time: '2016-03-02T14:56:19.721Z',
-                field: 12345
-            },
-            {
-                time: '2016-03-02T14:56:20.721Z',
-                field: 2346
-            },
-            {
-                time: '2016-03-02T14:56:21.721Z',
-                field: 4345
-            },
-            {
-                time: '2016-03-02T14:56:22.721Z',
-                field: 6345
-            },
-            {
-                time: '2016-03-02T14:56:23.721Z',
-                field: 2345
-            }
-        ]
-    };
+function dataPlot (state = {
+    initialLoadingComplete: true,
+    isLoading: false,
+    samples: [
+        {
+            time: '2016-03-02T14:56:19.721Z',
+            field: 12345
+        },
+        {
+            time: '2016-03-02T14:56:20.721Z',
+            field: 2346
+        },
+        {
+            time: '2016-03-02T14:56:21.721Z',
+            field: 4345
+        },
+        {
+            time: '2016-03-02T14:56:22.721Z',
+            field: 6345
+        },
+        {
+            time: '2016-03-02T14:56:23.721Z',
+            field: 2345
+        }
+    ]
+}, action) {
+    switch (action.type) {
+    case POS_LOAD_DATA_REQUEST:
+        return {
+            ...state,
+            isLoading: true
+        };
+    case POS_LOAD_DATA_RESPONSE: {
+        let samples = action.response.filter(x => x.state & 0x80).map(x => ({
+            ...x,
+            time: Number(new Date(x.time))
+        }));
+        return {
+            ...state,
+            samples,
+            isLoading: false
+        };
+    }
+    case POS_LOAD_DATA_FAILURE:
+        return {
+            ...state,
+            isLoading: false
+        };
+    default:
+        return state;
+    }
 }
 
 const posReducer = combineReducers({

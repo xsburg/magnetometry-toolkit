@@ -23,8 +23,10 @@ class PosDiagnostics extends React.Component {
         this._scrollToBottom();
     }
 
-    componentDidUpdate () {
-        //this._scrollToBottom();
+    componentDidUpdate (prevProps) {
+        if (prevProps.logEntries !== this.props.logEntries) {
+            this._scrollToBottom();
+        }
     }
 
     _scrollToBottom () {

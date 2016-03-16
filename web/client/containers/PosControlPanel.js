@@ -13,27 +13,7 @@ import { connect } from 'react-redux';
 import $ from 'jquery';
 import moment from 'moment';
 import dateTimeHelpers from '../utils/dateTimeHelpers';
-import { posUpdateConfigData } from '../actions';
-
-function createValueLink(component, key) {
-    let keys = key.split('.');
-    let value = component.props;
-    function combineState(keyIndex, newValue) {
-        return {
-            [keys[keyIndex]]: keyIndex === keys.length - 1 ? newValue : combineState(keyIndex + 1, newValue)
-        };
-    }
-    keys.forEach(k => {
-        value = value[k];
-    });
-
-    return {
-        value: value,
-        requestChange: function(newValue) {
-            //component.setState(combineState(component.state, 0, newValue));
-        }
-    };
-}
+import { posUpdateConfigData, posSendCommand, posLoadStatus } from '../actions';
 
 class PosControlPanel extends React.Component {
     static propTypes = {
@@ -41,7 +21,9 @@ class PosControlPanel extends React.Component {
         isLoading: React.PropTypes.bool.isRequired,
         readonly: React.PropTypes.bool.isRequired,
         data: React.PropTypes.object.isRequired,
-        posUpdateConfigData: React.PropTypes.func.isRequired
+        posUpdateConfigData: React.PropTypes.func.isRequired,
+        posSendCommand: React.PropTypes.func.isRequired,
+        posLoadStatus: React.PropTypes.func.isRequired
     };
 
     constructor (props) {
@@ -49,6 +31,39 @@ class PosControlPanel extends React.Component {
         this.state = {
             showMseedSettings: false
         };
+    }
+
+    componentDidMount () {
+        this.timer = setInterval(this.tick, 50);
+    }
+
+    componentWillUnmount () {
+        // This method is called immediately before the component is removed
+        // from the page and destroyed. We can clear the interval here:
+        clearInterval(this.timer);
+    }
+
+    tick () {
+        this.props.posLoadStatus();
+        let hasUnhandledCommands = this.props.hasUnhandledCommands;
+
+        this.view.setDataUpdating(true);
+        var commandSendLock = this.commandSendLock;
+        this.__updateStatus().finally(function () {
+            if (!this.isDestroyed) {
+                this.view.setDataUpdating(false);
+                var triggeredWhileQuery = !commandSendLock && this.commandSendLock;
+                if (this.model.get('commandQueueSize') > 0 || triggeredWhileQuery) {
+                    // lock everything until queue is empty
+                    this.view.setEnabled(false);
+                    this.commandSendLock = false;
+                } else {
+                    // unlock if queue is empty
+                    this.view.setEnabled(true);
+                }
+                this.__startBackgroundUpdater();
+            }
+        }.bind(this));
     }
 
     _createValueLink (key) {
@@ -122,7 +137,10 @@ class PosControlPanel extends React.Component {
     };
 
     _applyMseedSettings = () => {
-        // TODO: perform some action => and then:
+        this.props.posSendCommand({
+            command: 'apply-mseed-settings',
+            ...this.props.data.mseedSettings
+        });
         this.setState({
             showMseedSettings: false
         });
@@ -135,35 +153,56 @@ class PosControlPanel extends React.Component {
     };
 
     _setRange = () => {
-
+        this.props.posSendCommand({
+            command: 'set-device-range',
+            range: this.props.data.range.center
+        });
     };
 
     _fixDeviceTime = () => {
-
+        this.props.posSendCommand({
+            command: 'set-device-time',
+            time: Math.floor(Number(new Date()) / 1000)
+        });
     };
 
     _toggleStandBy = () => {
-
+        this.props.posSendCommand({
+            command: 'set-device-stand-by',
+            standBy: !this.props.data.standBy
+        });
     };
 
     _runDiagnostics = () => {
-
+        this.props.posSendCommand({
+            command: 'run-diagnostics'
+        });
     };
 
     _runAutoTest = () => {
-
+        this.props.posSendCommand({
+            command: 'run-mode-auto-test'
+        });
     };
 
     _onStartLogging = () => {
-
+        this.props.posSendCommand({
+            command: 'run',
+            intervalMilliseconds: this.props.data.samplingIntervalMs,
+            timeFixIntervalSeconds: this.props.data.timeFixIntervalSeconds
+        });
     };
 
     _onStopLogging = () => {
-
+        this.props.posSendCommand({
+            command: 'stop'
+        });
     };
 
     _forceUpdate = () => {
-
+        this.props.posSendCommand({
+            command: 'update-status'
+        });
     };
 
     _applySelectPicker (el) {
@@ -379,5 +418,7 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, {
-    posUpdateConfigData
+    posUpdateConfigData,
+    posSendCommand,
+    posLoadStatus
 })(PosControlPanel);

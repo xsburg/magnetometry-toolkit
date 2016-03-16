@@ -37,7 +37,7 @@ define([
                 this.__startDiagnosticsBackgroundUpdater();
             }.bind(this));
         },
-
+/*
         createModel: function () {
             this.model = new EbDeviceStatusModel();
             this.diagnosticsModel = new Backbone.Model({
@@ -65,22 +65,22 @@ define([
         bindReqres: function () {
             this.reqres = new Backbone.Wreqr.RequestResponse();
 
-            this.reqres.setHandler('logging:start', this.__startLogging, this);
+            /!*this.reqres.setHandler('logging:start', this.__startLogging, this);
             this.reqres.setHandler('logging:stop', this.__stopLogging, this);
             this.reqres.setHandler('standBy', this.__setStandBy, this);
             this.reqres.setHandler('deviceTime:fix', this.__fixDeviceTime, this);
             this.reqres.setHandler('device:update', this.__forceDeviceUpdate, this);
             this.reqres.setHandler('range:set', this.__setRange, this);
             this.reqres.setHandler('run:diagnostics', this.__runDiagnostics, this);
-            this.reqres.setHandler('run:autoTest', this.__runAutoTest, this);
-            this.reqres.setHandler('data:reload', this.__reloadData, this);
-            this.reqres.setHandler('mseed:updateSettings', this.__updateMSeedSettings, this);
-        },
+            this.reqres.setHandler('run:autoTest', this.__runAutoTest, this);*!/
+            //this.reqres.setHandler('data:reload', this.__reloadData, this);
+            /!*this.reqres.setHandler('mseed:updateSettings', this.__updateMSeedSettings, this);*!/
+        },*/
 
-        onDestroy: function () {
+        /*onDestroy: function () {
             this.isDestroyed = true;
-        },
-
+        },*/
+/*
         __reloadData: function () {
             return core.services.AjaxService.get('api/dashboard/eb-device/data').then(function (data) {
                 //noinspection JSUnresolvedVariable
@@ -94,7 +94,7 @@ define([
                 });
                 return data;
             }.bind(this));
-        },
+        },*/
 
         __startBackgroundUpdater: function () {
             setTimeout(function () {
@@ -141,7 +141,7 @@ define([
             return Promise.resolve(this.model.fetch());
         },
 
-        __startLogging: function (samplingIntervalMs, timeFixIntervalSeconds) {
+        /*__startLogging: function (samplingIntervalMs, timeFixIntervalSeconds) {
             return this.__sendCommand({
                 command: 'run',
                 intervalMilliseconds: samplingIntervalMs,
@@ -204,6 +204,6 @@ define([
             this.commandSendLock = true;
             this.view.setEnabled(false);
             return core.services.AjaxService.post('api/dashboard/eb-device/command', data);
-        }
+        }*/
     });
 });
