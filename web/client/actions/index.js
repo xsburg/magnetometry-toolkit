@@ -38,18 +38,18 @@ function ajaxApi ({ types, url, method = 'GET', data }) {
             throw new Error('Invalid method.');
         }
 
-        promise.then(
-            response => dispatch({
+        promise.
+            then(response => response.json()).
+            then(response => {debugger;return dispatch({
                 type: responseType,
                 request: data,
                 response
-            }),
-            error => dispatch({
+            });}).
+            catch(error => dispatch({
                 type: failureType,
                 request: data,
                 error
-            })
-        );
+            }));
     };
 }
 

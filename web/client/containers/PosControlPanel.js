@@ -15,11 +15,13 @@ import moment from 'moment';
 import dateTimeHelpers from '../utils/dateTimeHelpers';
 import { posUpdateConfigData, posSendCommand, posLoadStatus } from '../actions';
 
+const statusUpdateInterval = 1500;
+
 class PosControlPanel extends React.Component {
     static propTypes = {
         initialLoadingComplete: React.PropTypes.bool.isRequired,
         isLoading: React.PropTypes.bool.isRequired,
-        readonly: React.PropTypes.bool.isRequired,
+        hasUnhandledCommands: React.PropTypes.bool.isRequired,
         data: React.PropTypes.object.isRequired,
         posUpdateConfigData: React.PropTypes.func.isRequired,
         posSendCommand: React.PropTypes.func.isRequired,
@@ -34,36 +36,23 @@ class PosControlPanel extends React.Component {
     }
 
     componentDidMount () {
-        this.timer = setInterval(this.tick, 50);
+        this.props.posLoadStatus();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (!this.props.isLoading && prevProps.isLoading) {
+            // Previous loading is complete and we can schedule a new one
+            this.updateTimer = setTimeout(() => {
+                this.props.posLoadStatus();
+                this.updateTimer = null;
+            }, statusUpdateInterval);
+        }
     }
 
     componentWillUnmount () {
-        // This method is called immediately before the component is removed
-        // from the page and destroyed. We can clear the interval here:
-        clearInterval(this.timer);
-    }
-
-    tick () {
-        this.props.posLoadStatus();
-        let hasUnhandledCommands = this.props.hasUnhandledCommands;
-
-        this.view.setDataUpdating(true);
-        var commandSendLock = this.commandSendLock;
-        this.__updateStatus().finally(function () {
-            if (!this.isDestroyed) {
-                this.view.setDataUpdating(false);
-                var triggeredWhileQuery = !commandSendLock && this.commandSendLock;
-                if (this.model.get('commandQueueSize') > 0 || triggeredWhileQuery) {
-                    // lock everything until queue is empty
-                    this.view.setEnabled(false);
-                    this.commandSendLock = false;
-                } else {
-                    // unlock if queue is empty
-                    this.view.setEnabled(true);
-                }
-                this.__startBackgroundUpdater();
-            }
-        }.bind(this));
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
+        }
     }
 
     _createValueLink (key) {
@@ -225,6 +214,8 @@ class PosControlPanel extends React.Component {
         let about = this.props.data.about;
         about = about.split(/[\r\n]+/g).map((line, i) => <span key={i}>{line}<br /></span>);
 
+        let readonly = this.props.hasUnhandledCommands || this.props.data.commandQueueSize > 0;
+
         return (
             <div className="panel panel-default">
                 <div className="panel-heading">MagState Control Panel</div>
@@ -253,7 +244,7 @@ class PosControlPanel extends React.Component {
                             <td>
                                 <span>{moment(this.props.data.updated).format('lll')} </span>
                                 <button type="button" className="btn btn-primary btn-xs"
-                                        disabled={this.props.readonly}
+                                        disabled={readonly}
                                         onClick={this._forceUpdate}>Force device update</button>
                             </td>
                         </tr>
@@ -267,7 +258,7 @@ class PosControlPanel extends React.Component {
                                 <div style={this.props.data.isRunning ? null : {display: 'none'}}>
                                     <span>Running </span>
                                     <button type="button" className="btn btn-danger btn-xs"
-                                            disabled={this.props.readonly}
+                                            disabled={readonly}
                                             onClick={this._onStopLogging}>Stop</button>
                                 </div>
                                 <div style={this.props.data.isRunning ? {display: 'none'} : null}>
@@ -277,7 +268,7 @@ class PosControlPanel extends React.Component {
                                         <div>
                                             <select id="samplingIntervalSelect" className="form-control"
                                                     ref={this._applySelectPicker}
-                                                    disabled={this.props.readonly}
+                                                    disabled={readonly}
                                                     valueLink={this._createValueLink('samplingIntervalMs')}>
                                                 {intervalOptions}
                                             </select>
@@ -286,7 +277,7 @@ class PosControlPanel extends React.Component {
                                         <div>
                                             <select id="deviceTimeCorrectionSelect" className="form-control"
                                                     ref={this._applySelectPicker}
-                                                    disabled={this.props.readonly}
+                                                    disabled={readonly}
                                                     valueLink={this._createValueLink('timeFixIntervalSeconds')}>
                                                 <option value="0">Never</option>
                                                 <option value="10">10 Seconds</option>
@@ -298,7 +289,7 @@ class PosControlPanel extends React.Component {
                                             </select>
                                         </div>
                                         <button type="button" className="btn btn-success btn-sm eb-device__start-logging-btn"
-                                                disabled={this.props.readonly}
+                                                disabled={readonly}
                                                 onClick={this._onStartLogging}>Start</button>
                                     </div>
                                 </div>
@@ -316,11 +307,11 @@ class PosControlPanel extends React.Component {
                             <td>Diagnostics</td>
                             <td>
                                 <button type="button" className="btn btn-primary btn-xs"
-                                        disabled={this.props.readonly}
+                                        disabled={readonly}
                                         onClick={this._runDiagnostics}>General</button>
                                 <span> </span>
                                 <button type="button" className="btn btn-primary btn-xs"
-                                        disabled={this.props.readonly}
+                                        disabled={readonly}
                                         onClick={this._runAutoTest}>Sampling test</button>
                             </td>
                         </tr>
@@ -329,35 +320,35 @@ class PosControlPanel extends React.Component {
                             <td>
                                 <button type="button" className="btn btn-primary btn-xs"
                                         style={this.state.showMseedSettings ? {display: 'none'} : null}
-                                        disabled={this.props.readonly}
+                                        disabled={readonly}
                                         onClick={this._showMseedSettings}>Edit</button>
                                 <div style={this.state.showMseedSettings ? null : {display: 'none'}}>
                                     <label htmlFor="mseedSettingsFileName" className="form-label">File Name</label>
                                     <input id="mseedSettingsFileName" type="text" className="form-control"
-                                           disabled={this.props.readonly}
+                                           disabled={readonly}
                                            valueLink={this._createValueLink('mseedSettings.fileName')} placeholder="data.mseed" />
                                     <label htmlFor="mseedSettingsNetwork" className="form-label">Network</label>
                                     <input id="mseedSettingsNetwork" type="text" className="form-control"
-                                           disabled={this.props.readonly}
+                                           disabled={readonly}
                                            valueLink={this._createValueLink('mseedSettings.network')} placeholder="RU" />
                                     <label htmlFor="mseedSettingsStation" className="form-label">Station</label>
                                     <input id="mseedSettingsStation" type="text" className="form-control"
-                                           disabled={this.props.readonly}
+                                           disabled={readonly}
                                            valueLink={this._createValueLink('mseedSettings.station')} placeholder="IFZ" />
                                     <label htmlFor="mseedSettingsLocation" className="form-label">location</label>
                                     <input id="mseedSettingsLocation" type="text" className="form-control"
-                                           disabled={this.props.readonly}
+                                           disabled={readonly}
                                            valueLink={this._createValueLink('mseedSettings.location')} placeholder="SK" />
                                     <label htmlFor="mseedSettingsSamplesInRecord" className="form-label">Samples in MiniSEED record</label>
                                     <input id="mseedSettingsSamplesInRecord" type="number" className="form-control"
-                                           disabled={this.props.readonly}
+                                           disabled={readonly}
                                            valueLink={this._createValueLink('mseedSettings.samplesInRecord')} placeholder="2" />
                                     <div className="eb-device__mseed-settings-buttons">
                                         <button type="button" className="btn btn-primary btn-sm"
-                                                disabled={this.props.readonly}
+                                                disabled={readonly}
                                                 onClick={this._applyMseedSettings}>Apply</button>
                                         <button type="button" className="btn btn-link btn-sm"
-                                                disabled={this.props.readonly}
+                                                disabled={readonly}
                                                 onClick={this._cancelMseedSettings}>Cancel</button>
                                     </div>
                                 </div>
@@ -368,7 +359,7 @@ class PosControlPanel extends React.Component {
                             <td>
                                 <span>{this.props.data.standBy ? 'On ' : 'Off '}</span>
                                 <button type="button" className="btn btn-primary btn-xs"
-                                        disabled={this.props.readonly}
+                                        disabled={readonly}
                                         onClick={this._toggleStandBy}>{this.props.data.standBy ? 'Turn off ' : 'Turn on '}</button>
                             </td>
                         </tr>
@@ -378,7 +369,7 @@ class PosControlPanel extends React.Component {
                                 <span>{moment(this.props.data.time).format('lll')} </span>
                                 <button type="button" className="btn btn-primary btn-xs"
                                         onClick={this._fixDeviceTime}
-                                        disabled={this.props.readonly}>Fix</button>
+                                        disabled={readonly}>Fix</button>
                             </td>
                         </tr>
                         <tr>
@@ -389,11 +380,11 @@ class PosControlPanel extends React.Component {
                                     <input id="newCenterRange" type="number" min="1" max="10000000"
                                            className="form-control"
                                            valueLink={this._createValueLink('range.center')}
-                                           disabled={this.props.readonly}
+                                           disabled={readonly}
                                            placeholder="Center range (pT)" />
                                     <button type="button" className="btn btn-primary btn-sm eb-device__update-range-btn"
                                             onClick={this._setRange}
-                                            disabled={this.props.readonly}>Apply</button>
+                                            disabled={readonly}>Apply</button>
                                 </div>
                             </td>
                         </tr>

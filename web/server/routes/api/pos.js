@@ -12,7 +12,7 @@ let express = require('express');
 let appConfig = require('../../config');
 let router = express.Router();
 
-router.get('/eb-device/status', function(req, res) {
+router.get('/pos/status', function(req, res) {
     request.get({
         url: appConfig.ebDeviceUrl + '/api/status',
         json: true,
@@ -27,7 +27,7 @@ router.get('/eb-device/status', function(req, res) {
     });
 });
 
-router.get('/eb-device/log', function(req, res) {
+router.get('/pos/log', function(req, res) {
     request.get({
         url: appConfig.ebDeviceUrl + '/api/log',
         json: true,
@@ -42,7 +42,7 @@ router.get('/eb-device/log', function(req, res) {
     });
 });
 
-router.get('/eb-device/data', function(req, res) {
+router.get('/pos/data', function(req, res) {
     request.get({
         url: appConfig.ebDeviceUrl + '/api/data',
         json: true,
@@ -57,7 +57,7 @@ router.get('/eb-device/data', function(req, res) {
     });
 });
 
-router.post('/eb-device/command', function (req, res) {
+router.post('/pos/command', function (req, res) {
     request.post({
         url: appConfig.ebDeviceUrl + '/api/command',
         json: true,

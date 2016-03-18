@@ -15,9 +15,8 @@ import { combineReducers } from 'redux';
 import _ from 'lodash';
 
 function config (state = {
-    initialLoadingComplete: true,
+    initialLoadingComplete: false,
     isLoading: false,
-    readonly: false,
     hasUnhandledCommands: false,
     data: {
         about: 'MagState version 3.03\nQuantum Magnetometry Laboratory\nUrals State Technical University\nCopyright 2013.',
@@ -53,13 +52,19 @@ function config (state = {
     case POS_LOAD_STATUS_REQUEST:
         return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            hasUnhandledCommandsSnapshot: state.hasUnhandledCommands
         };
     case POS_LOAD_STATUS_RESPONSE:
     case POS_LOAD_STATUS_FAILURE:
+        // TODO
         return {
             ...state,
-            isLoading: false
+            isLoading: false,
+            initialLoadingComplete: true,
+            // There was a new POS_SEND_COMMAND_REQUEST while we were waiting for the response so it's unclear whether the server has handled it or not.
+            hasUnhandledCommands: !state.hasUnhandledCommandsSnapshot && state.hasUnhandledCommands,
+            hasUnhandledCommandsSnapshot: null
         };
     case POS_SEND_COMMAND_REQUEST: {
         let data = state.data;
@@ -73,7 +78,6 @@ function config (state = {
         return {
             ...state,
             data,
-            readonly: true,
             hasUnhandledCommands: true
         };
     }
@@ -246,6 +250,7 @@ function dataPlot (state = {
             isLoading: true
         };
     case POS_LOAD_DATA_RESPONSE: {
+        // TODO
         let samples = action.response.filter(x => x.state & 0x80).map(x => ({
             ...x,
             time: Number(new Date(x.time))
