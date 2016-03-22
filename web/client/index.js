@@ -20,12 +20,6 @@ const history = syncHistoryWithStore(browserHistory, store);
 
 moment.locale('en');
 
-Promise.onPossiblyUnhandledRejection(function(error, promise) {
-    var reason = promise.reason();
-    console.error('Unhandled rejection!', reason);
-    throw error;
-});
-
 function run() {
     render(
         <Root store={store} history={history} />,

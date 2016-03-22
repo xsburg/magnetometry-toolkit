@@ -18,6 +18,9 @@ const SideBar = () => {
                 <li>
                     <Link to="/Pos" className="active"><i className="fa fa-dashboard fa-fw" /> POS-1</Link>
                 </li>
+                <li>
+                    <Link to="/Gem" className="active"><i className="fa fa-dashboard fa-fw" /> GEM Systems</Link>
+                </li>
             </ul>
         </div>
     );

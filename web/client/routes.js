@@ -10,10 +10,12 @@ import React from 'react';
 import { Route, IndexRedirect } from 'react-router';
 import App from './containers/App';
 import PosPage from './components/PosPage';
+import GemPage from './components/GemPage';
 
 export default (
     <Route path="/" component={App}>
         <IndexRedirect to="/Pos" />
         <Route path="/Pos" component={PosPage} />
+        <Route path="/Gem" component={GemPage} />
     </Route>
 );

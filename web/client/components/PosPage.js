@@ -18,7 +18,7 @@ const PosPage = () => {
         <div className="container-fluid">
             <div className="row">
                 <div className="col-lg-12">
-                    <h2 className="page-header">Dashboard</h2>
+                    <h2 className="page-header">POS-1 Dashboard</h2>
                 </div>
             </div>
             <div className="row">
