@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import Morris from 'morris';
 import { posLoadData } from '../actions';
+import LoadingPanel from '../components/LoadingPanel';
 
 class PosDataPlot extends React.Component {
     static propTypes = {
@@ -55,21 +56,20 @@ class PosDataPlot extends React.Component {
     };
 
     render () {
+        let loadingPanel = null;
+        if (this.props.isLoading) {
+            loadingPanel = <LoadingPanel />;
+        }
+
         return (
             <div className="panel panel-default">
                 <div className="panel-heading">Data Plot</div>
                 <div className="panel-body eb-device__panel-body">
-                    <div className="eb-device__loading-panel"
-                         style={this.props.isLoading ? null : {display: 'none'}}>
-                        <div className="eb-device__loading-panel__fill"></div>
-                        <div className="eb-device__loading-panel__text">
-                            <div className="fa fa-cog fa-spin fa-2x"></div>
-                        </div>
-                    </div>
+                    {loadingPanel}
                     <div style={this.props.initialLoadingComplete ? null : {display: 'none'}}>
                         <div className="alert alert-info alert-dismissible" role="alert">
                             <button type="button" className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <strong>Note:</strong> Real time data is available via SeedLink protocol
+                            <strong>Note:</strong> Real time data is available via SeedLink protocol{' '}
                             <a href="#" className="alert-link">here</a>
                         </div>
                         <h4><small>

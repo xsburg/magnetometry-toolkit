@@ -1,8 +1,9 @@
 /**
  * Developer: Stepan Burguchev
- * Date: 10/25/2015
- * Copyright: 2009-2015 Stepan Burguchev®
+ * Date: 3/10/2016
+ * Copyright: 2009-2016 Stepan Burguchev®
  *       All Rights Reserved
+ * Published under the MIT license
  */
 
 export default {

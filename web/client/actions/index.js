@@ -40,11 +40,11 @@ function ajaxApi ({ types, url, method = 'GET', data }) {
 
         promise.
             then(response => response.json()).
-            then(response => {debugger;return dispatch({
+            then(response => dispatch({
                 type: responseType,
                 request: data,
                 response
-            });}).
+            })).
             catch(error => dispatch({
                 type: failureType,
                 request: data,
@@ -97,10 +97,10 @@ export function posSendCommand (data) {
     });
 }
 
-export const POS_UPDATE_CONFIG_DATA = 'POS_UPDATE_CONFIG_DATA';
-export function posUpdateConfigData (patch) {
+export const POS_UPDATE_FORM_DATA = 'POS_UPDATE_FORM_DATA';
+export function posUpdateFormData (patch) {
     return {
-        type: POS_UPDATE_CONFIG_DATA,
+        type: POS_UPDATE_FORM_DATA,
         patch: patch
     };
 }

@@ -9,13 +9,22 @@
 import 'babel-polyfill';
 import React from 'react';
 import { render } from 'react-dom';
-import ReactRouter, { browserHistory } from 'react-router';
+import { browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import Root from './containers/Root';
 import configureStore from './store/configureStore';
+import moment from 'moment';
 
 const store = configureStore();
 const history = syncHistoryWithStore(browserHistory, store);
+
+moment.locale('en');
+
+Promise.onPossiblyUnhandledRejection(function(error, promise) {
+    var reason = promise.reason();
+    console.error('Unhandled rejection!', reason);
+    throw error;
+});
 
 function run() {
     render(

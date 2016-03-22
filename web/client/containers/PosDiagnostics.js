@@ -11,21 +11,40 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { posLoadLog } from '../actions';
+import LoadingPanel from '../components/LoadingPanel';
+
+const statusUpdateInterval = 1500;
 
 class PosDiagnostics extends React.Component {
     static propTypes = {
         initialLoadingComplete: React.PropTypes.bool.isRequired,
         isLoading: React.PropTypes.bool.isRequired,
-        logEntries: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+        logEntries: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+        posLoadLog: React.PropTypes.func.isRequired
     };
 
     componentDidMount () {
         this._scrollToBottom();
+        this.props.posLoadLog();
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.logEntries !== this.props.logEntries) {
             this._scrollToBottom();
+        }
+        if (!this.props.isLoading && prevProps.isLoading) {
+            // Previous loading is complete and we can schedule a new one
+            this.updateTimer = setTimeout(() => {
+                this.props.posLoadLog();
+                this.updateTimer = null;
+            }, statusUpdateInterval);
+        }
+    }
+
+    componentWillUnmount () {
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
         }
     }
 
@@ -34,6 +53,11 @@ class PosDiagnostics extends React.Component {
     }
 
     render () {
+        let loadingPanel = null;
+        if (!this.props.initialLoadingComplete) {
+            loadingPanel = <LoadingPanel />;
+        }
+
         let dataUpdatingLoaderClass = this.props.isLoading ? 'eb-device__data-update-spinner_visible' : '';
 
         let logEntries = this.props.logEntries.map(entry => <div key={entry.id}>
@@ -45,13 +69,7 @@ class PosDiagnostics extends React.Component {
             <div className="panel panel-default">
                 <div className="panel-heading">POS-1 Diagnostic Log</div>
                 <div className="panel-body eb-device__panel-body">
-                    <div className="eb-device__loading-panel"
-                         style={this.props.initialLoadingComplete ? {display: 'none'} : null}>
-                        <div className="eb-device__loading-panel__fill"></div>
-                        <div className="eb-device__loading-panel__text">
-                            <div className="fa fa-cog fa-spin fa-2x"></div>
-                        </div>
-                    </div>
+                    {loadingPanel}
                     <h4><small>
                         <span>The service log is updated in real time </span>
                         <span className={`fa fa-circle-o-notch fa-spin eb-device__data-update-spinner ${dataUpdatingLoaderClass}`} />
@@ -69,4 +87,6 @@ function mapStateToProps(state) {
     return state.pos.diagnostics;
 }
 
-export default connect(mapStateToProps)(PosDiagnostics);
+export default connect(mapStateToProps, {
+    posLoadLog
+})(PosDiagnostics);
